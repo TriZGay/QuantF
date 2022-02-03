@@ -9,6 +9,10 @@
       "element-plus/global"
     ]
   },
+  "include": [
+    "src/**/*.js",
+    "src/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,10 +1,15 @@
 <template>
-  <div>halo this is home</div>
+  <el-header>
+    Header
+  </el-header>
 </template>
 
 <script lang="ts">
 export default {
-  name: "Home"
+  name: "LayoutHeader",
+  setup() {
+
+  }
 }
 </script>
 
