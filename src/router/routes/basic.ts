@@ -3,7 +3,7 @@ import {
     EXCEPTION_COMPONENT,
     PAGE_NOT_FOUND_NAME,
     LAYOUT
-} from "./constant";
+} from "../constant";
 import type{RouteRecordRaw} from "vue-router";
 
 export const PAGE_NOT_FOUNT_ROUTE: RouteRecordRaw = {
@@ -33,7 +33,7 @@ export const REDIRECT_ROUTE: RouteRecordRaw = {
     children: [{
         path: '/redirect/:path(.*)*',
         name: REDIRECT_NAME,
-        component: () => import('../pages/sys/redirect/index.vue'),
+        component: () => import('../../pages/sys/redirect/index.vue'),
         meta: {
             title: REDIRECT_NAME
         }
@@ -51,7 +51,7 @@ export const ERROR_LOG_ROUTE: RouteRecordRaw = {
     children: [{
         path: 'list',
         name: 'ErrorLogList',
-        component: () => import('../pages/sys/error-log/index.vue'),
+        component: () => import('../../pages/sys/error-log/index.vue'),
         meta: {
             title: 'ErrorLogList'
         }
