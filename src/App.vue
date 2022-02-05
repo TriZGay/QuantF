@@ -1,16 +1,20 @@
 <template>
-  <el-config-provider :locale="locale">
+  <AConfigprovider :locale="locale">
     <RouterView/>
-  </el-config-provider>
+  </AConfigprovider>
 </template>
 
 <script lang="ts">
-import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+
+dayjs.locale('zh-cn')
 
 export default {
   setup() {
     return {
-      locale: zhCn
+      locale: zhCN
     }
   }
 }
