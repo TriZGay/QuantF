@@ -4,16 +4,16 @@
     "target": "esnext",
     "strict": true,
     "jsx": "preserve",
-    "moduleResolution": "node",
-    "types": [
-      "element-plus/global"
-    ]
+    "moduleResolution": "node"
   },
   "include": [
     "src/**/*.js",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "types/**/*.ts",
+    "types/**/*.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

@@ -1,7 +1,7 @@
 <template>
-  <AConfigprovider :locale="locale">
+  <a-config-provider :locale="locale">
     <RouterView/>
-  </AConfigprovider>
+  </a-config-provider>
 </template>
 
 <script lang="ts">
