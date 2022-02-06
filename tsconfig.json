@@ -4,7 +4,10 @@
     "target": "esnext",
     "strict": true,
     "jsx": "preserve",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": [
+      "vite/client"
+    ]
   },
   "include": [
     "src/**/*.js",
