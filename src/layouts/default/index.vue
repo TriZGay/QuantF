@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import LayoutHeader from './header/index.vue'
-import LayoutSider from './sider/index.vue'
+import LayoutHeader from './header'
+import LayoutSider from './sider'
 
 export default {
   name: "DefaultLayout",

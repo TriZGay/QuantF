@@ -2,9 +2,9 @@
 
 </template>
 
-<script>
+<script lang="ts">
 export default {
-name: "index"
+  name: "index"
 }
 </script>
 

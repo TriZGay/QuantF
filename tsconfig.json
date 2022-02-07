@@ -7,7 +7,9 @@
     "moduleResolution": "node",
     "types": [
       "vite/client"
-    ]
+    ],
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*.js",
