@@ -17,3 +17,11 @@ export function isDef<T = unknown>(val?: T): val is T {
 export function isNullOrUnDef(val: unknown): val is null | undefined {
     return isUnDef(val) || isNull(val);
 }
+
+export function isString(val: unknown): val is string {
+    return is(val, 'String');
+}
+
+export function is(val: unknown, type: string) {
+    return toString.call(val) === `[object ${type}]`;
+}
