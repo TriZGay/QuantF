@@ -1,25 +1,14 @@
 {
-  "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "moduleResolution": "node",
-    "types": [
-      "vite/client"
-    ],
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
-  },
-  "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "types/**/*.ts",
-    "types/**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.config.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.vitest.json"
+    }
   ]
 }

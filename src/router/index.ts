@@ -1,30 +1,68 @@
-import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
-import {basicRoutes} from "./routes";
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
-const WHITE_LIST: string[] = [];
-const getRoutesNames = (array: any[]) => {
-    array.forEach((item) => {
-        WHITE_LIST.push(item.name);
-        getRoutesNames(item.children || []);
-    })
+declare module 'vue-router' {
+  interface RouteMeta {
+    title?: string,
+    icon?: string,
+    hidden?: boolean
+  }
 }
 
-getRoutesNames(basicRoutes);
+const routes: RouteRecordRaw[] = [
+  {
+    path: "/",
+    redirect: "/home",
+    component: () => import("@/layouts/Layout.vue"),
+    children: [{
+      path: "home",
+      name: "Home",
+      meta: {
+        title: "首页",
+      },
+      component: () => import("@/views/home/Home.vue")
+    }]
+  },
+  {
+    path: "/market",
+    name: "MartetPage",
+    meta: {
+      title: "市场",
+      showSideBar: true,
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: [{
+      path: "list",
+      name: "StockList",
+      meta: {
+        title: "股票列表"
+      },
+      component: () => import("@/views/stock/StockList.vue")
+    }]
+  },
+  {
+    path: "/operation",
+    name: "OperationPage",
+    meta: {
+      title: "操作中心"
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: []
+  },
+  {
+    path: "/trade",
+    name: "TradePage",
+    meta: {
+      title: "交易"
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: []
+  }
 
-export const router = createRouter({
-    history: createWebHistory(),
-    routes: basicRoutes as unknown as RouteRecordRaw[],
-    strict: true,
-    scrollBehavior: () => ({left: 0, top: 0})
+]
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: routes
 })
 
-console.log(router.getRoutes())
-
-export function resetRouter() {
-    router.getRoutes().forEach((route) => {
-        const {name} = route;
-        if (name && !WHITE_LIST.includes(name as string)) {
-            router.hasRoute(name) && router.removeRoute(name);
-        }
-    })
-}
+export { router, routes }
