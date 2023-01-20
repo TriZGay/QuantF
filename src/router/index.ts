@@ -1,10 +1,14 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from "vue-router";
 
-declare module 'vue-router' {
+declare module "vue-router" {
   interface RouteMeta {
-    title?: string,
-    icon?: string,
-    hidden?: boolean
+    title?: string;
+    icon?: string;
+    hidden?: boolean;
   }
 }
 
@@ -13,14 +17,16 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     redirect: "/home",
     component: () => import("@/layouts/Layout.vue"),
-    children: [{
-      path: "home",
-      name: "Home",
-      meta: {
-        title: "首页",
+    children: [
+      {
+        path: "home",
+        name: "Home",
+        meta: {
+          title: "首页",
+        },
+        component: () => import("@/views/home/Home.vue"),
       },
-      component: () => import("@/views/home/Home.vue")
-    }]
+    ],
   },
   {
     path: "/market",
@@ -30,39 +36,40 @@ const routes: RouteRecordRaw[] = [
       showSideBar: true,
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: [{
-      path: "list",
-      name: "StockList",
-      meta: {
-        title: "股票列表"
+    children: [
+      {
+        path: "list",
+        name: "StockList",
+        meta: {
+          title: "股票列表",
+        },
+        component: () => import("@/views/stock/StockList.vue"),
       },
-      component: () => import("@/views/stock/StockList.vue")
-    }]
+    ],
   },
   {
     path: "/operation",
     name: "OperationPage",
     meta: {
-      title: "操作中心"
+      title: "操作中心",
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: []
+    children: [],
   },
   {
     path: "/trade",
     name: "TradePage",
     meta: {
-      title: "交易"
+      title: "交易",
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: []
-  }
-
-]
+    children: [],
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes
-})
+  routes: routes,
+});
 
-export { router, routes }
+export { router, routes };

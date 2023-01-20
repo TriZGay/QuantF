@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import useResize from './mixins/ResizeHandler';
-useResize()
+import useResize from "./mixins/ResizeHandler";
+useResize();
 </script>
-<template>
-
-</template>
-<style scoped>
-
-</style>
+<template></template>
+<style scoped></style>
