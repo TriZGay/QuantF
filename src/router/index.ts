@@ -9,6 +9,8 @@ declare module "vue-router" {
     title?: string;
     icon?: string;
     hidden?: boolean;
+    noCache?: boolean;
+    affix?: boolean;
   }
 }
 
