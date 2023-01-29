@@ -1,9 +1,15 @@
 <script lang="ts">
 import { h } from 'vue'
 
-const MenuItem = (props, context) => {
-    console.log(props, context)
-    return h(`${props.icon} , ${props.title}`, context.attrs, context.slots)
+const MenuItem = (props: any, context: any) => {
+    const vnodes = []
+    if (props.icon) {
+        vnodes.push(h('div', { style: { backgroudColor: "red" } }))
+    }
+    if (props.title) {
+        vnodes.push(h("span", props.title))
+    }
+    return vnodes
 }
 
 MenuItem.props = ['icon', 'title']

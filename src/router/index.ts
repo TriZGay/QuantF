@@ -11,6 +11,7 @@ declare module "vue-router" {
     hidden?: boolean;
     noCache?: boolean;
     affix?: boolean;
+    alwaysShow?: boolean
   }
 }
 
