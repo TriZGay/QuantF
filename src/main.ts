@@ -6,6 +6,8 @@ import { router } from "@/router";
 
 import "ant-design-vue/dist/antd.css";
 
+import '@/styles/index.less'
+
 const app = createApp(App);
 
 app.use(createPinia());
