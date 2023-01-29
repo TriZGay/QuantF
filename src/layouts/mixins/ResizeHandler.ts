@@ -30,7 +30,7 @@ export default function useResize() {
     const { toggleDevice, closeSideBar } = useAppStore();
     if (is_mobile) {
       toggleDevice("mobile");
-      closeSideBar(true);
+      closeSideBar(false);
     }
   });
 
@@ -40,12 +40,11 @@ export default function useResize() {
   }
   function resizeHandler() {
     const { toggleDevice, closeSideBar } = useAppStore();
-    console.log("dddd");
     if (!document.hidden) {
       const is_Mobile = isMobile();
       toggleDevice(is_Mobile ? "mobile" : "desktop");
       if (is_Mobile) {
-        closeSideBar(true);
+        closeSideBar(false);
       }
     }
   }

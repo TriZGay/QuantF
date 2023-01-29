@@ -2,24 +2,33 @@
 import Logo from './Logo.vue';
 import SidebarItem from './SidebarItem.vue';
 import { routes } from '@/router';
-import { computed } from 'vue';
 import { useAppStore } from '@/stores/app';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
+const { sidebar, toggleSideBar } = useAppStore();
 
-const { meta, path } = useRoute();
-const { sidebar } = useAppStore();
-const isCollapse = computed<boolean>(() => sidebar.opened);
+const router = useRouter()
 
+function toSelectMenu(menu: any) {
+    router.push({
+        path: menu.key
+    })
+}
+
+function toCollapseSideBar(collapsed: boolean, type: string) {
+    toggleSideBar(collapsed)
+}
 
 </script>
 <template>
-    <div class="has-logo">
-        <Logo :collapse="isCollapse" />
-        <a-menu mode="inline">
-            <SidebarItem v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
+    <a-layout-sider @collapse="toCollapseSideBar" v-model:collapsed="sidebar.collapsed" collapsible>
+        <Logo :collapse="sidebar.collapsed" />
+        <a-menu mode="inline" theme="dark" @click="toSelectMenu">
+            <template v-for="route in routes" :key="route.path">
+                <SidebarItem :menu-info="route" />
+            </template>
         </a-menu>
-    </div>
+    </a-layout-sider>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 
 </style>

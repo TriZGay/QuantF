@@ -11,42 +11,56 @@ declare module "vue-router" {
     hidden?: boolean;
     noCache?: boolean;
     affix?: boolean;
-    alwaysShow?: boolean
+    alwaysShow?: boolean;
   }
 }
 
 const routes: RouteRecordRaw[] = [
   {
+    path: "/login",
+    name: "LoginPage",
+    component: () => import("@/views/login/Login.vue"),
+    meta: {
+      hidden: true
+    }
+  },
+  {
     path: "/",
     redirect: "/home",
     component: () => import("@/layouts/Layout.vue"),
-    children: [
-      {
-        path: "home",
-        name: "Home",
-        meta: {
-          title: "首页",
-        },
-        component: () => import("@/views/home/Home.vue"),
-      },
-    ],
+    meta: {
+      title: "首页",
+    },
+    children: [{
+      path: "/home",
+      name: "Home",
+      component: () => import("@/views/home/Home.vue"),
+    }],
   },
   {
     path: "/market",
     name: "MartetPage",
+    redirect: "/market/stockList",
     meta: {
       title: "市场",
-      showSideBar: true,
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
       {
-        path: "list",
+        path: "/market/stockList",
         name: "StockList",
         meta: {
           title: "股票列表",
         },
-        component: () => import("@/views/stock/StockList.vue"),
+        component: () => import("@/views/market/StockList.vue"),
+      },
+      {
+        path: "/market/futuresList",
+        name: "FuturesList",
+        meta: {
+          title: "期货列表",
+        },
+        component: () => import("@/views/market/FuturesList.vue"),
       },
     ],
   },
@@ -57,7 +71,6 @@ const routes: RouteRecordRaw[] = [
       title: "操作中心",
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: [],
   },
   {
     path: "/trade",
@@ -66,7 +79,6 @@ const routes: RouteRecordRaw[] = [
       title: "交易",
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: [],
   },
 ];
 

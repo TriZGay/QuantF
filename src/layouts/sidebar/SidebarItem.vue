@@ -1,68 +1,32 @@
 <script setup lang="ts">
-import path from 'path-browserify'
-import { isExternal } from '@/utils/validate';
-import MenuItem from './MenuItem.vue';
-import AppLink from './Link.vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 const props = defineProps<{
-    item: RouteRecordRaw,
-    isNest?: boolean,
-    basePath: string
+    menuInfo: RouteRecordRaw,
 }>()
-
-let onlyOneChild: any = null
-
-function hasOneShowingChild(children: RouteRecordRaw[] | undefined, parent: RouteRecordRaw) {
-    //@ts-ignore
-    const showingChildren = children.filter(item => {
-        if (item.children) {
-            return false
-        } else {
-            onlyOneChild = item
-            return true
-        }
-    })
-    if (showingChildren.length === 1) {
-        return true
-    }
-    if (showingChildren.length === 0) {
-        onlyOneChild = { ...parent, path: '', noShowingChildren: true }
-        return true
-    }
-    return false
-}
-
-function resolvePath(routePath: string) {
-    if (isExternal(routePath)) {
-        return routePath
-    }
-    if (isExternal(props.basePath)) {
-        return props.basePath
-    }
-    return path.resolve(props.basePath, routePath)
-}
-
 
 </script>
 <template>
-    <div v-if="!item.meta?.hidden">
-        <template v-if="hasOneShowingChild(item.children, item) &&
-        (!onlyOneChild.children || onlyOneChild.noShowingChildren) &&
-        !item.meta?.alwaysShow">
-            <AppLink v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
-                <a-menu-item :index="resolvePath(onlyOneChild.path)" :class="{ 'submenu-title-noDropdown': !isNest }">
-                    <MenuItem :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)"
-                        :title="onlyOneChild.meta.title">
-                    </MenuItem>
-                </a-menu-item>
-            </AppLink>
+    <div v-if="!menuInfo.meta?.hidden">
+        <template v-if="menuInfo.children?.length === 1">
+            <a-menu-item :key="menuInfo.children[0].path">
+                {{ menuInfo.children[0].meta?.title || menuInfo.meta?.title }}
+            </a-menu-item>
         </template>
-        <a-sub-menu v-else ref="subMenu" :index="resolvePath(item.path)">
-            <SidebarItem v-for="child in item.children" :key="child.path" :is-nest="true" :item="child"
-                :base-path="resolvePath(child.path)" class="nest-menu">
-
-            </SidebarItem>
-        </a-sub-menu>
+        <template v-else>
+            <a-sub-menu>
+                <template #title>{{ menuInfo.meta?.title }}</template>
+                <template v-for="child in menuInfo.children" :key="child.key">
+                    <template v-if="!child.children">
+                        <a-menu-item :key="child.path">
+                            {{ child.meta?.title }}
+                        </a-menu-item>
+                    </template>
+                    <template v-else>
+                        <SidebarItem :menu-info="child" key="child.path" />
+                    </template>
+                </template>
+            </a-sub-menu>
+        </template>
     </div>
 </template>
