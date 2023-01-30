@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useTagsView } from '@/stores/tagsView';
-import { computed } from 'vue';
+import { computed, Transition } from 'vue';
 import { useRoute, RouterView } from 'vue-router';
 import Navbar from './Navbar.vue';
+import TagView from './tagView/TagView.vue';
 
 const route = useRoute();
 const key = computed<string>(() => route.path)
@@ -14,14 +15,18 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews)
 
 <template>
     <a-layout>
-        <a-layout-header style="background: #fff;" />
+        <a-layout-header style="background: #fff;">
+            <TagView />
+        </a-layout-header>
         <a-layout-content style="margin: 0 16px">
             <Navbar />
             <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
                 <RouterView :key="key" v-slot="{ Component }">
-                    <KeepAlive>
-                        <component :is="Component" />
-                    </KeepAlive>
+                    <Transition name="fade" mode="out-in" :appear="true">
+                        <KeepAlive :include="cachedViews">
+                            <component :is="Component" />
+                        </KeepAlive>
+                    </Transition>
                 </RouterView>
             </div>
         </a-layout-content>
@@ -32,5 +37,13 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews)
 </template>
 
 <style lang="less" scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
 
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
 </style>
