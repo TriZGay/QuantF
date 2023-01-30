@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, watch, TransitionGroup } from 'vue';
+import { ref, watch } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import * as pathToRegexp from 'path-to-regexp'
 
 const levelList = ref<RouteRecordRaw[]>([])
 const route = useRoute()
+const router = useRouter()
 
 watch(
     () => route.path,
@@ -37,18 +39,33 @@ function isHomepage(route: RouteRecordRaw) {
 
 }
 
+function pathCompile(path: string) {
+    const { params } = route
+    let toPath = pathToRegexp.compile(path)
+    return toPath(params)
+}
+
+function handleLink(item: RouteRecordRaw) {
+    const { redirect, path } = item
+    if (redirect) {
+        //@ts-ignore
+        router.push(redirect)
+        return
+    }
+    router.push(pathCompile(path))
+}
+
 getBreadcrumb()
 
 </script>
 <template>
     <a-breadcrumb style="margin: 16px 0" separator="/" class="app-breadcrumb">
-        <TransitionGroup name="breadcrumb">
-            <a-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
-                <span v-if="item.redirect === 'noRedirect' || index === levelList?.length - 1">{{
-                    item.meta?.title
-                }}</span>
-            </a-breadcrumb-item>
-        </TransitionGroup>
+        <a-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
+            <span v-if="item.redirect === 'noRedirect' || index === levelList?.length - 1" class="no-redirect">{{
+                item.meta?.title
+            }}</span>
+            <a v-else @click.prevent="handleLink(item)">{{ item.meta?.title }} </a>
+        </a-breadcrumb-item>
     </a-breadcrumb>
 </template>
 <style lang="less" scoped>
