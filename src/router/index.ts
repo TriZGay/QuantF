@@ -30,6 +30,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     meta: {
       title: "首页",
+      icon:"home-filled"
     },
     children: [{
       path: "/home",
@@ -43,6 +44,7 @@ const routes: RouteRecordRaw[] = [
     redirect: "/market/stockList",
     meta: {
       title: "市场",
+      icon:"account-book-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
@@ -51,6 +53,7 @@ const routes: RouteRecordRaw[] = [
         name: "StockList",
         meta: {
           title: "股票列表",
+          icon:"container-filled"
         },
         component: () => import("@/views/market/StockList.vue"),
       },
@@ -59,6 +62,7 @@ const routes: RouteRecordRaw[] = [
         name: "FuturesList",
         meta: {
           title: "期货列表",
+          icon:"bank-filled"
         },
         component: () => import("@/views/market/FuturesList.vue"),
       },
@@ -69,6 +73,7 @@ const routes: RouteRecordRaw[] = [
     name: "OperationPage",
     meta: {
       title: "操作中心",
+      icon:"bank-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
   },
@@ -77,6 +82,7 @@ const routes: RouteRecordRaw[] = [
     name: "TradePage",
     meta: {
       title: "交易",
+      icon:"bank-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
   },

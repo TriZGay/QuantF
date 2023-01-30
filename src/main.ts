@@ -13,6 +13,7 @@ for (const i in Icons) {
     //@ts-ignore
     app.component(i, Icons[i])
 }
+app.config.globalProperties.$antIcons = Icons
 
 app.use(createPinia());
 app.use(router);
