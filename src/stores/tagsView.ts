@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from 'vue';
-import type { RouteRecordName, RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
 
 export const useTagsView = defineStore("tagsView", () => {
     const visitedViews = ref<RouteRecordRaw[]>([])

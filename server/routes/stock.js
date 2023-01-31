@@ -2,7 +2,7 @@ const Stock = require("../type/stock")
 
 const router = require("koa-router")()
 
-router.prefix("/stock")
+router.prefix("/stocks")
 
 router.get("/", (ctx, next) => {
     let stcoks = [new Stock("test")]
