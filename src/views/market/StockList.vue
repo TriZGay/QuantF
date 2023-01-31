@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import type { Stock } from '@/api/stock';
 import { useStockStore } from '@/stores/stock';
-import { computed } from 'vue';
+import { ref } from 'vue';
 
-const stockStore = useStockStore()
-const stocks = computed<Stock[]>(() => stockStore.stocks)
-
-stockStore.getStocks()
+const { data } = useStockStore();
+const stocksColumns = ref([])
 
 </script>
 <template>
-    <div>{{ stocks }}</div>
+    <div class="stock-list-container">
+        {{ data }}
+        <!-- <a-table :columns="stocksColumns" :data-source="stocks">
 
+        </a-table> -->
+    </div>
 </template>
 
-<style scoped>
+<style lang="less" scoped>
 
 </style>

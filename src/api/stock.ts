@@ -4,9 +4,17 @@ export interface Stock {
     name: string
 }
 
-export function fetchStocks() {
-    return request({
-        url: "/stocks",
-        method: "get"
-    })
+export interface StockResult {
+    data: Stock[],
+    total: number
+}
+
+export interface StockParams {
+    name?: string,
+    limit?: number,
+    page?: number
+}
+
+export function fetchStocks(params: StockParams) {
+    return request.post<StockResult>("/stocks", params)
 }

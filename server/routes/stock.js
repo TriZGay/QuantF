@@ -4,7 +4,7 @@ const router = require("koa-router")()
 
 router.prefix("/stocks")
 
-router.get("/", (ctx, next) => {
+router.post("/", (ctx, next) => {
     let stcoks = [new Stock("test")]
     ctx.body = {
         code: 10000,

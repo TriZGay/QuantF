@@ -1,26 +1,42 @@
-import { fetchStocks, type Stock } from "@/api/stock";
+import { fetchStocks } from "@/api/stock";
 import { defineStore } from "pinia";
-import { ref } from "vue";
-import { message } from 'ant-design-vue'
+import { computed } from "vue";
+import { usePagination } from 'vue-request'
 
 export const useStockStore = defineStore("stock", () => {
-    const stocks = ref<Stock[]>([])
 
-    function getStocks() {
-        fetchStocks().then(res => {
-            console.log(res.data)
-            stocks.value = res.data
-            message.success({
-                //@ts-ignore
-                content: res.message
-            })
-        }).catch(err => {
-            console.log(err)
-        })
-    }
+    const {
+        data,
+        run: queryStocks,
+        loading,
+        pageSize,
+        totalPage,
+        current
+    } = usePagination(fetchStocks, {
+        defaultParams: [
+            {
+                limit: 5,
+                page: 1
+            }
+        ],
+        pagination: {
+            currentKey: "page",
+            pageSizeKey: "limit",
+        }
+    })
 
+    console.log(data)
+    console.log(data.value)
+    // console.log(loading)
+    // console.log(pageSize)
+    // console.log(totalPage)
+    // console.log(current)
     return {
-        stocks,
-        getStocks
+        data,
+        queryStocks,
+        loading,
+        pageSize,
+        totalPage,
+        current
     }
 })
