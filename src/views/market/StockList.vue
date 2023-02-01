@@ -1,17 +1,30 @@
 <script setup lang="ts">
 import { useStockStore } from '@/stores/stock';
-import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { computed, ref } from 'vue';
 
-const { data } = useStockStore();
-const stocksColumns = ref([])
-
+const stockStore = useStockStore()
+const { list, loading, pageSize, totalPage, current } = storeToRefs(stockStore);
+const stocksColumns = ref([
+    {
+        title: "名称",
+        dataIndex: "name",
+        window: "20%"
+    }
+])
+const pagination = computed<Object>(() => {
+    return {
+        total: totalPage.value,
+        current: current.value,
+        pageSize: pageSize.value
+    }
+})
 </script>
 <template>
     <div class="stock-list-container">
-        {{ data }}
-        <!-- <a-table :columns="stocksColumns" :data-source="stocks">
+        <a-table :columns="stocksColumns" :data-source="list" :loading="loading" :pagination="pagination">
 
-        </a-table> -->
+        </a-table>
     </div>
 </template>
 

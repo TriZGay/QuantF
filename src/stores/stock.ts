@@ -25,14 +25,10 @@ export const useStockStore = defineStore("stock", () => {
         }
     })
 
-    console.log(data)
-    console.log(data.value)
-    // console.log(loading)
-    // console.log(pageSize)
-    // console.log(totalPage)
-    // console.log(current)
+    const list = computed(() => data.value?.data || [])
+
     return {
-        data,
+        list,
         queryStocks,
         loading,
         pageSize,
