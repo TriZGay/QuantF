@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     meta: {
       title: "首页",
-      icon:"home-filled"
+      icon: "home-filled"
     },
     children: [{
       path: "/home",
@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
     redirect: "/market/stockList",
     meta: {
       title: "市场",
-      icon:"account-book-filled"
+      icon: "account-book-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
@@ -53,7 +53,7 @@ const routes: RouteRecordRaw[] = [
         name: "StockList",
         meta: {
           title: "股票列表",
-          icon:"container-filled"
+          icon: "container-filled"
         },
         component: () => import("@/views/market/StockList.vue"),
       },
@@ -62,7 +62,7 @@ const routes: RouteRecordRaw[] = [
         name: "FuturesList",
         meta: {
           title: "期货列表",
-          icon:"bank-filled"
+          icon: "bank-filled"
         },
         component: () => import("@/views/market/FuturesList.vue"),
       },
@@ -73,18 +73,39 @@ const routes: RouteRecordRaw[] = [
     name: "OperationPage",
     meta: {
       title: "操作中心",
-      icon:"bank-filled"
+      icon: "bank-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
   },
   {
     path: "/trade",
     name: "TradePage",
+    redirect: "/trade/rtk",
     meta: {
       title: "交易",
-      icon:"bank-filled"
+      icon: "bank-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
+    children: [
+      {
+        path: "/trade/rtk",
+        name: "RealTimeK",
+        meta: {
+          title: "实时K线图",
+          icon: "bank-filled"
+        },
+        component: () => import("@/views/trade/RealTimeKLine.vue")
+      },
+      {
+        path: "/trade/sub",
+        name: "SubscribePage",
+        meta: {
+          title: "富途订阅",
+          icon: "bank-filled"
+        },
+        component: () => import("@/views/trade/SubscribePage.vue")
+      }
+    ]
   },
 ];
 
