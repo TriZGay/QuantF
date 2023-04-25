@@ -18,8 +18,9 @@
     "buffer": "^6.0.3",
     "path-browserify": "^1.0.1",
     "pinia": "^2.0.28",
-    "rsocket-core": "^1.0.0-alpha.3",
-    "rsocket-websocket-client": "^1.0.0-alpha.3",
+    "rsocket-core": "^0.0.27",
+    "rsocket-flowable": "^0.0.27",
+    "rsocket-websocket-client": "^0.0.27",
     "vue": "^3.2.45",
     "vue-request": "^2.0.0-rc.4",
     "vue-router": "^4.1.6"

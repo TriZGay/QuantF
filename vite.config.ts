@@ -12,7 +12,12 @@ export default defineConfig({
         target: "http://localhost:3000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      }
+      },
+      // '/rsocket': {
+      //   target: "http://localhost:9000",
+      //   changeOrigin: true,
+      //   ws: true
+      // }
     }
   },
   resolve: {
