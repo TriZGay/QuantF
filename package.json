@@ -16,14 +16,16 @@
   "dependencies": {
     "ant-design-vue": "^3.2.15",
     "buffer": "^6.0.3",
+    "isomorphic-ws": "^5.0.0",
     "path-browserify": "^1.0.1",
     "pinia": "^2.0.28",
-    "rsocket-core": "^0.0.27",
-    "rsocket-flowable": "^0.0.27",
-    "rsocket-websocket-client": "^0.0.27",
+    "rsocket-core": "^1.0.0-alpha.3",
+    "rsocket-websocket-client": "^1.0.0-alpha.3",
+    "rsocket-websocket-server": "^1.0.0-alpha.3",
     "vue": "^3.2.45",
     "vue-request": "^2.0.0-rc.4",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@ant-design/icons-vue": "^6.1.0",
