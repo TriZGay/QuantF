@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { syncStocks, syncPlates } from '@/api/stock'
+import { message } from 'ant-design-vue';
+
+function syncStock(event: any) {
+    syncStocks()
+        .then(response => {
+            message.success(response.data)
+        })
+        .catch(err => {
+            message.error("程序未知错误" + err)
+        })
+}
+
+function syncPlate(event: any) {
+    syncPlates()
+        .then(res => {
+            message.success(res.data)
+        }).catch(err => {
+            message.error("程序未知错误" + err)
+        })
+}
+</script>
+<template>
+    <div>
+        <span>数据同步</span>
+        <a-button type="primary" @click="syncStock">全量同步基础股票数据</a-button>
+        <a-button type="primary" @click="syncPlate">全量同步基础板块数据</a-button>
+    </div>
+</template>
+<style lang="less" scoped></style>

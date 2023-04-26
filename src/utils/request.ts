@@ -19,17 +19,16 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
     response => {
-        const res = response.data
-        if (res.code !== 10000) {
-            message.error({
-                content: res.message,
-            })
+        if (response.status === 200) {
+            message.success("请求成功")
+        } else {
+            message.error("请求失败.code=" + response.status)
         }
-        return res
+        return response
     },
     error => {
         message.error({
-            content: error.message,
+            content: "请求发起失败",
         })
         return Promise.reject(error)
     }

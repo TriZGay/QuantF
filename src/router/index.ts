@@ -76,6 +76,17 @@ const routes: RouteRecordRaw[] = [
       icon: "bank-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
+    children: [
+      {
+        path: "/operation/sync",
+        name: "SyncCenter",
+        meta: {
+          title: "数据同步",
+          icon: "bank-filled"
+        },
+        component: () => import("@/views/operation/SyncCenter.vue")
+      }
+    ]
   },
   {
     path: "/trade",
