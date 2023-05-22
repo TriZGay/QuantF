@@ -7,32 +7,28 @@ export const useStockStore = defineStore("stock", () => {
 
     const {
         data,
-        run: queryStocks,
+        run,
         loading,
         pageSize,
-        totalPage,
+        total,
         current
     } = usePagination(fetchStocks, {
-        defaultParams: [
-            {
-                limit: 5,
-                page: 1
-            }
-        ],
         pagination: {
-            currentKey: "page",
-            pageSizeKey: "limit",
+            currentKey: "current",
+            pageSizeKey: "size",
+            totalKey: "data.total",
         }
     })
-
-    const list = computed(() => data.value?.data || [])
+    const list = computed(() => {
+        return data.value?.data.records || []
+    })
 
     return {
         list,
-        queryStocks,
+        run,
         loading,
         pageSize,
-        totalPage,
+        total,
         current
     }
 })

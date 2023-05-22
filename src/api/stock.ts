@@ -9,14 +9,14 @@ export interface StockResult {
     total: number
 }
 
-export interface StockParams {
-    name?: string,
-    limit?: number,
-    page?: number
+export interface StockQueryRequest {
+    market?: number,
+    size?: number,
+    current?: number
 }
 
-export function fetchStocks(params: StockParams) {
-    return request.post<StockResult>("/stocks", params)
+export function fetchStocks(data: StockQueryRequest) {
+    return request.post<StockResult>("/base/stocks", data)
 }
 
 export function syncStocks() {
