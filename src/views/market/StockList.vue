@@ -83,6 +83,21 @@ const formState = reactive({
         type: "select",
         kv: FT_MARKET,
         bindValue: Object.keys(FT_MARKET)[1]
+    },
+    exchangeType: {
+        name: "交易所",
+        type: "select",
+        kv: FT_EXCHANGE_TYPE,
+        bindValue: Object.keys(FT_EXCHANGE_TYPE)[1]
+    },
+    delisting: {
+        name: "是否退市",
+        type: "select",
+        kv: {
+            1: "是",
+            0: "否"
+        },
+        bindValue: '0'
     }
 });
 function onFinish(values: any) {
