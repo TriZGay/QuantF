@@ -8,6 +8,7 @@ dayjs.extend(arraySupport);
 import { FT_MARKET, FT_EXCHANGE_TYPE } from '@/api/code'
 import type { FormInstance } from 'ant-design-vue';
 import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
+import { fetPlateByStockId } from '@/api/stock';
 
 const stockStore = useStockStore()
 const queryStocks = stockStore.run;
@@ -49,6 +50,13 @@ const stocksColumns = ref([
         fixed: "right"
     }
 ])
+const plateColumns = ref([
+    {
+        title: "板块名称",
+        dataIndex: "name",
+    }
+])
+const plates = ref([])
 const pagination = computed<Object>(() => {
     return {
         total: total.value,
@@ -115,6 +123,18 @@ function handleSearchFormState() {
     })
     return queryForm;
 }
+function expandRow(expanded, record) {
+    if (expanded) {
+        //展开时查询
+        console.log(record)
+        fetPlateByStockId(record.id)
+            .then(res => {
+                plates.value = res.data
+            })
+    } else {
+        //收缩
+    }
+}
 </script>
 <template>
     <div class="stock-list-container">
@@ -155,7 +175,7 @@ function handleSearchFormState() {
             </a-row>
         </a-form>
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :pagination="pagination" @change="onChangeTable">
+            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable" @expand="expandRow">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'listingDate'">
                     {{ parseDate(record.listingDate) }}
@@ -175,6 +195,9 @@ function handleSearchFormState() {
                         <a-divider type="vertical" />
                     </span>
                 </template>
+            </template>
+            <template #expandedRowRender="{ record }">
+                <a-table :columns="plateColumns" :data-source="plates" :pagination="false"></a-table>
             </template>
         </a-table>
     </div>

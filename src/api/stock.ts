@@ -5,7 +5,7 @@ export interface Stock {
 }
 
 export interface StockResult {
-    data: Stock[],
+    records: Stock[],
     total: number
 }
 
@@ -15,8 +15,21 @@ export interface StockQueryRequest {
     current?: number
 }
 
+export interface Plate {
+    name: string
+}
+
+export interface PlateResult {
+    records: Plate[],
+    total: number
+}
+
 export function fetchStocks(data: StockQueryRequest) {
     return request.post<StockResult>("/base/stocks", data)
+}
+
+export function fetPlateByStockId(stockId: Number) {
+    return request.get<PlateResult>("/base/plate/" + stockId)
 }
 
 export function syncStocks() {
