@@ -82,7 +82,7 @@ const routes: RouteRecordRaw[] = [
         name: "SyncCenter",
         meta: {
           title: "数据同步",
-          icon: "bank-filled"
+          icon: "tool-outlined"
         },
         component: () => import("@/views/operation/SyncCenter.vue")
       }
