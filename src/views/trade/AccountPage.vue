@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { fetchAccounts } from '@/api/account';
 import { FT_ACC_TYPE, FT_FIRM, FT_SIM_ACC_TYPE, FT_TRADE_ENV, FT_TRADE_MARKET_AUTH } from '@/api/code';
 import { ref } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { useAccountStore } from '@/stores/account';
+import { storeToRefs } from 'pinia';
 
+const accountStore = useAccountStore();
+const { list, loading } = storeToRefs(accountStore)
 const stocksColumns = ref([
     {
         title: "ACC_ID",
-        dataIndex: "accId"
+        dataIndex: "accId",
+        fixed: "left"
     },
     {
         title: "交易市场权限",
@@ -32,17 +36,12 @@ const stocksColumns = ref([
     {
         title: "模拟交易账户类型",
         dataIndex: "simAccType"
+    },
+    {
+        title: "操作",
+        fixed: "right"
     }
 ])
-
-const accounts = ref([])
-const loading = ref<boolean>(false)
-
-fetchAccounts().then(res => {
-    if (res.status === 200) {
-        accounts.value = res.data
-    }
-})
 
 function parseTradeEnv(tradeEnv: Number) {
     return FT_TRADE_ENV[tradeEnv];
@@ -62,7 +61,7 @@ function parseMarketAuth(marketAuth: Number) {
 </script>
 <template>
     <div class="account-list-container">
-        <a-table class="searchResult" :columns="stocksColumns" :data-source="accounts" :loading="loading"
+        <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
             :row-key="(record) => record.id" :pagination="false">
             <template #headerCell="{ column }">
                 <template v-if="column.dataIndex === 'tradeMarketAuthList'">
