@@ -3,7 +3,7 @@ import { message } from 'ant-design-vue'
 
 
 const service = axios.create({
-    baseURL: "/api",
+    baseURL: "/",
     timeout: 5000
 })
 

@@ -126,10 +126,11 @@ function handleSearchFormState() {
 function expandRow(expanded, record) {
     if (expanded) {
         //展开时查询
-        console.log(record)
         fetPlateByStockId(record.id)
             .then(res => {
-                plates.value = res.data
+                if(res.status===200){
+                    plates.value = res.data
+                }
             })
     } else {
         //收缩

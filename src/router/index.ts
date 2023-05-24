@@ -99,6 +99,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     children: [
       {
+        path:"/trade/account",
+        name:"AccountPage",
+        meta:{
+          title:"账户管理",
+          icon:"credit-card-outlined"
+        },
+        component:()=>import("@/views/trade/AccountPage.vue")
+      },
+      {
         path: "/trade/rtk",
         name: "RealTimeK",
         meta: {

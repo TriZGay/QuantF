@@ -25,17 +25,17 @@ export interface PlateResult {
 }
 
 export function fetchStocks(data: StockQueryRequest) {
-    return request.post<StockResult>("/base/stocks", data)
+    return request.post<StockResult>("/api/base/stocks", data)
 }
 
 export function fetPlateByStockId(stockId: Number) {
-    return request.get<PlateResult>("/base/plate/" + stockId)
+    return request.get<PlateResult>("/api/base/plate/" + stockId)
 }
 
 export function syncStocks() {
-    return request.get<string>("/sync/stocks")
+    return request.get<string>("/api/sync/stocks")
 }
 
 export function syncPlates() {
-    return request.get<string>("/sync/plates")
+    return request.get<string>("/api/sync/plates")
 }

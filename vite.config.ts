@@ -8,10 +8,17 @@ export default defineConfig({
   server: {
     port: 8888,
     proxy: {
+      //转到stock-service
       '/api': {
         target: "http://localhost:9090",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      //转到trade-service
+      '/aapi': {
+        target: "http://localhost:9092",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/aapi/, '')
       },
       // '/rsocket': {
       //   target: "http://localhost:9000",

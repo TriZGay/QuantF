@@ -29,3 +29,36 @@ export const FT_EXCHANGE_TYPE = {
     17: "新交所",
     18: "大阪交易所",
 }
+
+export const FT_TRADE_ENV = {
+    0: "模拟环境",
+    1: "真实环境"
+}
+
+export const FT_FIRM = {
+    0: "未知",
+    1: "富途证券（香港）",
+    2: "富途证券（美国）",
+    3: "富途证券（新加坡）"
+}
+
+export const FT_ACC_TYPE = {
+    0: "未知",
+    1: "现金账户",
+    2: "保证金账户"
+}
+
+export const FT_SIM_ACC_TYPE = {
+    0: "未知",
+    1: "股票模拟账户",
+    2: "期权模拟账户"
+}
+
+export const FT_TRADE_MARKET_AUTH = {
+    0: "未知市场",
+    1: "香港市场（证券、期权）",
+    2: "美国市场（证券、期权）",
+    3: "A 股市场（仅用于模拟交易）",
+    4: "A 股通市场（股票）",
+    5: "期货市场（环球期货）"
+}
