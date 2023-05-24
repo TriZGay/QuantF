@@ -11,7 +11,8 @@ const stocksColumns = ref([
     {
         title: "ACC_ID",
         dataIndex: "accId",
-        fixed: "left"
+        fixed: "left",
+        width:180
     },
     {
         title: "交易市场权限",
@@ -19,11 +20,13 @@ const stocksColumns = ref([
     },
     {
         title: "交易环境",
-        dataIndex: "tradeEnv"
+        dataIndex: "tradeEnv",
+        width: 100
     },
     {
         title: "账户类型",
-        dataIndex: "accType"
+        dataIndex: "accType",
+        width: 120
     },
     {
         title: "卡号",
@@ -31,15 +34,19 @@ const stocksColumns = ref([
     },
     {
         title: "所属券商",
-        dataIndex: "firm"
+        dataIndex: "firm",
+        width: 150
     },
     {
         title: "模拟交易账户类型",
-        dataIndex: "simAccType"
+        dataIndex: "simAccType",
+        width: 200
     },
     {
         title: "操作",
-        fixed: "right"
+        key: "action",
+        fixed: "right",
+        width:100
     }
 ])
 
@@ -62,7 +69,7 @@ function parseMarketAuth(marketAuth: Number) {
 <template>
     <div class="account-list-container">
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :row-key="(record) => record.id" :pagination="false">
+            :row-key="(record) => record.id" :pagination="false" :scroll="{ x: 1500 }">
             <template #headerCell="{ column }">
                 <template v-if="column.dataIndex === 'tradeMarketAuthList'">
                     <span>
@@ -100,6 +107,12 @@ function parseMarketAuth(marketAuth: Number) {
                 </template>
                 <template v-if="column.dataIndex === 'simAccType'">
                     {{ parseSimAccType(record.simAccType) }}
+                </template>
+                <template v-if="column.key === 'action'">
+                    <span>
+                        <a>交易</a>
+                        <a-divider type="vertical" />
+                    </span>
                 </template>
             </template>
         </a-table>
