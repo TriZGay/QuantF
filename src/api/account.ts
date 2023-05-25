@@ -9,17 +9,17 @@ export interface AccountResult {
 }
 
 export function fetchAccounts() {
-    return request.get<AccountResult>("/aapi/acc/accounts")
+    return request.get<AccountResult>("/api/acc/accounts")
 }
 
 export function refreshAcc() {
-    return request.get<String>("/aapi/acc/refresh")
+    return request.get<String>("/api/acc/refresh")
 }
 
 export function refreshFunds() {
-    return request.get<String>("/aapi/acc/refreshAllFunds")
+    return request.get<String>("/api/acc/refreshAllFunds")
 }
 
 export function fetchAccInfoByAccId(accId: string) {
-    return request.get("/aapi/acc/info/" + accId)
+    return request.get("/api/acc/info/" + accId)
 }

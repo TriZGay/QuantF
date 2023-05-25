@@ -14,12 +14,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },
-      //转到trade-service
-      '/aapi': {
-        target: "http://localhost:9092",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/aapi/, '')
-      },
       // '/rsocket': {
       //   target: "http://localhost:9000",
       //   changeOrigin: true,
