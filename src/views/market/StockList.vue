@@ -56,7 +56,6 @@ const plateColumns = ref([
         dataIndex: "name",
     }
 ])
-const plates = ref([])
 const pagination = computed<Object>(() => {
     return {
         total: total.value,
@@ -128,8 +127,8 @@ function expandRow(expanded, record) {
         //展开时查询
         fetPlateByStockId(record.id)
             .then(res => {
-                if(res.status===200){
-                    plates.value = res.data
+                if (res.status === 200) {
+                    record.plates = res.data;
                 }
             })
     } else {
@@ -198,7 +197,7 @@ function expandRow(expanded, record) {
                 </template>
             </template>
             <template #expandedRowRender="{ record }">
-                <a-table :columns="plateColumns" :data-source="plates" :pagination="false"></a-table>
+                <a-table :columns="plateColumns" :data-source="record.plates" :pagination="false"></a-table>
             </template>
         </a-table>
     </div>

@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { FT_ACC_TYPE, FT_FIRM, FT_SIM_ACC_TYPE, FT_TRADE_ENV, FT_TRADE_MARKET_AUTH } from '@/api/code';
 import { ref } from 'vue';
-import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { QuestionCircleOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import { useAccountStore } from '@/stores/account';
 import { storeToRefs } from 'pinia';
+import { fetchAccInfoByAccId, refreshAcc, refreshFunds } from '@/api/account';
+import { message } from 'ant-design-vue';
 
 const accountStore = useAccountStore();
+const queryAccounts = accountStore.run;
 const { list, loading } = storeToRefs(accountStore)
 const stocksColumns = ref([
     {
         title: "ACC_ID",
         dataIndex: "accId",
         fixed: "left",
-        width:180
+        width: 180
     },
     {
         title: "交易市场权限",
@@ -46,7 +49,7 @@ const stocksColumns = ref([
         title: "操作",
         key: "action",
         fixed: "right",
-        width:100
+        width: 100
     }
 ])
 
@@ -65,11 +68,97 @@ function parseSimAccType(simAccType: Number) {
 function parseMarketAuth(marketAuth: Number) {
     return FT_TRADE_MARKET_AUTH[marketAuth];
 }
+function refreshAccList() {
+    refreshAcc().then(res => {
+        message.success(res.data)
+    }).catch(err => {
+        message.error(err)
+    })
+}
+function refreshAccFunds() {
+    refreshFunds().then(res => {
+        message.success(res.data)
+    }).catch(err => {
+        message.error(err)
+    })
+}
+const accInfoColumns = ref([
+    {
+        title: "ACC_ID",
+        dataIndex: "accId"
+    },
+    {
+        title: "最大购买力",
+        dataIndex: "power"
+    },
+    {
+        title: "资产净值",
+        dataIndex: "totalAssets"
+    },
+    {
+        title: "现金",
+        dataIndex: "cash"
+    },
+    {
+        title: "证券市值",
+        dataIndex: "marketVal"
+    },
+    {
+        title: "冻结资金",
+        dataIndex: "frozenCash"
+    },
+    {
+        title: "计息金额",
+        dataIndex: "debtCash"
+    },
+    {
+        title: "现金可提",
+        dataIndex: "avlWithdrawalCash"
+    }
+]);
+const accInfoLoading = ref<boolean>(false);
+
+function queryAccInfoByAccId(expanded, record) {
+    if (expanded) {
+        accInfoLoading.value = true;
+        fetchAccInfoByAccId(record.accId)
+            .then(res => {
+                record.accInfos = res.data
+            })
+            .catch(err => {
+                message.error(err)
+            })
+            .finally(() => {
+                accInfoLoading.value = false
+            })
+    } else {
+
+    }
+}
+
+
 </script>
 <template>
     <div class="account-list-container">
+        <a-button type="primary" @click="refreshAccList" style="margin-right: 8px;">
+            <template #icon>
+                <reload-outlined />
+            </template>
+            刷新账号信息
+        </a-button>
+        <a-button type="primary" @click="refreshAccFunds" style="margin-right:8px">
+            <template #icon>
+                <reload-outlined />
+            </template>
+            刷新账号资金信息
+        </a-button>
+        <a-button @click="queryAccounts()">
+            <template #icon>
+                <reload-outlined />
+            </template>
+        </a-button>
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :row-key="(record) => record.id" :pagination="false" :scroll="{ x: 1500 }">
+            :row-key="(record) => record.id" :pagination="false" :scroll="{ x: 1500 }" @expand="queryAccInfoByAccId">
             <template #headerCell="{ column }">
                 <template v-if="column.dataIndex === 'tradeMarketAuthList'">
                     <span>
@@ -114,6 +203,10 @@ function parseMarketAuth(marketAuth: Number) {
                         <a-divider type="vertical" />
                     </span>
                 </template>
+            </template>
+            <template #expandedRowRender="{ record }">
+                <a-table size="small" :columns="accInfoColumns" :data-source="record.accInfos" :pagination="false"
+                    :loading="accInfoLoading"></a-table>
             </template>
         </a-table>
     </div>
