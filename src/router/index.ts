@@ -99,20 +99,29 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     children: [
       {
-        path:"/trade/account",
-        name:"AccountPage",
-        meta:{
-          title:"账户管理",
-          icon:"credit-card-outlined"
+        path: "/trade/account",
+        name: "AccountPage",
+        meta: {
+          title: "账户管理",
+          icon: "credit-card-outlined"
         },
-        component:()=>import("@/views/trade/AccountPage.vue")
+        component: () => import("@/views/trade/AccountPage.vue")
+      },
+      {
+        path: "/trade/position",
+        name: "PositionPage",
+        meta: {
+          title: "持仓管理",
+          icon: "table-outlined"
+        },
+        component: () => import("@/views/trade/PositionPage.vue")
       },
       {
         path: "/trade/rtk",
         name: "RealTimeK",
         meta: {
           title: "实时K线图",
-          icon: "bank-filled"
+          icon: "area-chart-outlined"
         },
         component: () => import("@/views/trade/RealTimeKLine.vue")
       },
