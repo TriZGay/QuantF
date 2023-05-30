@@ -1,7 +1,22 @@
 <script setup lang="ts">
 import { useWebSocket } from "@vueuse/core";
-
-const { status, data, send, open, close } = useWebSocket("ws://localhost:9090/websocket/", {
+import type { Message } from '@/types/message'
+const { status, data, send, open, close } = useWebSocket("ws://localhost:9090/websocket?sessionId=1", {
+    onMessage(ws, event) {
+        console.log("Ws onMessage:" + event.data)
+    },
+    onDisconnected(ws, event) {
+        console.log("Ws disconnected:" + event.code)
+    },
+    onError(ws, event) {
+        console.log("Ws error:" + event)
+    },
+    onConnected(websocket) {
+        let message: Message = {
+            type: "JOIN_IN"
+        };
+        websocket.send(JSON.stringify(message))
+    },
     autoReconnect: {
         retries: 3,
         delay: 1000,
@@ -9,13 +24,8 @@ const { status, data, send, open, close } = useWebSocket("ws://localhost:9090/we
             console.error("连接Websocket失败.")
         }
     },
-    heartbeat: {
-        message: "ping",
-        interval: 1000,
-        pongTimeout: 1000
-    }
+    // heartbeat: true
 })
-send("hhhh")
 
 </script>
 <template>

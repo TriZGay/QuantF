@@ -4,6 +4,7 @@ import { computed, Transition } from 'vue';
 import { useRoute, RouterView } from 'vue-router';
 import Navbar from './Navbar.vue';
 import TagView from './tagView/TagView.vue';
+import User from './User.vue';
 
 const route = useRoute();
 const key = computed<string>(() => route.path)
@@ -16,7 +17,10 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews)
 <template>
     <a-layout>
         <a-layout-header style="background: #fff;">
-            <TagView />
+            <a-space>
+                <TagView />
+                <User />
+            </a-space>
         </a-layout-header>
         <a-layout-content style="margin: 0 16px">
             <Navbar />
