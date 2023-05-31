@@ -4,7 +4,7 @@ import { useGlobalFTState } from '@/stores/global';
 import { storeToRefs } from 'pinia';
 
 const global = useGlobalFTState();
-const { status, data } = storeToRefs(global);
+const { status, notify } = storeToRefs(global);
 
 </script>
 <template>
