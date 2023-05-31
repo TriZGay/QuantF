@@ -20,7 +20,7 @@ export const useGlobalFTState = defineStore("global", () => {
         },
         onError(ws, event) {
             notification.error({
-                message: "Ws error:" + event,
+                message: "Ws error:" + event.type,
                 placement: "bottomRight"
             })
         },

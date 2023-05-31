@@ -4,7 +4,7 @@ import { useTagsView } from '@/stores/tagsView';
 import { computed, onMounted, ref, watch, nextTick } from 'vue';
 import { useRoute, type RouteRecordRaw, RouterLink } from 'vue-router';
 import path from 'path-browserify'
-
+import { CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
 const {
     visitedViews,
     addView,
@@ -98,12 +98,84 @@ function moveToCurrentTag() {
 
 </script>
 <template>
-    <div id="tags-view-container">
-        <RouterLink v-for="tag in computedVisitedViews" ref="tag" :key="tag.path" :to="tag">
+    <div id="tags-view-container" class="tags-view-container">
+        <span class="left-caret">
+            <caret-left-outlined />
+        </span>
+        <RouterLink v-for="tag in computedVisitedViews" ref="tag" :class="isActive(tag) ? 'active' : ''" :key="tag.path"
+            :to="tag" class="tags-view-item">
             {{ tag.meta?.title }}
         </RouterLink>
+        <span class="right-caret">
+            <caret-right-outlined />
+        </span>
     </div>
 </template>
 <style scoped lang="less">
+.tags-view-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background: #fff;
 
+    .left-caret,
+    .right-caret {
+        position: absolute;
+        display: inline-block;
+        transition: all 0.5s;
+    }
+
+    .left-caret:hover ,.right-caret:hover {
+        cursor: pointer;
+        transform: scale(1.8);
+    }
+
+    .left-caret {
+        left: 0;
+    }
+
+    .right-caret {
+        right: 0;
+    }
+
+    .tags-view-item {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        height: 26px;
+        line-height: 26px;
+        border: 1px solid #d8dce5;
+        color: #495060;
+        background: #fff;
+        padding: 0 8px;
+        font-size: 12px;
+        margin-left: 5px;
+        margin-top: 4px;
+
+        &:first-of-type {
+            margin-left: 30px;
+        }
+
+        &:last-of-type {
+            margin-right: 30px;
+        }
+
+        &.active {
+            background-color: #42b983;
+            color: #fff;
+            border-color: #42b983;
+
+            &::before {
+                content: '';
+                background: #fff;
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                position: relative;
+                margin-right: 2px;
+            }
+        }
+    }
+}
 </style>

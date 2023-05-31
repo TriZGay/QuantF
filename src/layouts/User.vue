@@ -8,8 +8,8 @@ const { status, data } = storeToRefs(global);
 
 </script>
 <template>
-    <a-dropdown>
-        <a-avatar>
+    <a-dropdown >
+        <a-avatar >
             <template #icon>
                 <UserOutlined />
             </template>
@@ -23,4 +23,6 @@ const { status, data } = storeToRefs(global);
         </template>
     </a-dropdown>
 </template>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+
+</style>

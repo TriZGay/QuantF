@@ -16,11 +16,15 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews)
 
 <template>
     <a-layout>
-        <a-layout-header style="background: #fff;">
-            <a-space>
-                <TagView />
-                <User />
-            </a-space>
+        <a-layout-header style="background: #fff;padding: 0;">
+            <a-row type="flex">
+                <a-col flex="auto">
+                    <TagView />
+                </a-col>
+                <a-col flex="100px" >
+                    <User />
+                </a-col>
+            </a-row>
         </a-layout-header>
         <a-layout-content style="margin: 0 16px">
             <Navbar />
