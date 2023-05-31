@@ -2,17 +2,19 @@
 import { routes } from '@/router';
 import { useTagsView } from '@/stores/tagsView';
 import { computed, onMounted, ref, watch, nextTick } from 'vue';
-import { useRoute, type RouteRecordRaw, RouterLink } from 'vue-router';
+import { useRoute, type RouteRecordRaw, RouterLink, useRouter } from 'vue-router';
 import path from 'path-browserify'
-import { CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
+import { CaretLeftOutlined, CaretRightOutlined, CloseOutlined } from '@ant-design/icons-vue';
 const {
     visitedViews,
     addView,
     addVistedView,
-    updateVisitedView
+    updateVisitedView,
+    delView
 } = useTagsView()
 const computedVisitedViews = computed<RouteRecordRaw[]>(() => visitedViews)
 const route = useRoute()
+const router = useRouter();
 const affixTags = ref<RouteRecordRaw[]>([])
 const tag = ref<HTMLElement[]>([])
 
@@ -37,6 +39,25 @@ function isAffix(tag: RouteRecordRaw) {
     return tag.meta && tag.meta.affix
 }
 
+function closeSelectedTag(tag: RouteRecordRaw) {
+    delView(tag).then(({ visitedViews }) => {
+        if (isActive(tag)) {
+            toLastView(visitedViews, tag)
+        }
+    })
+}
+function toLastView(visitedViews: [], tag: RouteRecordRaw) {
+    const latestView = visitedViews.slice(-1)[0];
+    if (latestView) {
+        router.push(latestView.fullPath)
+    } else {
+        if (tag.name === 'Home') {
+            router.replace({ path: "/redirect" + tag.fullPath })
+        } else {
+            router.push("/")
+        }
+    }
+}
 function filterAffixTags(routes: RouteRecordRaw[], basepath: string = "/") {
     let tags: RouteRecordRaw[] = []
     routes.forEach(route => {
@@ -105,6 +126,7 @@ function moveToCurrentTag() {
         <RouterLink v-for="tag in computedVisitedViews" ref="tag" :class="isActive(tag) ? 'active' : ''" :key="tag.path"
             :to="tag" class="tags-view-item">
             {{ tag.meta?.title }}
+            <close-outlined @click="closeSelectedTag(tag)" />
         </RouterLink>
         <span class="right-caret">
             <caret-right-outlined />
@@ -125,7 +147,8 @@ function moveToCurrentTag() {
         transition: all 0.5s;
     }
 
-    .left-caret:hover ,.right-caret:hover {
+    .left-caret:hover,
+    .right-caret:hover {
         cursor: pointer;
         transform: scale(1.8);
     }
