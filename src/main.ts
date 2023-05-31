@@ -7,17 +7,12 @@ import { router } from "@/router";
 import "ant-design-vue/dist/antd.css";
 import * as Icons from '@ant-design/icons-vue'
 
-import * as buffer from 'buffer';
-
-//解决浏览器没有node环境的Buffer包
-if (typeof (window as any).global === 'undefined') {
-    (window as any).global = window;
-}
-if (typeof (window as any).Buffer === 'undefined') {
-    (window as any).Buffer = buffer.Buffer
-}
-
 const app = createApp(App);
+
+import 'echarts';
+import VChart from 'vue-echarts';
+
+app.component("VChart", VChart);
 
 for (const i in Icons) {
     //@ts-ignore
