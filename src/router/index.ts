@@ -52,7 +52,7 @@ const routes: RouteRecordRaw[] = [
         path: "/market/stockList",
         name: "StockList",
         meta: {
-          title: "股票列表",
+          title: "股票",
           icon: "container-filled"
         },
         component: () => import("@/views/market/StockList.vue"),
@@ -61,11 +61,20 @@ const routes: RouteRecordRaw[] = [
         path: "/market/futuresList",
         name: "FuturesList",
         meta: {
-          title: "期货列表",
+          title: "期货",
           icon: "bank-filled"
         },
         component: () => import("@/views/market/FuturesList.vue"),
       },
+      {
+        path: "/market/indies",
+        name: "IndexList",
+        meta: {
+          title: "指数",
+          icon: "line-chart-outlined"
+        },
+        component: () => import("@/views/market/Indies.vue")
+      }
     ],
   },
   {

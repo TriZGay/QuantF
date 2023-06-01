@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { useStockStore } from '@/stores/stock';
+import { useIndiesStore } from '@/stores/indies';
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
-import { FT_MARKET, FT_EXCHANGE_TYPE } from '@/api/code'
-import type { FormInstance } from 'ant-design-vue';
-import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
-import { fetPlateByStockId } from '@/api/stock';
+import { FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
+import { message, type FormInstance } from 'ant-design-vue';
+import { subscribe } from '@/api/sub';
 
-const stockStore = useStockStore()
-const queryStocks = stockStore.run;
-const { list, loading, pageSize, current, total } = storeToRefs(stockStore);
+const indiesStore = useIndiesStore()
+const queryIndies = indiesStore.run;
+const { list, loading, pageSize, current, total } = storeToRefs(indiesStore);
 
 const stocksColumns = ref([
     {
@@ -50,12 +49,7 @@ const stocksColumns = ref([
         fixed: "right"
     }
 ])
-const plateColumns = ref([
-    {
-        title: "板块名称",
-        dataIndex: "name",
-    }
-])
+
 const pagination = computed<Object>(() => {
     return {
         total: total.value,
@@ -66,9 +60,9 @@ const pagination = computed<Object>(() => {
 })
 function onChangeTable(pagination, filters, sorter, { currentDataSource }) {
     let queryForm = handleSearchFormState();
-    queryStocks({
+    queryIndies({
         ...queryForm,
-        stockType: 3,
+        stockType: 6,
         size: pagination.pageSize,
         current: pagination.current
     })
@@ -110,9 +104,9 @@ const formState = reactive({
 });
 function onFinish(values: any) {
     let queryForm = handleSearchFormState();
-    queryStocks({
+    queryIndies({
         ...queryForm,
-        stockType: 3,
+        stockType: 6,
         size: 10,
         current: 1
     })
@@ -124,19 +118,35 @@ function handleSearchFormState() {
     })
     return queryForm;
 }
-function expandRow(expanded, record) {
-    if (expanded) {
-        //展开时查询
-        fetPlateByStockId(record.id)
-            .then(res => {
-                if (res.status === 200) {
-                    record.plates = res.data;
-                }
-            })
-    } else {
-        //收缩
-    }
+
+const subTypes = computed(() => {
+    let arr = []
+    Object.keys(FT_SUB_TYPE).forEach(key => {
+        arr.push({
+            label: FT_SUB_TYPE[key],
+            value: key
+        })
+    })
+    return arr;
+})
+
+const selectedSubType = ref([]);
+
+function onClick2Subscribe(row) {
+    let { market, code } = row;
+    subscribe({
+        securityList: [{
+            market: market,
+            code: code
+        }],
+        subTypeList: selectedSubType.value
+    }).then(res => {
+        message.success(res.data)
+    }).catch(err => {
+        message.error(err)
+    })
 }
+
 </script>
 <template>
     <div class="stock-list-container">
@@ -174,7 +184,7 @@ function expandRow(expanded, record) {
             </a-row>
         </a-form>
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable" @expand="expandRow">
+            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'listingDate'">
                     {{ parseDate(record.listingDate) }}
@@ -190,13 +200,23 @@ function expandRow(expanded, record) {
                 </template>
                 <template v-if="column.key === 'action'">
                     <span>
-                        <a>订阅</a>
+                        <a-dropdown :trigger="['click']">
+                            <a @click.prevent>
+                                订阅
+                                <DownOutlined />
+                            </a>
+                            <template #overlay>
+                                <a-menu style="padding: 10px 10px;">
+                                    <a-checkbox-group style="width:100px" v-model:value="selectedSubType"
+                                        :options="subTypes" />
+                                    <br />
+                                    <a-button type="primary" size="small" @click="onClick2Subscribe(record)">确定</a-button>
+                                </a-menu>
+                            </template>
+                        </a-dropdown>
                         <a-divider type="vertical" />
                     </span>
                 </template>
-            </template>
-            <template #expandedRowRender="{ record }">
-                <a-table :columns="plateColumns" :data-source="record.plates" :pagination="false"></a-table>
             </template>
         </a-table>
     </div>

@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import { usePagination } from 'vue-request'
 
-export const useStockStore = defineStore("stock", () => {
+export const useIndiesStore = defineStore("indies", () => {
 
     const {
         data,
@@ -17,7 +17,7 @@ export const useStockStore = defineStore("stock", () => {
             delisting: 0,
             exchangeType: 1,
             market: 1,
-            stockType: 3
+            stockType: 6
         }],
         pagination: {
             currentKey: "current",

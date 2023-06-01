@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { FT_ACC_TYPE, FT_FIRM, FT_SIM_ACC_TYPE, FT_TRADE_ENV, FT_TRADE_MARKET_AUTH } from '@/api/code';
 import { ref } from 'vue';
-import { QuestionCircleOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import { useAccountStore } from '@/stores/account';
 import { storeToRefs } from 'pinia';
 import { fetchAccInfoByAccId, refreshAcc, refreshFunds } from '@/api/account';
