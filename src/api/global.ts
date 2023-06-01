@@ -7,3 +7,7 @@ export function connect2FT() {
 export function disconnect2FT() {
     return request.get<string>("/api/global/disconnect")
 }
+
+export function fetchGlobalMartketState() {
+    return request.get<string>("/api/global/")
+}

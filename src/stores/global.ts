@@ -31,7 +31,7 @@ export const useGlobalFTState = defineStore("global", () => {
             websocket.send(JSON.stringify(message))
         },
     })
-    const notify = computed(() => JSON.parse(data))
+    const notify = computed(() => JSON.parse(data.value))
 
     return {
         status,

@@ -4,7 +4,6 @@ import { useTagsView } from '@/stores/tagsView';
 import { computed, onMounted, ref, watch, nextTick } from 'vue';
 import { useRoute, type RouteRecordRaw, RouterLink, useRouter } from 'vue-router';
 import path from 'path-browserify'
-import { CaretLeftOutlined, CaretRightOutlined, CloseOutlined } from '@ant-design/icons-vue';
 const {
     visitedViews,
     addView,
