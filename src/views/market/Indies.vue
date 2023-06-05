@@ -1,7 +1,8 @@
 <script setup lang="ts">
+//@ts-nocheck
 import { useIndiesStore } from '@/stores/indies';
 import { storeToRefs } from 'pinia';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
@@ -147,6 +148,19 @@ function onClick2Subscribe(row) {
     })
 }
 
+const checkAll = ref(false);
+const indeterminate = ref(false)
+
+function onCheckAllChange(e: any) {
+    indeterminate.value = false;
+    selectedSubType.value = e.target.checked ? subTypes.value.map(v => v.value) : [];
+}
+
+watch(() => selectedSubType, (val) => {
+    indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
+    checkAll.value = val.value.length === subTypes.value.length;
+}, { deep: true })
+
 </script>
 <template>
     <div class="stock-list-container">
@@ -207,6 +221,9 @@ function onClick2Subscribe(row) {
                             </a>
                             <template #overlay>
                                 <a-menu style="padding: 10px 10px;">
+                                    <a-checkbox v-model:checked="checkAll" :indeterminate="indeterminate"
+                                        @change="onCheckAllChange">全选</a-checkbox>
+                                    <br />
                                     <a-checkbox-group style="width:100px" v-model:value="selectedSubType"
                                         :options="subTypes" />
                                     <br />
