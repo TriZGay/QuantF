@@ -11,7 +11,7 @@ const { notify } = storeToRefs(global);
 
 const marketState = useMarketState();
 const refreshMartketState = marketState.run;
-const { data, loading } = storeToRefs(marketState)
+const { loading } = storeToRefs(marketState)
 
 const globalMarketState = ref({
   time: "",
@@ -46,7 +46,7 @@ function parseNow(now: Object) {
     </a-button>
     <a-row style="margin-bottom: 8px;">
       <a-col :span="24">
-        <a-card title="时间" size="small">
+        <a-card title="时间" size="small" :loading="loading">
           <UseNow v-slot="{ now, pause, resume }">
             本机客户端时间:<span style="font-weight: bolder;">{{ parseNow(now) }}</span>
           </UseNow>
@@ -58,7 +58,7 @@ function parseNow(now: Object) {
     </a-row>
     <a-row :gutter="8">
       <a-col :span="6">
-        <a-card title="香港市场" size="small">
+        <a-card title="香港市场" size="small" :loading="loading">
           <div>
             香港股市:<span style="font-weight: bolder;">{{ globalMarketState.marketHK }}</span>
           </div>
@@ -68,7 +68,7 @@ function parseNow(now: Object) {
         </a-card>
       </a-col>
       <a-col :span="6">
-        <a-card title="大A" size="small">
+        <a-card title="大A" size="small" :loading="loading">
           <div>
             上海:<span style="font-weight: bolder;">{{ globalMarketState.marketSH }}</span>
           </div>
@@ -78,7 +78,7 @@ function parseNow(now: Object) {
         </a-card>
       </a-col>
       <a-col :span="6">
-        <a-card title="美国市场" size="small">
+        <a-card title="美国市场" size="small" :loading="loading">
           <div>
             美国股市:<span style="font-weight: bolder;">{{ globalMarketState.marketUS }}</span>
           </div>
@@ -88,7 +88,7 @@ function parseNow(now: Object) {
         </a-card>
       </a-col>
       <a-col :span="6">
-        <a-card title="其他" size="small">
+        <a-card title="其他" size="small" :loading="loading">
           <div>
             新加坡期货:<span style="font-weight: bolder;">{{ globalMarketState.marketSGFuture }}</span>
           </div>
