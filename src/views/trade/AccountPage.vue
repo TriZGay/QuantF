@@ -1,4 +1,5 @@
 <script setup lang="ts">
+//@ts-nocheck
 import { FT_ACC_TYPE, FT_FIRM, FT_SIM_ACC_TYPE, FT_TRADE_ENV, FT_TRADE_MARKET_AUTH } from '@/api/code';
 import { ref } from 'vue';
 import { useAccountStore } from '@/stores/account';
@@ -9,7 +10,7 @@ import { message } from 'ant-design-vue';
 const accountStore = useAccountStore();
 const queryAccounts = accountStore.run;
 const { list, loading } = storeToRefs(accountStore)
-const stocksColumns = ref([
+const accountColumns = ref([
     {
         title: "ACC_ID",
         dataIndex: "accId",
@@ -156,7 +157,7 @@ function queryAccInfoByAccId(expanded, record) {
                 <reload-outlined />
             </template>
         </a-button>
-        <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
+        <a-table class="searchResult" :columns="accountColumns" :data-source="list" :loading="loading"
             :row-key="(record) => record.id" :pagination="false" :scroll="{ x: 1500 }" @expand="queryAccInfoByAccId">
             <template #headerCell="{ column }">
                 <template v-if="column.dataIndex === 'tradeMarketAuthList'">

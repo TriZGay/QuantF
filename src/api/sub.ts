@@ -12,3 +12,7 @@ export interface Security {
 export function subscribe(data: SubscribeRequest) {
     return request.post<string>("/api/sub/", data)
 }
+
+export function syncSubscribeInfo() {
+    return request.get<string>("/api/sub/refresh")
+}
