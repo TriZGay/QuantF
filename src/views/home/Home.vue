@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { UseNow } from '@vueuse/components'
-import { computed } from 'vue';
+import { ref, watch } from 'vue';
 import { useGlobalFTState } from '@/stores/global';
 import { storeToRefs } from 'pinia';
 import { useMarketState } from '@/stores/market';
+import * as dayjs from 'dayjs';
 
 const global = useGlobalFTState();
 const { notify } = storeToRefs(global);
@@ -12,82 +13,89 @@ const marketState = useMarketState();
 const refreshMartketState = marketState.run;
 const { data, loading } = storeToRefs(marketState)
 
-const globalMarketState = computed(() => {
-  let content = {
-    time: "",
-    marketHK: "",
-    marketHKFuture: "",
-    marketSH: "",
-    marketSZ: "",
-    marketUS: "",
-    marketUSFuture: "",
-    marketSGFuture: "",
-    marketJPFuture: ""
-  }
-  try {
-    console.log(notify.value.content)
-    let marketState = JSON.parse(notify.value.conent)
-    console.log(marketState)
-    Object.assign(content,marketState)
-  } catch (error) {
-    console.log(error)
-  }
-  return content;
+const globalMarketState = ref({
+  time: "",
+  marketHK: "",
+  marketHKFuture: "",
+  marketSH: "",
+  marketSZ: "",
+  marketUS: "",
+  marketUSFuture: "",
+  marketSGFuture: "",
+  marketJPFuture: ""
 })
 
+watch(() => notify, (message) => {
+  globalMarketState.value = JSON.parse(message.value.content)
+}, { deep: true })
+
+
+refreshMartketState()
+
+function parseNow(now: Object) {
+  return dayjs(now).format("DD-MM-YYYY HH:mm:ss")
+}
 </script>
 <template>
   <div>
-    <UseNow v-slot="{ now, pause, resume }">
-      Now:{{ now }}
-    </UseNow>
-
-    市场状态
-    <a-button size="small" @click="refreshMartketState">
+    <a-button size="small" @click="refreshMartketState" style="margin-bottom: 8px;">
       刷新
       <template #icon>
         <reload-outlined />
       </template>
     </a-button>
-    <a-row>
-      <a-col :span="24">服务器时间: <span style="font-weight: bolder;">{{ globalMarketState.time
-      }}</span></a-col>
-    </a-row>
-    <a-row>
-      <a-col :span="4">香港股市:</a-col>
-      <a-col :span="8"><span style="font-weight: bolder;">{{
-        globalMarketState.marketHK }}</span></a-col>
-      <a-col :span="4">香港期货:</a-col>
-      <a-col :span="8"><span style="font-weight: bolder;">{{
-        globalMarketState.marketHKFuture }}</span></a-col>
-    </a-row>
-    <a-row>
-      <a-col :span="4">大A上海:</a-col>
-      <a-col :span="8"><span style="font-weight: bolder;">{{ globalMarketState.marketSH
-      }}</span></a-col>
-      <a-col :span="4">大A深圳:</a-col>
-      <a-col :span="8">
-        <span style="font-weight: bolder;">{{ globalMarketState.marketSZ }}</span>
+    <a-row style="margin-bottom: 8px;">
+      <a-col :span="24">
+        <a-card title="时间" size="small">
+          <UseNow v-slot="{ now, pause, resume }">
+            本机客户端时间:<span style="font-weight: bolder;">{{ parseNow(now) }}</span>
+          </UseNow>
+          <div>
+            服务器时间:<span style="font-weight: bolder;">{{ globalMarketState.time }}</span>
+          </div>
+        </a-card>
       </a-col>
     </a-row>
-    <a-row>
-      <a-col :span="4">美国股市:</a-col>
-      <a-col :span="8">
-        <span style="font-weight: bolder;">{{ globalMarketState.marketUS }}</span>
+    <a-row :gutter="8">
+      <a-col :span="6">
+        <a-card title="香港市场" size="small">
+          <div>
+            香港股市:<span style="font-weight: bolder;">{{ globalMarketState.marketHK }}</span>
+          </div>
+          <div>
+            香港期货:<span style="font-weight: bolder;">{{ globalMarketState.marketHKFuture }}</span>
+          </div>
+        </a-card>
       </a-col>
-      <a-col :span="4">美国期货:</a-col>
-      <a-col :span="8">
-        <span style="font-weight: bolder;">{{ globalMarketState.marketUSFuture }}</span>
+      <a-col :span="6">
+        <a-card title="大A" size="small">
+          <div>
+            上海:<span style="font-weight: bolder;">{{ globalMarketState.marketSH }}</span>
+          </div>
+          <div>
+            深圳:<span style="font-weight: bolder;">{{ globalMarketState.marketSZ }}</span>
+          </div>
+        </a-card>
       </a-col>
-    </a-row>
-    <a-row>
-      <a-col :span="4">新加坡期货:</a-col>
-      <a-col :span="8">
-        <span style="font-weight: bolder;">{{ globalMarketState.marketSGFuture }}</span>
+      <a-col :span="6">
+        <a-card title="美国市场" size="small">
+          <div>
+            美国股市:<span style="font-weight: bolder;">{{ globalMarketState.marketUS }}</span>
+          </div>
+          <div>
+            美国期货:<span style="font-weight: bolder;">{{ globalMarketState.marketUSFuture }}</span>
+          </div>
+        </a-card>
       </a-col>
-      <a-col :span="4">日本期货:</a-col>
-      <a-col :span="8">
-        <span style="font-weight: bolder;">{{ globalMarketState.marketJPFuture }}</span>
+      <a-col :span="6">
+        <a-card title="其他" size="small">
+          <div>
+            新加坡期货:<span style="font-weight: bolder;">{{ globalMarketState.marketSGFuture }}</span>
+          </div>
+          <div>
+            日本期货: <span style="font-weight: bolder;">{{ globalMarketState.marketJPFuture }}</span>
+          </div>
+        </a-card>
       </a-col>
     </a-row>
   </div>
