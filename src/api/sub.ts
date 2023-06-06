@@ -6,7 +6,9 @@ export interface SubscribeRequest {
 }
 export interface Security {
     market: Number,
-    code: string
+    code: string,
+    name: string,
+    type: Number
 }
 
 export function subscribe(data: SubscribeRequest) {

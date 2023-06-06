@@ -134,17 +134,19 @@ const subTypes = computed(() => {
 const selectedSubType = ref([]);
 
 function onClick2Subscribe(row) {
-    let { market, code } = row;
+    let { market, code, name, stockType } = row;
     subscribe({
         securityList: [{
             market: market,
-            code: code
+            code: code,
+            name: name,
+            type: stockType
         }],
         subTypeList: selectedSubType.value
     }).then(res => {
         message.success(res.data)
     }).catch(err => {
-        message.error(err)
+        message.error(err.response.data)
     })
 }
 

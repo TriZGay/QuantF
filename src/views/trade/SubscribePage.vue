@@ -2,7 +2,6 @@
 import { useSubStores } from '@/stores/sub';
 import { storeToRefs } from 'pinia';
 
-
 const subStores = useSubStores();
 const refreshSubscribeInfo = subStores.syncSub;
 const { syncLoading } = storeToRefs(subStores);
@@ -11,7 +10,8 @@ refreshSubscribeInfo()
 </script>
 <template>
     <div class="subscribe-info-container">
-        <a-button @click="refreshSubscribeInfo()">
+        <a-button @click="refreshSubscribeInfo()" :loading="syncLoading">
+            刷新
             <template #icon>
                 <reload-outlined />
             </template>
