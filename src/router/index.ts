@@ -126,15 +126,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/trade/PositionPage.vue")
       },
       {
-        path: "/trade/rtk",
-        name: "RealTimeK",
-        meta: {
-          title: "实时K线图",
-          icon: "area-chart-outlined"
-        },
-        component: () => import("@/views/trade/RealTimeKLine.vue")
-      },
-      {
         path: "/trade/sub",
         name: "SubscribePage",
         meta: {
@@ -145,6 +136,35 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
+  {
+    path: "/realtime",
+    redirect:"/realtime/rtk",
+    meta: {
+      title: "实时",
+      icon:"fund-outlined"
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: [
+      {
+        path: "/realtime/rtk",
+        name: "RealTimeK",
+        meta: {
+          title: "实时K线图",
+          icon: "sliders-outlined"
+        },
+        component: () => import("@/views/trade/RealTimeKLine.vue")
+      },
+      {
+        path: "/realtime/rto",
+        name: "RealTimeBaseQuote",
+        meta: {
+          title: "实时报价",
+          icon: "area-chart-outlined"
+        },
+        component: () => import("@/views/trade/RealTimeBaseQuote.vue")
+      }
+    ]
+  }
 ];
 
 const router = createRouter({
