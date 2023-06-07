@@ -16,8 +16,6 @@ const {
     queryTotal
 } = storeToRefs(subStores);
 
-refreshSubscribeInfo()
-
 const subscribeInfoColumns = ref([
     {
         title: "代码",
@@ -42,13 +40,12 @@ const subscribeInfoColumns = ref([
     }
 ])
 function onChangeTable(pagination, filters, sorter, { currentDataSource }) {
-    let queryForm = handleSearchFormState();
-    // queryStocks({
-    //     ...queryForm,
-    //     stockType: 3,
-    //     size: pagination.pageSize,
-    //     current: pagination.current
-    // })
+    // let queryForm = handleSearchFormState();
+    fetchSubscribeInfo({
+        // ...queryForm,
+        size: pagination.pageSize,
+        current: pagination.current
+    })
 }
 
 const pagination = computed<Object>(() => {
@@ -102,4 +99,10 @@ fetchSubscribeInfo({
 </template>
 <style lang="less" scoped>
 .subscribe-info-container {}
+
+.searchResult {
+    margin-top: 16px;
+    border: 1px dashed #e9e9e9;
+    border-radius: 2px;
+}
 </style>
