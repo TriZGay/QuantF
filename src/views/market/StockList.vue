@@ -1,11 +1,12 @@
 <script setup lang="ts">
+//@ts-nocheck
 import { useStockStore } from '@/stores/stock';
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
-import { FT_MARKET, FT_EXCHANGE_TYPE } from '@/api/code'
+import { parseMarket, parseExchangeType,FT_MARKET,FT_EXCHANGE_TYPE } from '@/api/code'
 import type { FormInstance } from 'ant-design-vue';
 import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { fetPlateByStockId } from '@/api/stock';
@@ -75,12 +76,6 @@ function onChangeTable(pagination, filters, sorter, { currentDataSource }) {
 }
 function parseDate(date: Array<Number>) {
     return dayjs(date).format("DD/MM/YYYY")
-}
-function parseMarket(marketValue: Number) {
-    return FT_MARKET[marketValue];
-}
-function parseExchangeType(exchangeValue: Number) {
-    return FT_EXCHANGE_TYPE[exchangeValue];
 }
 
 const expand = ref<boolean>(false);

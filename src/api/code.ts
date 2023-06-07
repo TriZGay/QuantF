@@ -1,3 +1,4 @@
+//@ts-nocheck
 export const FT_MARKET = {
     0: "未知",
     1: "香港市场",
@@ -80,4 +81,32 @@ export const FT_SUB_TYPE = {
     15: "季K",
     16: "年K",
     17: "3分K"
+}
+export const FT_SECURITY_TYPE = {
+    0: "未知",
+    1: "债券",
+    2: "一揽子权证",
+    3: "正股",
+    4: "信托,基金",
+    5: "窝轮",
+    6: "指数",
+    7: "板块",
+    8: "期权",
+    9: "板块集",
+    10: "期货",
+}
+
+export function parseMarket(marketValue: Number) {
+    return FT_MARKET[marketValue];
+}
+export function parseExchangeType(exchangeValue: Number) {
+    return FT_EXCHANGE_TYPE[exchangeValue];
+}
+
+export function parseFTsubType(code: Number) {
+    return FT_SUB_TYPE[code];
+}
+
+export function parseSecurityType(code: Number) {
+    return FT_SECURITY_TYPE[code];
 }
