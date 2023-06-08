@@ -7,7 +7,9 @@ export const useMarketState = defineStore("market", () => {
         data,
         run,
         loading
-    } = useRequest(fetchGlobalMartketState)
+    } = useRequest(fetchGlobalMartketState, {
+        manual: true
+    })
 
     return {
         data,

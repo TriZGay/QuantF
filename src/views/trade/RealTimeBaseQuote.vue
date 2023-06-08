@@ -1,48 +1,103 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+//@ts-nocheck
+import { ref, watch, reactive, computed } from 'vue';
+import { useGlobalFTState } from '@/stores/global'
+import { storeToRefs } from 'pinia';
 
-const option = ref({
-    title: {
-    text: "Traffic Sources",
-    left: "center"
-  },
-  tooltip: {
-    trigger: "item",
-    formatter: "{a} <br/>{b} : {c} ({d}%)"
-  },
-  legend: {
-    orient: "vertical",
-    left: "left",
-    data: ["Direct", "Email", "Ad Networks", "Video Ads", "Search Engines"]
-  },
-  series: [
-    {
-      name: "Traffic Sources",
-      type: "pie",
-      radius: "55%",
-      center: ["50%", "60%"],
-      data: [
-        { value: 335, name: "Direct" },
-        { value: 310, name: "Email" },
-        { value: 234, name: "Ad Networks" },
-        { value: 135, name: "Video Ads" },
-        { value: 1548, name: "Search Engines" }
-      ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: "rgba(0, 0, 0, 0.5)"
-        }
-      }
+const messageStore = useGlobalFTState();
+const { notify } = storeToRefs(messageStore);
+const basicQuoteMessage = computed(() => {
+    if (notify.value != null && notify.value.type === 'RT_BASIC_QUOTE') {
+        return notify.value
     }
-  ]
 })
+
+//一个标的物对应一个echarts配置
+const echartsOptionMap = reactive({
+    subscribing: [],//market+code
+    optionsMap: {}
+})
+
+const timeAxis = ref([]);
+const basicQuoteValue = ref([]);
+
+watch(() => basicQuoteMessage, (message) => {
+    let marketAndCode = message.value.content.security.market + "+" + message.value.content.security.code;
+    if (echartsOptionMap.subscribing.indexOf(marketAndCode) > -1) {
+        timeAxis.value.push(basicQuote.content.updateTime);
+        basicQuoteValue.value.push(basicQuote.content.curPrice)
+        echartsOptionMap.optionsMap[marketAndCode] = {
+            title: {
+                text: marketAndCode + "基础报价",
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#283b56'
+                    }
+                }
+            },
+            legend: {},
+            xAxis: [{
+                type: "category",
+                boundaryGap: true,
+                data: timeAxis
+            }],
+            yAxis: [{
+                type: "value",
+
+            }],
+            series: [
+                {
+                    name: "Dynamic line",
+                    type: "line",
+                    data: basicQuoteValue
+                }
+            ]
+        }
+    } else {
+        echartsOptionMap.subscribing.push(marketAndCode);
+        echartsOptionMap.optionsMap[marketAndCode] = {
+            title: {
+                text: marketAndCode + "基础报价",
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#283b56'
+                    }
+                }
+            },
+            legend: {},
+            xAxis: [{
+                type: "category",
+                boundaryGap: true,
+                data: []
+            }],
+            yAxis: [{
+                type: "value",
+
+            }],
+            series: [
+                {
+                    name: "Dynamic line",
+                    type: "line",
+                    data: []
+                }
+            ]
+        }
+    }
+}, { deep: true })
 
 </script>
 <template>
-    <div>实时K
-        <v-chart style="height: 400px;" :option="option"></v-chart>
+    <div>
+        <v-chart style="height: 400px;" :autoresize="true" v-for="(item, index) in Object.keys(echartsOptionMap.optionsMap)"
+            :option="echartsOptionMap.optionsMap[item]"></v-chart>
     </div>
 </template>
 <style lang="less" scoped></style>

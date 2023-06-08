@@ -7,10 +7,12 @@ export const useGlobalFTState = defineStore("global", () => {
     const { status, data } = useWebSocket("ws://localhost:9090/websocket?sessionId=1", {
         onMessage(ws, event) {
             const notify = JSON.parse(event.data);
-            notification.info({
-                message: notify.content,
-                placement: "bottomRight"
-            })
+            if (notify.type === 'NOTIFY') {
+                notification.info({
+                    message: notify.content,
+                    placement: "bottomRight"
+                })
+            }
         },
         onDisconnected(ws, event) {
             notification.info({
