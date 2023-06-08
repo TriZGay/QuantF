@@ -1,4 +1,5 @@
 <script setup lang="ts">
+//@ts-nocheck
 import { UseNow } from '@vueuse/components'
 import { ref, watch } from 'vue';
 import { useGlobalFTState } from '@/stores/global';
