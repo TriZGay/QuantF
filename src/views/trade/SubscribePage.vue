@@ -2,18 +2,23 @@
 //@ts-nocheck
 import { useSubStores } from '@/stores/sub';
 import { storeToRefs } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, ref, createVNode } from 'vue';
 import { parseFTsubType, parseSecurityType } from '@/api/code'
+import { Modal } from 'ant-design-vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 const subStores = useSubStores();
 const refreshSubscribeInfo = subStores.syncSub;
 const fetchSubscribeInfo = subStores.querySubscribeInfo;
+const cancelSubscribeInfo = subStores.cancelSubscribeFn;
 const {
     syncLoading,
     queryLoading,
     subscribeInfoList,
     queryPageSize,
     queryCurrent,
-    queryTotal
+    queryTotal,
+    cancelLoading,
+    cancelResult
 } = storeToRefs(subStores);
 
 const subscribeInfoColumns = ref([
@@ -69,6 +74,30 @@ fetchSubscribeInfo({
     current: 1
 })
 
+function cancelSubscribe(row) {
+    let { securityMarket, securityCode, securityName, securityType, subType } = row;
+    Modal.confirm({
+        title: "请确认",
+        icon: createVNode(ExclamationCircleOutlined),
+        content: "确定取消订阅?",
+        okText: "是",
+        okType: "danger",
+        cancelText: "否",
+        onOk() {
+            cancelSubscribeInfo({
+                securityList: [{
+                    market: securityMarket,
+                    code: securityCode,
+                    name: securityName,
+                    type: securityType
+                }],
+                subTypeList: [subType],
+                unsub: true
+            })
+        }
+    })
+}
+
 </script>
 <template>
     <div class="subscribe-info-container">
@@ -89,7 +118,7 @@ fetchSubscribeInfo({
                 </template>
                 <template v-if="column.key === 'action'">
                     <span>
-                        <a>订阅</a>
+                        <a-button type="link" size="small" @click="cancelSubscribe(record)">取消订阅</a-button>
                         <a-divider type="vertical" />
                     </span>
                 </template>

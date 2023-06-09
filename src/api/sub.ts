@@ -2,7 +2,8 @@ import request from '@/utils/request'
 
 export interface SubscribeRequest {
     securityList: Array<Security>,
-    subTypeList: Array<Number>
+    subTypeList: Array<Number>,
+    unsub?: boolean
 }
 export interface Security {
     market: Number,
@@ -35,4 +36,8 @@ export function syncSubscribeInfo() {
 
 export function fetchSubscribeInfos(data: QuerySubscribeInfo) {
     return request.post<SubscribeResult>("/api/sub/list", data)
+}
+
+export function cancelSubscribeInfo(data: SubscribeRequest) {
+    return request.post<string>("/api/sub/cancel", data)
 }

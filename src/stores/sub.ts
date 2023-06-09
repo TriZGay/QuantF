@@ -1,4 +1,4 @@
-import { fetchSubscribeInfos, syncSubscribeInfo } from "@/api/sub";
+import { cancelSubscribeInfo, fetchSubscribeInfos, syncSubscribeInfo } from "@/api/sub";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { usePagination, useRequest } from "vue-request";
@@ -29,6 +29,14 @@ export const useSubStores = defineStore("sub", () => {
     const subscribeInfoList = computed(() => {
         return subscribeInfo.value?.data.records || []
     })
+
+    const {
+        loading: cancelLoading,
+        data: cancelResult,
+        run: cancelSubscribeFn
+    } = useRequest(cancelSubscribeInfo, {
+        manual: true
+    })
     return {
         syncLoading,
         syncSub,
@@ -38,6 +46,10 @@ export const useSubStores = defineStore("sub", () => {
         querySubscribeInfo,
         queryPageSize,
         queryCurrent,
-        queryTotal
+        queryTotal,
+
+        cancelLoading,
+        cancelResult,
+        cancelSubscribeFn
     }
 })
