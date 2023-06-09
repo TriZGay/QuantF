@@ -15,17 +15,28 @@ const basicQuoteMessage = computed(() => {
 //一个标的物对应一个echarts配置
 const echartsOptionMap = reactive({
     subscribing: [],//market+code
-    optionsMap: {}
+    optionsMap: {},
+    timeMap: {},// {key : []}
+    curPriceMap: {},  //当前价 {key : []}
+    volumeMap: {}, //成交量
+    turnoverMap: {}, // 成交额
+    lowPriceMap: {}, //最低价
+    highPriceMap: {}, //最高价
+    openPriecMap: {}, //开盘价
+    lastClosePriceMap: {}//昨收价
 })
-
-const timeAxis = ref([]);
-const basicQuoteValue = ref([]);
 
 watch(() => basicQuoteMessage, (message) => {
     let marketAndCode = message.value.content.security.market + "+" + message.value.content.security.code;
     if (echartsOptionMap.subscribing.indexOf(marketAndCode) > -1) {
-        timeAxis.value.push(basicQuote.content.updateTime);
-        basicQuoteValue.value.push(basicQuote.content.curPrice)
+        echartsOptionMap.timeMap[marketAndCode].push(message.value.content.updateTime)
+        echartsOptionMap.curPriceMap[marketAndCode].push(message.value.content.curPrice)
+        echartsOptionMap.volumeMap[marketAndCode].push(message.value.content.volume)
+        echartsOptionMap.turnoverMap[marketAndCode].push(message.value.content.turnover)
+        echartsOptionMap.lowPriceMap[marketAndCode].push(message.value.content.lowPrice)
+        echartsOptionMap.highPriceMap[marketAndCode].push(message.value.content.highPrice)
+        echartsOptionMap.openPriecMap[marketAndCode].push(message.value.content.openPrice)
+        echartsOptionMap.lastClosePriceMap[marketAndCode].push(message.value.content.lastClosePrice)
         echartsOptionMap.optionsMap[marketAndCode] = {
             title: {
                 text: marketAndCode + "基础报价",
@@ -43,22 +54,59 @@ watch(() => basicQuoteMessage, (message) => {
             xAxis: [{
                 type: "category",
                 boundaryGap: true,
-                data: timeAxis
+                data: echartsOptionMap.timeMap[marketAndCode]
             }],
             yAxis: [{
                 type: "value",
-
             }],
             series: [
                 {
-                    name: "Dynamic line",
+                    name: "最新价",
                     type: "line",
-                    data: basicQuoteValue
+                    data: echartsOptionMap.curPriceMap[marketAndCode]
+                },
+                {
+                    name: "成交量",
+                    type: "line",
+                    data: echartsOptionMap.volumeMap[marketAndCode]
+                },
+                {
+                    name: "成交额",
+                    type: "line",
+                    data: echartsOptionMap.turnoverMap[marketAndCode]
+                },
+                {
+                    name: "最低价",
+                    type: "line",
+                    data: echartsOptionMap.lowPriceMap[marketAndCode]
+                },
+                {
+                    name: "最高价",
+                    type: "line",
+                    data: echartsOptionMap.highPriceMap[marketAndCode]
+                },
+                {
+                    name: "看盘价",
+                    type: "line",
+                    data: echartsOptionMap.openPriecMap[marketAndCode]
+                },
+                {
+                    name: "昨天收盘价",
+                    type: "line",
+                    data: echartsOptionMap.lastClosePriceMap[marketAndCode]
                 }
             ]
         }
     } else {
         echartsOptionMap.subscribing.push(marketAndCode);
+        echartsOptionMap.timeMap[marketAndCode] = [];
+        echartsOptionMap.curPriceMap[marketAndCode] = [];
+        echartsOptionMap.volumeMap[marketAndCode] = [];
+        echartsOptionMap.turnoverMap[marketAndCode] = [];
+        echartsOptionMap.lowPriceMap[marketAndCode] = [];
+        echartsOptionMap.highPriceMap[marketAndCode] = [];
+        echartsOptionMap.openPriecMap[marketAndCode] = [];
+        echartsOptionMap.lastClosePriceMap[marketAndCode] = []
         echartsOptionMap.optionsMap[marketAndCode] = {
             title: {
                 text: marketAndCode + "基础报价",
@@ -80,11 +128,10 @@ watch(() => basicQuoteMessage, (message) => {
             }],
             yAxis: [{
                 type: "value",
-
             }],
             series: [
                 {
-                    name: "Dynamic line",
+                    name: "最新价",
                     type: "line",
                     data: []
                 }
