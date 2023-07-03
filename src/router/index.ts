@@ -74,6 +74,15 @@ const routes: RouteRecordRaw[] = [
           icon: "line-chart-outlined"
         },
         component: () => import("@/views/market/Indies.vue")
+      },
+      {
+        path:"/market/plates",
+        name:"PlateList",
+        meta:{
+          title:"板块",
+          icon: "line-chart-outlined"
+        },
+        component:()=>import("@/views/market/PlateList.vue")
       }
     ],
   },
