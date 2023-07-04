@@ -52,7 +52,7 @@ const routes: RouteRecordRaw[] = [
         path: "/market/stockList",
         name: "StockList",
         meta: {
-          title: "股票",
+          title: "正股",
           icon: "container-filled"
         },
         component: () => import("@/views/market/StockList.vue"),
@@ -74,15 +74,23 @@ const routes: RouteRecordRaw[] = [
           icon: "line-chart-outlined"
         },
         component: () => import("@/views/market/Indies.vue")
+      }, {
+        path: "/market/bond",
+        name: "BondList",
+        meta: {
+          title: "债券",
+          icon: "audit-outlined"
+        },
+        component: () => import("@/views/market/Bond.vue")
       },
       {
-        path:"/market/plates",
-        name:"PlateList",
-        meta:{
-          title:"板块",
-          icon: "line-chart-outlined"
+        path: "/market/plates",
+        name: "PlateList",
+        meta: {
+          title: "板块",
+          icon: "pie-chart-outlined"
         },
-        component:()=>import("@/views/market/PlateList.vue")
+        component: () => import("@/views/market/PlateList.vue")
       }
     ],
   },
@@ -147,10 +155,10 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/realtime",
-    redirect:"/realtime/rtk",
+    redirect: "/realtime/rtk",
     meta: {
       title: "实时",
-      icon:"fund-outlined"
+      icon: "fund-outlined"
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
