@@ -2,14 +2,14 @@
 //@ts-nocheck
 import { useStockStore } from '@/stores/stock';
 import { storeToRefs } from 'pinia';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
-import { parseMarket, parseExchangeType,FT_MARKET,FT_EXCHANGE_TYPE } from '@/api/code'
-import type { FormInstance } from 'ant-design-vue';
+import { parseMarket, parseExchangeType, FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
+import { message, type FormInstance } from 'ant-design-vue';
 import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
-import { fetPlateByStockId } from '@/api/stock';
+import { subscribe } from '@/api/sub'
 
 const stockStore = useStockStore()
 const queryStocks = stockStore.run;
@@ -51,12 +51,7 @@ const stocksColumns = ref([
         fixed: "right"
     }
 ])
-const plateColumns = ref([
-    {
-        title: "板块名称",
-        dataIndex: "name",
-    }
-])
+
 const pagination = computed<Object>(() => {
     return {
         total: total.value,
@@ -119,19 +114,49 @@ function handleSearchFormState() {
     })
     return queryForm;
 }
-function expandRow(expanded, record) {
-    if (expanded) {
-        //展开时查询
-        fetPlateByStockId(record.id)
-            .then(res => {
-                if (res.status === 200) {
-                    record.plates = res.data;
-                }
-            })
-    } else {
-        //收缩
-    }
+const subTypes = computed(() => {
+    let arr = []
+    Object.keys(FT_SUB_TYPE).forEach(key => {
+        arr.push({
+            label: FT_SUB_TYPE[key],
+            value: key
+        })
+    })
+    return arr;
+})
+
+
+const selectedSubType = ref([]);
+
+function onClick2Subscribe(row) {
+    let { market, code, name, stockType } = row;
+    subscribe({
+        securityList: [{
+            market: market,
+            code: code,
+            name: name,
+            type: stockType
+        }],
+        subTypeList: selectedSubType.value
+    }).then(res => {
+        message.success(res.data)
+    }).catch(err => {
+        message.error(err.response.data)
+    })
 }
+
+const checkAll = ref(false);
+const indeterminate = ref(false)
+
+function onCheckAllChange(e: any) {
+    indeterminate.value = false;
+    selectedSubType.value = e.target.checked ? subTypes.value.map(v => v.value) : [];
+}
+
+watch(() => selectedSubType, (val) => {
+    indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
+    checkAll.value = val.value.length === subTypes.value.length;
+}, { deep: true })
 </script>
 <template>
     <div class="stock-list-container">
@@ -169,7 +194,7 @@ function expandRow(expanded, record) {
             </a-row>
         </a-form>
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable" @expand="expandRow">
+            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'listingDate'">
                     {{ parseDate(record.listingDate) }}
@@ -185,18 +210,30 @@ function expandRow(expanded, record) {
                 </template>
                 <template v-if="column.key === 'action'">
                     <span>
-                        <a>订阅</a>
+                        <a-dropdown :trigger="['click']">
+                            <a @click.prevent>
+                                订阅
+                                <DownOutlined />
+                            </a>
+                            <template #overlay>
+                                <a-menu style="padding: 10px 10px;">
+                                    <a-checkbox v-model:checked="checkAll" :indeterminate="indeterminate"
+                                        @change="onCheckAllChange">全选</a-checkbox>
+                                    <br />
+                                    <a-checkbox-group style="width:100px" v-model:value="selectedSubType"
+                                        :options="subTypes" />
+                                    <br />
+                                    <a-button type="primary" size="small" @click="onClick2Subscribe(record)">确定</a-button>
+                                </a-menu>
+                            </template>
+                        </a-dropdown>
                         <a-divider type="vertical" />
                     </span>
                 </template>
             </template>
-            <template #expandedRowRender="{ record }">
-                <a-table :columns="plateColumns" :data-source="record.plates" :pagination="false"></a-table>
-            </template>
         </a-table>
     </div>
 </template>
-
 <style lang="less" scoped>
 .searchResult {
     margin-top: 16px;
