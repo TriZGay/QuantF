@@ -11,10 +11,19 @@ export interface PositionResult {
 export interface Position {
     name: string
 }
+
+export interface OrderRequest {
+
+}
+
 export function refreshPositions() {
     return request.get<string>("/api/acc/refreshAllPosition")
 }
 
 export function fetchPositions(queryRequest: PositionsQueryRequest) {
     return request.post<PositionResult>("/api/acc/positions", queryRequest)
+}
+
+export function placeOrder(orderRequest: OrderRequest) {
+    return request.post<string>("/api/trade/order", orderRequest)
 }

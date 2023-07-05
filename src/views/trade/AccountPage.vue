@@ -1,7 +1,7 @@
 <script setup lang="ts">
 //@ts-nocheck
 import { FT_ACC_TYPE, FT_FIRM, FT_SIM_ACC_TYPE, FT_TRADE_ENV, FT_TRADE_MARKET_AUTH } from '@/api/code';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { useAccountStore } from '@/stores/account';
 import { storeToRefs } from 'pinia';
 import { fetchAccInfoByAccId, refreshAcc, refreshFunds } from '@/api/account';
@@ -136,10 +136,22 @@ function queryAccInfoByAccId(expanded, record) {
     }
 }
 
+const openTradeModal = ref<boolean>(false);
 
+const tradeForm = reactive<Object>({
+    
+})
+
+function order() {
+    console.log('下单')
+    openTradeModal.value = false
+}
 </script>
 <template>
     <div class="account-list-container">
+        <a-modal v-model:visible="openTradeModal" title="交易" @ok="order">
+            <p>ddd</p>
+        </a-modal>
         <a-button type="primary" @click="refreshAccList" style="margin-right: 8px;">
             <template #icon>
                 <reload-outlined />
@@ -199,7 +211,7 @@ function queryAccInfoByAccId(expanded, record) {
                 </template>
                 <template v-if="column.key === 'action'">
                     <span>
-                        <a>交易</a>
+                        <a @click="openTradeModal = true">交易</a>
                         <a-divider type="vertical" />
                     </span>
                 </template>
