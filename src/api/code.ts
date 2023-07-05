@@ -96,6 +96,26 @@ export const FT_SECURITY_TYPE = {
     10: "期货",
 }
 
+export const FT_POSITION_SIDE = {
+    0: "未知",
+    1: "买入",
+    2: "卖出",
+    3: "卖空",
+    4: "买回"
+}
+
+export function parsePositionSide(value: Number) {
+    return FT_POSITION_SIDE[value];
+}
+
+export function parseTradeMarketAuth(value: Number) {
+    return FT_TRADE_MARKET_AUTH[value];
+}
+
+export function parseTradeEnv(value: Number) {
+    return FT_TRADE_ENV[value];
+}
+
 export function parseMarket(marketValue: Number) {
     return FT_MARKET[marketValue];
 }
