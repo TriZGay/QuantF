@@ -13,6 +13,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },
+      '/ana': {
+        target: "http://localhost:9091",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ana/, '')
+      }
     }
   },
   resolve: {

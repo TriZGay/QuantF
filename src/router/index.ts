@@ -181,6 +181,22 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/trade/RealTimeBaseQuote.vue")
       }
     ]
+  }, {
+    path: "/analyze",
+    redirect: "/analyze/k",
+    meta: {
+      title: "统计分析",
+      icon: "stock-outlined"
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: [{
+      path: "/analyze/k",
+      meta: {
+        title: "K线",
+        icon: "sliders-outlined"
+      },
+      component: () => import("@/views/analyze/K.vue")
+    }]
   }
 ];
 
