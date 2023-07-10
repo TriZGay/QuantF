@@ -27,3 +27,8 @@ export interface BasicQuote {
 export function fetchBasicQuotes(basicQuoteRequest: BasicQuoteRequest) {
     return request.post<BasicQuote[]>("/ana/quote/list", basicQuoteRequest);
 }
+
+//有指数数据的codes
+export function fetchMetaIndiesCodes() {
+    return request.get<Object>("/ana/meta/indiesCodes")
+}
