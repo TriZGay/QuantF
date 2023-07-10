@@ -10,10 +10,11 @@ export interface StockResult {
 }
 
 export interface StockQueryRequest {
-    exchangeType?:number,
-    delisting?:number,
-    stockType?:number,
+    exchangeType?: number,
+    delisting?: number,
+    stockType?: number,
     market?: number,
+    name?: string,
     size?: number,
     current?: number
 }

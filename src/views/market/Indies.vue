@@ -101,6 +101,11 @@ const formState = reactive({
             0: "否"
         },
         bindValue: '0'
+    },
+    name: {
+        name: "名称",
+        type: "input",
+        bindValue: ""
     }
 });
 function onFinish(values: any) {
@@ -166,7 +171,7 @@ watch(() => selectedSubType, (val) => {
 </script>
 <template>
     <div class="stock-list-container">
-        <a-form ref="formRef" :model="formState" @finish="onFinish">
+        <a-form ref="formRef" :model="formState" :label-col="{ style: { width: '65px' } }" @finish="onFinish">
             <a-row :gutter="24">
                 <template v-for="(value, key, index) in formState" :key="key">
                     <a-col v-show="expand || index <= 6" :span="8">
@@ -178,6 +183,9 @@ watch(() => selectedSubType, (val) => {
                                         {{ value.kv[option] }}
                                     </a-select-option>
                                 </a-select>
+                            </template>
+                            <template v-if="value.type === 'input'">
+                                <a-input v-model:value="value.bindValue" placeholder="请输入名称" />
                             </template>
                         </a-form-item>
                     </a-col>

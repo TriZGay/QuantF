@@ -73,6 +73,7 @@ const formState = reactive({
         bindValue: Object.keys(indiesCodes.value)[1]
     },
     range: {
+        name:"时间范围",
         type: "date-range",
         bindValue: [dayjs(), dayjs().subtract(1, "minute")],
         ranges: {
