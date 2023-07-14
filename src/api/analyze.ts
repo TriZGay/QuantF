@@ -6,6 +6,12 @@ export interface BasicQuoteRequest {
     end: string
 }
 
+export interface KLineRequest {
+    code: string,
+    start: string,
+    end: string
+}
+
 export interface BasicQuote {
     code: string,
     amplitude: number,
@@ -24,11 +30,36 @@ export interface BasicQuote {
     volume: number
 }
 
+export interface KLine {
+    market: number,
+    code: string,
+    highPrice: number,
+    openPrice: number,
+    lowPrice: number,
+    closePrice: number,
+    lastClosePrice: number,
+    volume: number,
+    turnover: number,
+    turnoverRate: number,
+    pe: number,
+    changeRate: number,
+    updateTime: string
+}
+
 export function fetchBasicQuotes(basicQuoteRequest: BasicQuoteRequest) {
     return request.post<BasicQuote[]>("/ana/quote/list", basicQuoteRequest);
+}
+
+export function fetchDayKData(klineRequest: KLineRequest) {
+    return request.post<KLine[]>("/ana/k/dayK", klineRequest)
 }
 
 //有指数数据的codes
 export function fetchMetaIndiesCodes() {
     return request.get<Object>("/ana/meta/indiesCodes")
+}
+
+//有日K数据的codes
+export function fetchMetaDayKCodes() {
+    return request.get<[[]]>("/ana/meta/dayKCodes")
 }
