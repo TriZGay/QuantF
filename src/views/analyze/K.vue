@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 //@ts-nocheck
 import DayK from './components/dayK.vue'
+import min15K from './components/min15K.vue';
 import { ref } from 'vue';
 const activeTab = ref('1')
 
@@ -9,7 +10,7 @@ const activeTab = ref('1')
     <div class="k-line-container">
         <a-tabs v-model:activeKey="activeTab">
             <a-tab-pane key="1" tab="日K">
-                <DayK/>
+                <DayK />
             </a-tab-pane>
             <a-tab-pane key="2" tab="周K">周 k</a-tab-pane>
             <a-tab-pane key="3" tab="月K">day k</a-tab-pane>
@@ -18,7 +19,9 @@ const activeTab = ref('1')
             <a-tab-pane key="6" tab="1分K">day k</a-tab-pane>
             <a-tab-pane key="7" tab="3分K">day k</a-tab-pane>
             <a-tab-pane key="8" tab="5分K">day k</a-tab-pane>
-            <a-tab-pane key="9" tab="15分K">day k</a-tab-pane>
+            <a-tab-pane key="9" tab="15分K">
+                <min15K />
+            </a-tab-pane>
             <a-tab-pane key="10" tab="30分K">day k</a-tab-pane>
             <a-tab-pane key="11" tab="60分K">day k</a-tab-pane>
         </a-tabs>

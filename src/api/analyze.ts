@@ -54,6 +54,10 @@ export function fetchDayKData(klineRequest: KLineRequest) {
     return request.post<KLine[]>("/ana/k/dayK", klineRequest)
 }
 
+export function fetchMin15KData(klineRequest: KLineRequest) {
+    return request.post<KLine[]>("/ana/k/min15K", klineRequest)
+}
+
 //有指数数据的codes
 export function fetchMetaIndiesCodes() {
     return request.get<Object>("/ana/meta/indiesCodes")
@@ -62,4 +66,9 @@ export function fetchMetaIndiesCodes() {
 //有日K数据的codes
 export function fetchMetaDayKCodes() {
     return request.get<[[]]>("/ana/meta/dayKCodes")
+}
+
+//有15分K数据的codes
+export function fetchMetaMin15KCodes() {
+    return request.get<[[]]>("/ana/meta/min15Codes")
 }
