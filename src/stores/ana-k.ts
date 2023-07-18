@@ -1,4 +1,4 @@
-import { fetchDayKData, fetchMin15KData, fetchMin1KData } from "@/api/analyze";
+import { fetchDayKData, fetchMin15KData, fetchMin1KData, fetchMin3KData } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useRequest } from "vue-request";
@@ -40,6 +40,18 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
         return min1K.value?.data || []
     })
 
+    const {
+        loading: min3KLoading,
+        data: min3K,
+        run: requestMin3K
+    } = useRequest(fetchMin3KData, {
+        manual: true
+    })
+
+    const min3KData = computed(() => {
+        return min3K.value?.data || []
+    })
+
     return {
         dayKLoading,
         dayKData,
@@ -49,6 +61,9 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
         requestMin15K,
         min1KLoading,
         min1KData,
-        requestMin1K
+        requestMin1K,
+        min3KLoading,
+        min3KData,
+        requestMin3K
     }
 })
