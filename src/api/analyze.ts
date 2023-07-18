@@ -78,6 +78,10 @@ export function fetchMin60KData(klineRequest: KLineRequest) {
     return request.post<KLine[]>("/ana/k/min60K", klineRequest)
 }
 
+export function fetchWeekKData(klineRequest: KLineRequest) {
+    return request.post<KLine[]>("/ana/k/weekK", klineRequest)
+}
+
 //有指数数据的codes
 export function fetchMetaIndiesCodes() {
     return request.get<Object>("/ana/meta/indiesCodes")
@@ -116,4 +120,9 @@ export function fetchMetaMin30KCodes() {
 //有60分K数据的codes
 export function fetchMetaMin60KCodes() {
     return request.get<[[]]>("/ana/meta/min60Codes")
+}
+
+//有周K数据的codes
+export function fetchMetaWeekKCodes() {
+    return request.get<[[]]>("/ana/meta/weekKCodes")
 }

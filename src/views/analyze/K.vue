@@ -7,6 +7,7 @@ import min3K from './components/min3K.vue';
 import min5K from './components/min5K.vue';
 import min30K from './components/min30K.vue';
 import min60K from './components/min60K.vue';
+import weekK from './components/weekK.vue';
 import { ref } from 'vue';
 const activeTab = ref('1')
 
@@ -17,7 +18,9 @@ const activeTab = ref('1')
             <a-tab-pane key="1" tab="日K">
                 <DayK />
             </a-tab-pane>
-            <a-tab-pane key="2" tab="周K">周 k</a-tab-pane>
+            <a-tab-pane key="2" tab="周K">
+                <weekK />
+            </a-tab-pane>
             <a-tab-pane key="3" tab="月K">day k</a-tab-pane>
             <a-tab-pane key="4" tab="季K">day k</a-tab-pane>
             <a-tab-pane key="5" tab="月K">day k</a-tab-pane>
