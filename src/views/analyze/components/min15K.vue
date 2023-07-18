@@ -82,6 +82,7 @@ const formState = reactive({
 });
 function onFinish(values: any) {
     fetchMethod({
+        rehabType: 1,
         code: values.code.bindValue,
         start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
         end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
