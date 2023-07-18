@@ -8,15 +8,15 @@ import type { FormInstance } from 'ant-design-vue';
 import * as dayjs from 'dayjs'
 
 const analyzeMetaStores = useAnalyzeMeta();
-const fetchCodes = analyzeMetaStores.requestMin3KCodes;
-const { min3KCodes } = storeToRefs(analyzeMetaStores);
+const fetchCodes = analyzeMetaStores.requestMin5KCodes;
+const { min5KCodes } = storeToRefs(analyzeMetaStores);
 
 const analyzeKStores = useAnalyzeKline();
-const fetchMethod = analyzeKStores.requestMin3K;
-const { min3KData, min3KLoading } = storeToRefs(analyzeKStores);
+const fetchMethod = analyzeKStores.requestMin5K;
+const { min5KData, min5KLoading } = storeToRefs(analyzeKStores);
 const kLineOptions = ref({})
 
-watch(() => min3KData, kline => {
+watch(() => min5KData, kline => {
     let xAxisTime = [];
     let candelstickArray = [];
     kline.value.forEach(k => {
@@ -68,7 +68,7 @@ const formState = reactive({
     code: {
         name: "标的物代码",
         type: "select",
-        kv: min3KCodes,
+        kv: min5KCodes,
         bindValue: ""
     },
     range: {
@@ -128,6 +128,6 @@ fetchCodes()
             </a-col>
         </a-row>
     </a-form>
-    <v-chart style="height: 400px;" :loading="min3KLoading" :autoresize="true" :option="kLineOptions"></v-chart>
+    <v-chart style="height: 400px;" :loading="min5KLoading" :autoresize="true" :option="kLineOptions"></v-chart>
 </template>
 <style scoped lang="less"></style>
