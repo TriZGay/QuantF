@@ -1,4 +1,4 @@
-import { fetchMetaDayKCodes, fetchMetaIndiesCodes, fetchMetaMin15KCodes, fetchMetaMin1KCodes, fetchMetaMin30KCodes, fetchMetaMin3KCodes, fetchMetaMin5KCodes, fetchMetaMin60KCodes, fetchMetaWeekKCodes, fetchMin5KData } from "@/api/analyze";
+import { fetchMetaDayKCodes, fetchMetaIndiesCodes, fetchMetaMin15KCodes, fetchMetaMin1KCodes, fetchMetaMin30KCodes, fetchMetaMin3KCodes, fetchMetaMin5KCodes, fetchMetaMin60KCodes, fetchMetaMonthKCodes, fetchMetaWeekKCodes, fetchMin5KData } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useRequest } from "vue-request";
@@ -103,6 +103,17 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
         return weekKMetaCodes.value?.data || []
     })
 
+    const {
+        data: monthKMetaCodes,
+        run: requestMonthKCodes
+    } = useRequest(fetchMetaMonthKCodes, {
+        manual: true
+    })
+
+    const monthKCodes = computed(() => {
+        return monthKMetaCodes.value?.data || []
+    })
+
     return {
         indiesCodes,
         requestIndiesCodes,
@@ -121,6 +132,8 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
         min60KCodes,
         requestMin60KCodes,
         weekKCodes,
-        requestWeekKCodes
+        requestWeekKCodes,
+        monthKCodes,
+        requestMonthKCodes
     }
 })
