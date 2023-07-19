@@ -86,6 +86,10 @@ export function fetchMonthKData(klineRequest: KLineRequest) {
     return request.post<KLine[]>("/ana/k/monthK", klineRequest)
 }
 
+export function fetchQuarterKData(klineRequest: KLineRequest) {
+    return request.post<KLine[]>("/ana/k/quarterK", klineRequest)
+}
+
 //有指数数据的codes
 export function fetchMetaIndiesCodes() {
     return request.get<Object>("/ana/meta/indiesCodes")
@@ -134,4 +138,8 @@ export function fetchMetaWeekKCodes() {
 //有月K数据的codes
 export function fetchMetaMonthKCodes() {
     return request.get<[[]]>("/ana/meta/monthKCodes")
+}
+
+export function fetchMetaQuarterKCodes() {
+    return request.get<[[]]>("/ana/meta/quarterKCodes")
 }
