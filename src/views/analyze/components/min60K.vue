@@ -19,35 +19,95 @@ const kLineOptions = ref({})
 watch(() => min60KData, kline => {
     let xAxisTime = [];
     let candelstickArray = [];
-    kline.value.forEach(k => {
+    let volumes = [];
+    kline.value.forEach((k, index) => {
         xAxisTime.push(k.updateTime);
         candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice])
+        volumes.push([index, k.volume, k.openPrice > k.closePrice ? 1 : -1])
     })
     kLineOptions.value = {
-        xAxis: {
-            data: xAxisTime
-        },
-        yAxis: {
+        xAxis: [{
+            type: "category",
+            data: xAxisTime,
+            boundaryGap: false,
+            axisLine: { onZero: false },
+            splitLine: { show: false },
+            axisPointer: {
+                z: 100
+            }
+        }, {
+            type: "category",
+            data: xAxisTime,
+            boundaryGap: false,
+            gridIndex: 1,
+            axisLine: { onZero: false },
+            axisTick: { show: false },
+            splitLine: { show: false },
+            axisLabel: { show: false },
+        }],
+        yAxis: [{
             scale: true,
             splitArea: {
                 show: true
             }
-        },
+        }, {
+            scale: true,
+            gridIndex: 1,
+            splitNumber: 2,
+            axisLabel: { show: false },
+            axisLine: { show: false },
+            axisTick: { show: false },
+            splitLine: { show: false }
+        }],
         tooltip: {
             trigger: 'axis',
             axisPointer: {
                 type: 'cross'
             }
         },
+        axisPointer: {
+            link: [
+                {
+                    xAxisIndex: 'all'
+                }
+            ],
+
+        },
+        visualMap: {
+            show: false,
+            seriesIndex: 1,
+            dimension: 2,
+            pieces: [
+                {
+                    value: 1,
+                    color: '#00da3c'
+                },
+                {
+                    value: -1,
+                    color: '#ec0000'
+                }
+            ]
+        },
+        grid: [
+            {
+                height: '50%'
+            },
+            {
+                top: '65%',
+                height: '25%'
+            }
+        ],
         dataZoom: [
             {
                 type: "inside",
+                xAxisIndex: [0, 1],
                 start: 50,
                 end: 100
             },
             {
                 show: true,
                 type: 'slider',
+                xAxisIndex: [0, 1],
                 top: '90%',
                 start: 50,
                 end: 100
@@ -55,8 +115,16 @@ watch(() => min60KData, kline => {
         ],
         series: [
             {
+                name: formState.code.bindValue,
                 type: "candlestick",
-                data: candelstickArray
+                data: candelstickArray,
+            },
+            {
+                name: '成交量',
+                type: 'bar',
+                xAxisIndex: 1,
+                yAxisIndex: 1,
+                data: volumes
             }
         ]
     }
