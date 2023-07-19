@@ -1,4 +1,4 @@
-import { fetchDayKData, fetchMin15KData, fetchMin1KData, fetchMin30KData, fetchMin3KData, fetchMin5KData, fetchMin60KData, fetchMonthKData, fetchQuarterKData, fetchWeekKData } from "@/api/analyze";
+import { fetchDayKData, fetchMin15KData, fetchMin1KData, fetchMin30KData, fetchMin3KData, fetchMin5KData, fetchMin60KData, fetchMonthKData, fetchQuarterKData, fetchWeekKData, fetchYearKData } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useRequest } from "vue-request";
@@ -124,6 +124,18 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
         return quarterK.value?.data || []
     })
 
+    const {
+        loading: yearKLoading,
+        data: yearK,
+        run: requestYearK
+    } = useRequest(fetchYearKData, {
+        manual: true
+    })
+
+    const yearKData = computed(() => {
+        return yearK.value?.data || []
+    })
+
     return {
         dayKLoading,
         dayKData,
@@ -154,6 +166,9 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
         requestMonthK,
         quarterKLoading,
         quarterKData,
-        requestQuarterK
+        requestQuarterK,
+        yearKLoading,
+        yearKData,
+        requestYearK
     }
 })
