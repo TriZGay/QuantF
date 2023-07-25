@@ -1,3 +1,3 @@
 export declare interface Message {
-    type: "JOIN_IN" | "NOTIFY"
+    type: "JOIN_IN" | "NOTIFY" | "MARKET_STATE"
 }

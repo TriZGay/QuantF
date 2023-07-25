@@ -2,17 +2,13 @@
 //@ts-nocheck
 import { UseNow } from '@vueuse/components'
 import { ref, watch } from 'vue';
-import { useGlobalFTState } from '@/stores/global';
 import { storeToRefs } from 'pinia';
 import { useMarketState } from '@/stores/market';
 import * as dayjs from 'dayjs';
 
-const global = useGlobalFTState();
-const { notify } = storeToRefs(global);
-
 const marketState = useMarketState();
 const refreshMartketState = marketState.run;
-const { loading } = storeToRefs(marketState)
+const { loading, rtMarketState } = storeToRefs(marketState)
 
 const globalMarketState = ref({
   time: "",
@@ -26,8 +22,8 @@ const globalMarketState = ref({
   marketJPFuture: ""
 })
 
-watch(() => notify, (message) => {
-  globalMarketState.value = JSON.parse(message.value.content)
+watch(() => rtMarketState, (message) => {
+  globalMarketState.value = message.value
 }, { deep: true })
 
 

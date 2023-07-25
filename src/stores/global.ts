@@ -4,7 +4,7 @@ import { defineStore } from "pinia";
 import { notification } from "ant-design-vue";
 import { computed } from 'vue';
 export const useGlobalFTState = defineStore("global", () => {
-    const { status, data } = useWebSocket("ws://localhost:9090/websocket/notify", {
+    const { status, data } = useWebSocket("ws://localhost:9093/websocket/notify", {
         onMessage(ws, event) {
             const notify = JSON.parse(event.data);
             if (notify.type === 'NOTIFY') {
