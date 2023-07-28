@@ -11,3 +11,7 @@ export function disconnect2FT() {
 export function fetchGlobalMartketState() {
     return request.get<string>("/api/global/")
 }
+
+export function syncTradeDate() {
+    return request.get<string>("/api/sync/tradeDate")
+}
