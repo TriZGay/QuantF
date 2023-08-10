@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { reactive, ref, watch } from 'vue';
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from '@/stores/ana-k';
+import { useAnalyzeMa } from '@/stores/ana-ma';
 import type { FormInstance } from 'ant-design-vue';
 import * as dayjs from 'dayjs'
 
@@ -14,164 +15,24 @@ const { dayKCodes } = storeToRefs(analyzeMetaStores);
 const analyzeKStores = useAnalyzeKline();
 const fetchMethod = analyzeKStores.requestDayK;
 const { dayKData, dayKLoading } = storeToRefs(analyzeKStores);
-const kLineOptions = ref({})
 
-watch(() => dayKData, kline => {
-    let xAxisTime = [];
-    let candelstickArray = [];
-    let volumes = [];
-    kline.value.forEach((k, index) => {
-        xAxisTime.push(k.updateTime);
-        candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice])
-        volumes.push([index, k.volume, k.openPrice > k.closePrice ? 1 : -1])
-    })
-    kLineOptions.value = {
-        toolbox: {
-            feature: {
-                myTool1: {
-                    show: true,
-                    title: "前复权",
-                    icon: 'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
-                    onclick: function () {
-                        fetchMethod({
-                            rehabType: 1,
-                            code: formState.code.bindValue,
-                            start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-                            end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
-                        })
-                    }
-                },
-                myTool2: {
-                    show: true,
-                    title: "后复权",
-                    icon: 'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
-                    onclick: function () {
-                        fetchMethod({
-                            rehabType: 2,
-                            code: formState.code.bindValue,
-                            start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-                            end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
-                        })
-                    }
-                },
-                myTool3: {
-                    show: true,
-                    title: "不复权",
-                    icon: 'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
-                    onclick: function () {
-                        fetchMethod({
-                            rehabType: 0,
-                            code: formState.code.bindValue,
-                            start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-                            end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
-                        })
-                    }
-                }
-            },
-        },
-        xAxis: [{
-            type: "category",
-            data: xAxisTime,
-            boundaryGap: false,
-            axisLine: { onZero: false },
-            splitLine: { show: false },
-            axisPointer: {
-                z: 100
-            }
-        }, {
-            type: "category",
-            data: xAxisTime,
-            boundaryGap: false,
-            gridIndex: 1,
-            axisLine: { onZero: false },
-            axisTick: { show: false },
-            splitLine: { show: false },
-            axisLabel: { show: false },
-        }],
-        yAxis: [{
-            scale: true,
-            splitArea: {
-                show: true
-            }
-        }, {
-            scale: true,
-            gridIndex: 1,
-            splitNumber: 2,
-            axisLabel: { show: false },
-            axisLine: { show: false },
-            axisTick: { show: false },
-            splitLine: { show: false }
-        }],
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross'
-            }
-        },
-        axisPointer: {
-            link: [
-                {
-                    xAxisIndex: 'all'
-                }
-            ],
+const analyzeMaStores = useAnalyzeMa();
+const fetchDayKMa5 = analyzeMaStores.requestDayKMa5;
+const fetchDayKMa10 = analyzeMaStores.requestDayKMa10;
+const fetchDayKMa20 = analyzeMaStores.requestDayKMa20;
+const fetchDayKMa30 = analyzeMaStores.requestDayKMa30;
+const { dayKMa5, dayKMa5Loading,
+    dayKMa10, dayKMa10Loading,
+    dayKMa20, dayKMa20Loading,
+    dayKMa30, dayKMa30Loading } = storeToRefs(analyzeMaStores);
 
-        },
-        visualMap: {
-            show: false,
-            seriesIndex: 1,
-            dimension: 2,
-            pieces: [
-                {
-                    value: 1,
-                    color: '#00da3c'
-                },
-                {
-                    value: -1,
-                    color: '#ec0000'
-                }
-            ]
-        },
-        grid: [
-            {
-                height: '50%'
-            },
-            {
-                top: '65%',
-                height: '25%'
-            }
-        ],
-        dataZoom: [
-            {
-                type: "inside",
-                xAxisIndex: [0, 1],
-                start: 50,
-                end: 100
-            },
-            {
-                show: true,
-                type: 'slider',
-                xAxisIndex: [0, 1],
-                top: '90%',
-                start: 50,
-                end: 100
-            }
-        ],
-        series: [
-            {
-                name: formState.code.bindValue,
-                type: "candlestick",
-                data: candelstickArray,
-            },
-            {
-                name: '成交量',
-                type: 'bar',
-                xAxisIndex: 1,
-                yAxisIndex: 1,
-                data: volumes
-            }
-        ]
-    }
-}, { deep: true })
+const xAxisTimeRef = ref([]);
+const candelstickArrayRef = ref([]);
+const volumesRef = ref([]);
+const ma5Ref = ref([]);
+const ma10Ref = ref([]);
+const ma20Ref = ref([]);
+const ma30Ref = ref([]);
 
 const expand = ref<boolean>(false);
 const formRef = ref<FormInstance>();
@@ -191,8 +52,336 @@ const formState = reactive({
         }
     }
 });
+
+const kLineOptions = reactive({
+    toolbox: {
+        feature: {
+            myTool1: {
+                show: true,
+                title: "前复权",
+                icon: 'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
+                onclick: function () {
+                    fetchMethod({
+                        rehabType: 1,
+                        code: formState.code.bindValue,
+                        start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa5({
+                        rehabType: 1,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa10({
+                        rehabType: 1,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa20({
+                        rehabType: 1,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa30({
+                        rehabType: 1,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                }
+            },
+            myTool2: {
+                show: true,
+                title: "后复权",
+                icon: 'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
+                onclick: function () {
+                    fetchMethod({
+                        rehabType: 2,
+                        code: formState.code.bindValue,
+                        start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa5({
+                        rehabType: 2,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa10({
+                        rehabType: 2,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa20({
+                        rehabType: 2,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa30({
+                        rehabType: 2,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                }
+            },
+            myTool3: {
+                show: true,
+                title: "不复权",
+                icon: 'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
+                onclick: function () {
+                    fetchMethod({
+                        rehabType: 0,
+                        code: formState.code.bindValue,
+                        start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa5({
+                        rehabType: 0,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa10({
+                        rehabType: 0,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa20({
+                        rehabType: 0,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                    fetchDayKMa30({
+                        rehabType: 0,
+                        code: values.code.bindValue,
+                        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+                        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+                    })
+                }
+            }
+        },
+    },
+    xAxis: [{
+        type: "category",
+        data: xAxisTimeRef,
+        boundaryGap: false,
+        axisLine: { onZero: false },
+        splitLine: { show: false },
+        axisPointer: {
+            z: 100
+        }
+    }, {
+        type: "category",
+        data: xAxisTimeRef,
+        boundaryGap: false,
+        gridIndex: 1,
+        axisLine: { onZero: false },
+        axisTick: { show: false },
+        splitLine: { show: false },
+        axisLabel: { show: false },
+    }],
+    yAxis: [{
+        scale: true,
+        splitArea: {
+            show: true
+        }
+    }, {
+        scale: true,
+        gridIndex: 1,
+        splitNumber: 2,
+        axisLabel: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { show: false }
+    }, {
+        scale: true,
+        axisLabel: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { show: false }
+    }],
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'cross'
+        }
+    },
+    axisPointer: {
+        link: [
+            {
+                xAxisIndex: 'all'
+            }
+        ],
+
+    },
+    visualMap: {
+        show: false,
+        seriesIndex: 1,
+        dimension: 2,
+        pieces: [
+            {
+                value: 1,
+                color: '#00da3c'
+            },
+            {
+                value: -1,
+                color: '#ec0000'
+            }
+        ]
+    },
+    grid: [
+        {
+            height: '50%'
+        },
+        {
+            top: '65%',
+            height: '25%'
+        }
+    ],
+    dataZoom: [
+        {
+            type: "inside",
+            xAxisIndex: [0, 1],
+            start: 50,
+            end: 100
+        },
+        {
+            show: true,
+            type: 'slider',
+            xAxisIndex: [0, 1],
+            top: '90%',
+            start: 50,
+            end: 100
+        }
+    ],
+    series: [
+        {
+            name: formState.code.bindValue,
+            type: "candlestick",
+            data: candelstickArrayRef,
+        },
+        {
+            name: '成交量',
+            type: 'bar',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: volumesRef
+        },
+        {
+            name: "MA5",
+            type: "line",
+            yAxisIndex: 2,
+            data: ma5Ref
+        }
+        ,
+        {
+            name: "MA10",
+            type: "line",
+            yAxisIndex: 2,
+            data: ma10Ref
+        }
+        ,
+        {
+            name: "MA20",
+            type: "line",
+            yAxisIndex: 2,
+            data: ma20Ref
+        }
+        ,
+        {
+            name: "MA30",
+            type: "line",
+            yAxisIndex: 2,
+            data: ma30Ref
+        }
+    ]
+})
+
+watch(() => dayKMa30, ma30 => {
+    let xAxisTime = [];
+    let ma30Datas = [];
+    ma30.value.forEach((value, index) => {
+        xAxisTime.push(value.updateTime);
+        ma30Datas.push(value.maValue)
+    })
+}, { deep: true })
+
+watch(() => dayKMa20, ma20 => {
+    let xAxisTime = [];
+    let ma20Datas = [];
+    ma20.value.forEach((value, index) => {
+        xAxisTime.push(value.updateTime);
+        ma20Datas.push(value.maValue)
+    })
+}, { deep: true })
+
+watch(() => dayKMa10, ma10 => {
+    let xAxisTime = [];
+    let ma10Datas = [];
+    ma10.value.forEach((value, index) => {
+        xAxisTime.push(value.updateTime);
+        ma10Datas.push(value.maValue)
+    })
+}, { deep: true })
+
+watch(() => dayKMa5, ma5 => {
+    let xAxisTime = [];
+    let ma5Datas = [];
+    ma5.value.forEach((value, index) => {
+        xAxisTime.push(value.updateTime);
+        ma5Datas.push(value.maValue)
+    })
+    ma5Ref.value = ma5Datas
+}, { deep: true })
+
+watch(() => dayKData, kline => {
+    let xAxisTime = [];
+    let candelstickArray = [];
+    let volumes = [];
+    kline.value.forEach((k, index) => {
+        xAxisTime.push(k.updateTime);
+        candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice])
+        volumes.push([index, k.volume, k.openPrice > k.closePrice ? 1 : -1])
+    })
+    xAxisTimeRef.value = xAxisTime;
+    candelstickArrayRef.value = candelstickArray;
+    volumesRef.value = volumes;
+}, { deep: true })
+
 function onFinish(values: any) {
     fetchMethod({
+        rehabType: 1,
+        code: values.code.bindValue,
+        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+    })
+    fetchDayKMa5({
+        rehabType: 1,
+        code: values.code.bindValue,
+        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+    })
+    fetchDayKMa10({
+        rehabType: 1,
+        code: values.code.bindValue,
+        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+    })
+    fetchDayKMa20({
+        rehabType: 1,
+        code: values.code.bindValue,
+        start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
+        end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+    })
+    fetchDayKMa30({
         rehabType: 1,
         code: values.code.bindValue,
         start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),

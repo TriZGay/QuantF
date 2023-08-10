@@ -46,6 +46,21 @@ export interface KLine {
     updateTime: string
 }
 
+export interface MaRequest {
+    code: string,
+    start: string,
+    end: string
+}
+
+export interface MaData {
+    market: number,
+    code: string,
+    rehabType: number,
+    maValue: number,
+    updateTime: string,
+    addTime: string
+}
+
 export function fetchBasicQuotes(basicQuoteRequest: BasicQuoteRequest) {
     return request.post<BasicQuote[]>("/ana/quote/list", basicQuoteRequest);
 }
@@ -92,6 +107,22 @@ export function fetchQuarterKData(klineRequest: KLineRequest) {
 
 export function fetchYearKData(klineRequest: KLineRequest) {
     return request.post<KLine[]>("/ana/k/yearK", klineRequest)
+}
+
+export function fetchDayKMa5Data(maRequest: MaRequest) {
+    return request.post<MaData[]>("/ana/dayk/ma5", maRequest)
+}
+
+export function fetchDayKMa10Data(maRequest: MaRequest) {
+    return request.post<MaData[]>("/ana/dayk/ma10", maRequest)
+}
+
+export function fetchDayKMa20Data(maRequest: MaRequest) {
+    return request.post<MaData[]>("/ana/dayk/ma20", maRequest)
+}
+
+export function fetchDayKMa30Data(maRequest: MaRequest) {
+    return request.post<MaData[]>("/ana/dayk/ma30", maRequest)
 }
 
 //有指数数据的codes
