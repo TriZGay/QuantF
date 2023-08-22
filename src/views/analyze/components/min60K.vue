@@ -144,7 +144,7 @@ watch(() => min60KData, kline => {
             {
                 type: "inside",
                 xAxisIndex: [0, 1],
-                start: 50,
+                start: 0,
                 end: 100
             },
             {
@@ -152,7 +152,7 @@ watch(() => min60KData, kline => {
                 type: 'slider',
                 xAxisIndex: [0, 1],
                 top: '90%',
-                start: 50,
+                start: 0,
                 end: 100
             }
         ],

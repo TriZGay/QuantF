@@ -250,7 +250,7 @@ const kLineOptions = reactive({
         {
             type: "inside",
             xAxisIndex: [0, 1],
-            start: 50,
+            start: 0,
             end: 100
         },
         {
@@ -258,7 +258,7 @@ const kLineOptions = reactive({
             type: 'slider',
             xAxisIndex: [0, 1],
             top: '90%',
-            start: 50,
+            start: 0,
             end: 100
         }
     ],
