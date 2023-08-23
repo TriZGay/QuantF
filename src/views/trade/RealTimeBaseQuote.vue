@@ -1,15 +1,17 @@
 <script setup lang="ts">
 //@ts-nocheck
-import { ref, watch, reactive, computed } from 'vue';
-import { useGlobalFTState } from '@/stores/global'
+import { watch, reactive, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useWsBasicQuote } from '@/stores/rt-basic-quote'
 
-const messageStore = useGlobalFTState();
-const { notify } = storeToRefs(messageStore);
+const rtWsBasicQuoteStore = useWsBasicQuote();
+const { rtBasicQuote } = storeToRefs(rtWsBasicQuoteStore);
+
 const basicQuoteMessage = computed(() => {
-    if (notify.value != null && notify.value.type === 'RT_BASIC_QUOTE') {
-        return notify.value
-    }
+    console.log(rtBasicQuote)
+    // if (notify.value != null && notify.value.type === 'RT_BASIC_QUOTE') {
+    //     return notify.value
+    // }
 })
 
 //一个标的物对应一个echarts配置
