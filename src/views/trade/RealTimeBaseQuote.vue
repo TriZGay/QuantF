@@ -1,18 +1,11 @@
 <script setup lang="ts">
 //@ts-nocheck
-import { watch, reactive, computed } from 'vue';
+import { watch, reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useWsBasicQuote } from '@/stores/rt-basic-quote'
 
 const rtWsBasicQuoteStore = useWsBasicQuote();
 const { rtBasicQuote } = storeToRefs(rtWsBasicQuoteStore);
-
-const basicQuoteMessage = computed(() => {
-    console.log(rtBasicQuote)
-    // if (notify.value != null && notify.value.type === 'RT_BASIC_QUOTE') {
-    //     return notify.value
-    // }
-})
 
 //一个标的物对应一个echarts配置
 const echartsOptionMap = reactive({
@@ -28,17 +21,17 @@ const echartsOptionMap = reactive({
     lastClosePriceMap: {}//昨收价
 })
 
-watch(() => basicQuoteMessage, (message) => {
-    let marketAndCode = message.value.content.security.market + "+" + message.value.content.security.code;
+watch(() => rtBasicQuote, (message) => {
+    let marketAndCode = message.value.market + "+" + message.value.code;
     if (echartsOptionMap.subscribing.indexOf(marketAndCode) > -1) {
-        echartsOptionMap.timeMap[marketAndCode].push(message.value.content.updateTime)
-        echartsOptionMap.curPriceMap[marketAndCode].push(message.value.content.curPrice)
-        echartsOptionMap.volumeMap[marketAndCode].push(message.value.content.volume)
-        echartsOptionMap.turnoverMap[marketAndCode].push(message.value.content.turnover)
-        echartsOptionMap.lowPriceMap[marketAndCode].push(message.value.content.lowPrice)
-        echartsOptionMap.highPriceMap[marketAndCode].push(message.value.content.highPrice)
-        echartsOptionMap.openPriecMap[marketAndCode].push(message.value.content.openPrice)
-        echartsOptionMap.lastClosePriceMap[marketAndCode].push(message.value.content.lastClosePrice)
+        echartsOptionMap.timeMap[marketAndCode].push(message.value.updateTime)
+        echartsOptionMap.curPriceMap[marketAndCode].push(message.value.curPrice)
+        echartsOptionMap.volumeMap[marketAndCode].push(message.value.volume)
+        echartsOptionMap.turnoverMap[marketAndCode].push(message.value.turnover)
+        echartsOptionMap.lowPriceMap[marketAndCode].push(message.value.lowPrice)
+        echartsOptionMap.highPriceMap[marketAndCode].push(message.value.highPrice)
+        echartsOptionMap.openPriecMap[marketAndCode].push(message.value.openPrice)
+        echartsOptionMap.lastClosePriceMap[marketAndCode].push(message.value.lastClosePrice)
         echartsOptionMap.optionsMap[marketAndCode] = {
             title: {
                 text: marketAndCode + "基础报价",
@@ -88,7 +81,7 @@ watch(() => basicQuoteMessage, (message) => {
                     data: echartsOptionMap.highPriceMap[marketAndCode]
                 },
                 {
-                    name: "看盘价",
+                    name: "开盘价",
                     type: "line",
                     data: echartsOptionMap.openPriecMap[marketAndCode]
                 },
@@ -142,9 +135,21 @@ watch(() => basicQuoteMessage, (message) => {
     }
 }, { deep: true })
 
+const panes = ref([
+    { title: "tab1", content: `<div style='width:20px;height:20px;background-color:red'>ddd</div>`, key: "1" },
+    { title: "tab2", content: "content2", key: "2" }
+])
+
+const activeKey = ref(panes.value[0].key)
+
 </script>
 <template>
     <div>
+        <a-tabs v-model:activeKey="activeKey" type="editable-card">
+            <a-tab-pane v-for="pane in panes" :key="pane.key" :tab="pane.title">
+                {{ pane.content }}
+            </a-tab-pane>
+        </a-tabs>
         <v-chart style="height: 400px;" :autoresize="true" v-for="(item, index) in Object.keys(echartsOptionMap.optionsMap)"
             :option="echartsOptionMap.optionsMap[item]"></v-chart>
     </div>
