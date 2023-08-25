@@ -115,12 +115,12 @@ function moveToCurrentTag() {
 
 const activeKey = ref()
 
-function onEdit() {
+function onEdit(targetKey, action) {
 
 }
 
-function selectedTab() {
-
+function selectedTab(activeKey) {
+    
 }
 
 </script>
