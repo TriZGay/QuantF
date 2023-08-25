@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, reactive, computed } from 'vue';
+import { watch, ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useWsKLine } from '@/stores/rt-k';
 import type { EChartsOption } from 'echarts';
