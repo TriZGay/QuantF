@@ -1,4 +1,5 @@
 <script setup lang="ts">
+//@ts-nocheck
 import { routes } from '@/router';
 import { useTagsView } from '@/stores/tagsView';
 import { computed, onMounted, ref, watch, nextTick } from 'vue';
@@ -92,7 +93,6 @@ function initTags() {
 function addTags() {
     const { name } = route
     if (name) {
-        //@ts-ignore
         addView(route)
     }
     return false
@@ -103,11 +103,8 @@ function moveToCurrentTag() {
     console.log(tags)
     nextTick(() => {
         for (const tag of tags) {
-            //@ts-ignore
             if (tag.to.path === route.path) {
-                //@ts-ignore
                 if (tag.to.fullPath !== route.fullPath) {
-                    //@ts-ignore
                     updateVisitedView(route)
                 }
                 break
@@ -116,9 +113,23 @@ function moveToCurrentTag() {
     })
 }
 
+const activeKey = ref()
+
+function onEdit() {
+
+}
+
+function selectedTab() {
+
+}
+
 </script>
 <template>
-    <div id="tags-view-container" class="tags-view-container">
+    <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :hideAdd="true" @change="selectedTab">
+        <a-tab-pane v-for="pane in panes" :key="pane.key" :tab="pane.title" :closable="pane.closable">
+        </a-tab-pane>
+    </a-tabs>
+    <!-- <div id="tags-view-container" class="tags-view-container">
         <span class="left-caret">
             <caret-left-outlined />
         </span>
@@ -130,9 +141,14 @@ function moveToCurrentTag() {
         <span class="right-caret">
             <caret-right-outlined />
         </span>
-    </div>
+    </div> -->
 </template>
 <style scoped lang="less">
+:deep(div.ant-tabs-content-holder) {
+    display: none;
+    /*隐藏标签页内容，标签页内容由<router-view>内容替代*/
+}
+
 .tags-view-container {
     position: relative;
     height: 100%;
