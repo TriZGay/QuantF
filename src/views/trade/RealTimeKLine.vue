@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, reactive } from 'vue';
+import { watch, ref, reactive, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useWsKLine } from '@/stores/rt-k';
 import type { EChartsOption } from 'echarts';
@@ -120,7 +120,13 @@ watch(() => rtKline, (kline) => {
   updateKLineChart(marketAndCode, rehabType, Array.from(target.updateTime), target.kArray)
 }, { deep: true })
 
-const activeKey = ref(marketAndCodes.value[0].key)
+const activeKey = computed(() => {
+  if (marketAndCodes.value.length === 0) {
+    return ""
+  } else {
+    return marketAndCodes.value[0].key
+  }
+})
 
 </script>
 <template>
