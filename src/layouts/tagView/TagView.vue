@@ -113,16 +113,86 @@ function moveToCurrentTag() {
     })
 }
 
+const emit = defineEmits(["removeCachePageId", "addCachePageId"]);
+emit("addCachePageId", "Home");
+
 const activeKey = ref()
+const activedKeyIdArray = [];//存放曾经激活tab页的key,用于删除时计算应激活的tab页
+const panes = ref<{
+    key: string,
+    title: string,
+    closable?: boolean,
+    path: string
+}[]>([])
+
+function add(paneObj) {
+    //添加tab页签,选中侧边栏时调用
+    router.push(paneObj.path);
+    let oneTab = getTabByKey(paneObj.key);
+    if (oneTab == null) {
+        emit("addCachePageId", paneObj.path.substring(1));
+        setActivedKeyId(paneObj.key);
+        panes.value.push(paneObj)
+    } else {
+        setActivedKeyId(oneTab.key)
+    }
+}
+
+function remove(targetKey) {
+    //关闭页签
+    emit("removeCachePageId", getTabByKey(targetKey)?.path.substring(1));
+    panes.value = panes.value.filter(pane => pane.key != targetKey);
+
+    if (activeKey.value === targetKey) {
+        let loopFlag = true;
+        while (loopFlag) {
+            let keyId = activedKeyIdArray.pop();
+            if (keyId != targetKey) {
+                let oneTab = getTabByKey(keyId);
+                if (oneTab != null) {
+                    setActivedKeyId(oneTab.key);
+                    router.push(oneTab.path);
+                    break;
+                }
+            }
+        }
+    }
+}
 
 function onEdit(targetKey, action) {
-
+    if (action === 'add') {
+        add()
+    } else {
+        remove(targetKey)
+    }
 }
 
-function selectedTab(activeKey) {
-    
+function selectedTab(activeKeyId) {
+    //选择某页签时激活该页签
+    let oneTab = getTabByKey(activeKeyId);
+    if (oneTab != null) {
+        setActivedKeyId(oneTab.key);
+        router.push(oneTab.path)
+    }
 }
 
+function getTabByKey(keyId) {
+    let returnValue = null;
+    for (let index = 0; index < panes.value.length; index++) {
+        if (panes.value[index].key === keyId) {
+            returnValue = panes.value[index];
+            break;
+        }
+    }
+    return returnValue;
+}
+
+function setActivedKeyId(keyId) {
+    activeKey.value = keyId;
+    activedKeyIdArray.push(keyId)
+}
+
+defineExpose({ add })
 </script>
 <template>
     <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :hideAdd="true" @change="selectedTab">

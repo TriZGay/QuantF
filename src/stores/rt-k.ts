@@ -5,16 +5,17 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 
 export const useWsKLine = defineStore("ws-k", () => {
-    const { status, data } = useWebSocket("ws://localhost:9093/websocket/kl", {
+    const { status, data, open: min1RTConnect } = useWebSocket("ws://localhost:9093/websocket/kl_min1", {
+        immediate: false,
         onDisconnected(ws, event) {
             notification.info({
-                message: "实时K线Ws disconnected:" + event.type,
+                message: "实时1分K线Ws disconnected:" + event.type,
                 placement: "bottomRight"
             })
         },
         onError(ws, event) {
             notification.error({
-                message: "实时K线Ws error:" + event.type,
+                message: "实时1分K线Ws error:" + event.type,
                 placement: "bottomRight"
             })
         },
@@ -25,10 +26,12 @@ export const useWsKLine = defineStore("ws-k", () => {
             websocket.send(JSON.stringify(message))
         }
     })
-    const rtKline = computed(() => {
+    const rtKlineMin1 = computed(() => {
         return JSON.parse(data.value)
     })
+    
     return {
-        rtKline
+        rtKlineMin1,
+        min1RTConnect
     }
 })
