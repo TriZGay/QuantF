@@ -3,7 +3,9 @@
 import { watch, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useWsKLine } from '@/stores/rt-k';
-import { useDrawKLine } from '@/views/trade/components/drawKLine';
+import { useDrawKLine } from '@/views/trade/k/components/drawKLine';
+import KLineTabs from './components/KLineTabs.vue'
+
 const rtWsKlineStore = useWsKLine();
 const { rtKlineMin1 } = storeToRefs(rtWsKlineStore)
 const { getKLineData, updateKLineChart, updateKLineData, marketAndCodes } = useDrawKLine()
@@ -20,25 +22,10 @@ watch(() => rtKlineMin1, (kline) => {
   updateKLineChart(marketAndCode, rehabType, Array.from(target?.updateTime), target?.kArray)
 }, { deep: true })
 
-const activeKey = ref("")
-
-watch(marketAndCodes, (newVal) => {
-  if (newVal.length !== 0) {
-    activeKey.value = newVal[0].key
-  } else {
-    activeKey.value = ""
-  }
-})
-
 </script>
 <template>
   <div>
-    <a-tabs v-model:activeKey="activeKey" type="editable-card">
-      <a-tab-pane v-for="pane in marketAndCodes" :key="pane.key" :tab="pane.title">
-        <v-chart v-for="option in pane.rehabTypesWithOptions" style="height: 400px;" :autoresize="true"
-          :option="option.options"></v-chart>
-      </a-tab-pane>
-    </a-tabs>
+    <KLineTabs :marketAndCodes="marketAndCodes"></KLineTabs>
   </div>
 </template>
 <style lang="less" scoped></style>

@@ -163,13 +163,22 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     children: [
       {
-        path: "/realtime/rtk",
-        name: "RealTimeK",
+        path: "/realtime/rtk_min1",
+        name: "RealTimeKMin1",
         meta: {
-          title: "实时K线图",
+          title: "1分钟实时K线图",
           icon: "sliders-outlined"
         },
-        component: () => import("@/views/trade/RealTimeKLine.vue")
+        component: () => import("@/views/trade/k/RealTimeKLine.vue")
+      },
+      {
+        path: "/realtime/rtk_min3",
+        name: "RealTimeKMin3",
+        meta: {
+          title: "3分钟实时K线图",
+          icon: "sliders-outlined"
+        },
+        component: () => import("@/views/trade/k/RealTimeKLineMin3.vue")
       },
       {
         path: "/realtime/rto",

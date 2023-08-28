@@ -2,12 +2,12 @@
 import type { EChartsOption } from 'echarts'
 import { reactive, ref } from 'vue'
 
-type RehabTypesWithOptions = {
+export type RehabTypesWithOptions = {
     rehabType: number,
     options?: EChartsOption
 }
 
-type RehabTypesWithData = {
+export type RehabTypesWithData = {
     rehabType: number,
     updateTime: Set<string>,
     kArray: Array<Array<number>>
