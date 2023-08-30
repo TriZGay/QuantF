@@ -21,7 +21,7 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews)
                 <a-col flex="auto">
                     <TagView />
                 </a-col>
-                <a-col flex="100px" >
+                <a-col flex="100px">
                     <User />
                 </a-col>
             </a-row>

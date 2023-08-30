@@ -160,20 +160,16 @@ function remove(targetKey) {
 }
 
 function onEdit(targetKey, action) {
-    if (action === 'add') {
+    console.log(targetKey, action)
+    if (action === 'remove') {
         add()
-    } else {
-        remove(targetKey)
+
     }
 }
 
-function selectedTab(activeKeyId) {
+function selectedTab(routePath) {
     //选择某页签时激活该页签
-    let oneTab = getTabByKey(activeKeyId);
-    if (oneTab != null) {
-        setActivedKeyId(oneTab.key);
-        router.push(oneTab.path)
-    }
+    router.push(routePath)
 }
 
 function getTabByKey(keyId) {
@@ -196,7 +192,7 @@ defineExpose({ add })
 </script>
 <template>
     <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :hideAdd="true" @change="selectedTab">
-        <a-tab-pane v-for="pane in panes" :key="pane.key" :tab="pane.title" :closable="pane.closable">
+        <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title" :closable="true">
         </a-tab-pane>
     </a-tabs>
     <!-- <div id="tags-view-container" class="tags-view-container">

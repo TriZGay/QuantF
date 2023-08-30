@@ -6,13 +6,6 @@ const props = defineProps({
 })
 const activeKey = ref("")
 
-watch(props.marketAndCodes, (newVal) => {
-    if (newVal.length !== 0) {
-        activeKey.value = newVal[0].key
-    } else {
-        activeKey.value = ""
-    }
-})
 </script>
 <template>
     <a-tabs v-model:activeKey="activeKey" type="editable-card">
