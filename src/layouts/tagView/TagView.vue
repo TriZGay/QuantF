@@ -113,57 +113,11 @@ function moveToCurrentTag() {
     })
 }
 
-const emit = defineEmits(["removeCachePageId", "addCachePageId"]);
-emit("addCachePageId", "Home");
-
-const activeKey = ref()
-const activedKeyIdArray = [];//存放曾经激活tab页的key,用于删除时计算应激活的tab页
-const panes = ref<{
-    key: string,
-    title: string,
-    closable?: boolean,
-    path: string
-}[]>([])
-
-function add(paneObj) {
-    //添加tab页签,选中侧边栏时调用
-    router.push(paneObj.path);
-    let oneTab = getTabByKey(paneObj.key);
-    if (oneTab == null) {
-        emit("addCachePageId", paneObj.path.substring(1));
-        setActivedKeyId(paneObj.key);
-        panes.value.push(paneObj)
-    } else {
-        setActivedKeyId(oneTab.key)
-    }
-}
-
-function remove(targetKey) {
-    //关闭页签
-    emit("removeCachePageId", getTabByKey(targetKey)?.path.substring(1));
-    panes.value = panes.value.filter(pane => pane.key != targetKey);
-
-    if (activeKey.value === targetKey) {
-        let loopFlag = true;
-        while (loopFlag) {
-            let keyId = activedKeyIdArray.pop();
-            if (keyId != targetKey) {
-                let oneTab = getTabByKey(keyId);
-                if (oneTab != null) {
-                    setActivedKeyId(oneTab.key);
-                    router.push(oneTab.path);
-                    break;
-                }
-            }
-        }
-    }
-}
-
 function onEdit(targetKey, action) {
     console.log(targetKey, action)
     if (action === 'remove') {
-        add()
-
+        let selectedTag = computedVisitedViews.value.find(view => view.path === targetKey);
+        closeSelectedTag(selectedTag)
     }
 }
 
@@ -172,42 +126,12 @@ function selectedTab(routePath) {
     router.push(routePath)
 }
 
-function getTabByKey(keyId) {
-    let returnValue = null;
-    for (let index = 0; index < panes.value.length; index++) {
-        if (panes.value[index].key === keyId) {
-            returnValue = panes.value[index];
-            break;
-        }
-    }
-    return returnValue;
-}
-
-function setActivedKeyId(keyId) {
-    activeKey.value = keyId;
-    activedKeyIdArray.push(keyId)
-}
-
-defineExpose({ add })
 </script>
 <template>
     <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :hideAdd="true" @change="selectedTab">
-        <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title" :closable="true">
+        <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title" :closable="pane.meta?.closable">
         </a-tab-pane>
     </a-tabs>
-    <!-- <div id="tags-view-container" class="tags-view-container">
-        <span class="left-caret">
-            <caret-left-outlined />
-        </span>
-        <RouterLink v-for="tag in computedVisitedViews" ref="tag" :class="isActive(tag) ? 'active' : ''" :key="tag.path"
-            :to="tag" class="tags-view-item">
-            {{ tag.meta?.title }}
-            <close-outlined @click="closeSelectedTag(tag)" />
-        </RouterLink>
-        <span class="right-caret">
-            <caret-right-outlined />
-        </span>
-    </div> -->
 </template>
 <style scoped lang="less">
 :deep(div.ant-tabs-content-holder) {

@@ -12,6 +12,7 @@ declare module "vue-router" {
     noCache?: boolean;
     affix?: boolean;
     alwaysShow?: boolean;
+    closable?: boolean;
   }
 }
 
@@ -21,7 +22,7 @@ const routes: RouteRecordRaw[] = [
     name: "LoginPage",
     component: () => import("@/views/login/Login.vue"),
     meta: {
-      hidden: true
+      hidden: true,
     }
   },
   {
@@ -30,7 +31,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     meta: {
       title: "首页",
-      icon: "home-filled"
+      icon: "home-filled",
+      closable: false
     },
     children: [{
       path: "/home",
