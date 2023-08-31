@@ -17,6 +17,7 @@ const route = useRoute()
 const router = useRouter();
 const affixTags = ref<RouteRecordRaw[]>([])
 const tag = ref<HTMLElement[]>([])
+const activeKey = ref("");
 
 watch(
     () => route.path,
@@ -91,8 +92,9 @@ function initTags() {
 }
 
 function addTags() {
-    const { name } = route
+    const { name, path } = route
     if (name) {
+        activeKey.value = path
         addView(route)
     }
     return false
@@ -112,8 +114,6 @@ function moveToCurrentTag() {
     })
 }
 
-const activeKey = ref("");
-
 function onEdit(targetKey, action) {
     if (action === 'remove') {
         let selectedTag = computedVisitedViews.value.find(view => view.path === targetKey);
@@ -129,15 +129,23 @@ function selectedTab(routePath) {
 
 </script>
 <template>
-    <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :hideAdd="true" @change="selectedTab">
-        <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title"
-            :closable="pane.meta?.closable">
-        </a-tab-pane>
-    </a-tabs>
+    <div>
+        <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :animated="false" size="large"
+            :tabBarGutter="8" :hideAdd="true" @change="selectedTab">
+            <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title"
+                :closable="pane.meta?.closable">
+            </a-tab-pane>
+        </a-tabs>
+    </div>
 </template>
 <style scoped lang="less">
 :deep(div.ant-tabs-content-holder) {
     display: none;
     /*隐藏标签页内容，标签页内容由<router-view>内容替代*/
+}
+
+:deep(div.ant-tabs-nav) {
+    padding: 2px 2px 0 2px;
+    margin: 0;
 }
 </style>

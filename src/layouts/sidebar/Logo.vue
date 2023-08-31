@@ -15,11 +15,15 @@ defineProps<{
         <Transition name="sidebarLogoFade">
             <RouterLink v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
                 <img v-if="logo" :src="logo" class="sidebar-logo">
-                <h1 v-else class="sidebar-title">{{ title }}</h1>
+                <h1 v-else class="sidebar-title">
+                    {{ title }}
+                </h1>
             </RouterLink>
             <RouterLink v-else key="expand" class="sidebar-logo-link" to="/">
                 <img v-if="logo" :src="logo" class="sidebar-logo">
-                <h1 class="sidebar-title">{{ title }}</h1>
+                <h1 class="sidebar-title">
+                    {{ title }}
+                </h1>
             </RouterLink>
         </Transition>
     </div>
