@@ -22,7 +22,7 @@ export const useTagsView = defineStore("tagsView", () => {
         if (cachedViews.value.includes(view.name)) {
             return
         }
-        if (view.meta?.noCache) {
+        if (!view.meta?.noCache) {
             //@ts-ignore
             cachedViews.value.push(view.name)
         }

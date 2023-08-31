@@ -1,7 +1,7 @@
 <script setup lang="ts">
 //@ts-nocheck
 import { UseNow } from '@vueuse/components'
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMarketState } from '@/stores/market';
 import * as dayjs from 'dayjs';
@@ -26,8 +26,9 @@ watch(() => rtMarketState, (message) => {
   globalMarketState.value = message.value
 }, { deep: true })
 
-
-refreshMartketState()
+onMounted(() => {
+  refreshMartketState()
+})
 
 function parseNow(now: Object) {
   return dayjs(now).format("DD-MM-YYYY HH:mm:ss")

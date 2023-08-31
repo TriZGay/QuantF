@@ -29,7 +29,7 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews)
         <a-layout-content style="margin: 0 16px">
             <Navbar />
             <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
-                <RouterView :key="key" v-slot="{ Component }">
+                <RouterView v-slot="{ Component }">
                     <Transition name="fade" mode="out-in" appear>
                         <KeepAlive :include="cachedViews">
                             <component :is="Component" />

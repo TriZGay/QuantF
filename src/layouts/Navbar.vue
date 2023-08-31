@@ -11,7 +11,6 @@ const router = useRouter()
 watch(
     () => route.path,
     (newRoute, oldRoute) => {
-        console.log(newRoute, oldRoute)
         if (newRoute.startsWith("/redirect/")) {
             return
         }

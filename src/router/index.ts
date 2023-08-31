@@ -29,14 +29,14 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     redirect: "/home",
     component: () => import("@/layouts/Layout.vue"),
-    meta: {
-      title: "首页",
-      icon: "home-filled",
-      closable: false
-    },
     children: [{
       path: "/home",
       name: "Home",
+      meta: {
+        title: "首页",
+        icon: "home-filled",
+        closable: false
+      },
       component: () => import("@/views/home/Home.vue"),
     }],
   },
@@ -110,7 +110,8 @@ const routes: RouteRecordRaw[] = [
         name: "SyncCenter",
         meta: {
           title: "数据同步",
-          icon: "tool-outlined"
+          icon: "tool-outlined",
+          noCache: true
         },
         component: () => import("@/views/operation/SyncCenter.vue")
       }

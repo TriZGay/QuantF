@@ -3,7 +3,7 @@
 import { routes } from '@/router';
 import { useTagsView } from '@/stores/tagsView';
 import { computed, onMounted, ref, watch, nextTick } from 'vue';
-import { useRoute, type RouteRecordRaw, RouterLink, useRouter } from 'vue-router';
+import { useRoute, type RouteRecordRaw, useRouter } from 'vue-router';
 import path from 'path-browserify'
 const {
     visitedViews,
@@ -100,7 +100,6 @@ function addTags() {
 
 function moveToCurrentTag() {
     const tags = tag.value
-    console.log(tags)
     nextTick(() => {
         for (const tag of tags) {
             if (tag.to.path === route.path) {
@@ -113,8 +112,9 @@ function moveToCurrentTag() {
     })
 }
 
+const activeKey = ref("");
+
 function onEdit(targetKey, action) {
-    console.log(targetKey, action)
     if (action === 'remove') {
         let selectedTag = computedVisitedViews.value.find(view => view.path === targetKey);
         closeSelectedTag(selectedTag)
@@ -123,13 +123,15 @@ function onEdit(targetKey, action) {
 
 function selectedTab(routePath) {
     //选择某页签时激活该页签
+    activeKey.value = routePath
     router.push(routePath)
 }
 
 </script>
 <template>
     <a-tabs v-model:activeKey="activeKey" type="editable-card" @edit="onEdit" :hideAdd="true" @change="selectedTab">
-        <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title" :closable="pane.meta?.closable">
+        <a-tab-pane v-for="pane in computedVisitedViews" :key="pane.path" :tab="pane.meta?.title"
+            :closable="pane.meta?.closable">
         </a-tab-pane>
     </a-tabs>
 </template>
@@ -137,73 +139,5 @@ function selectedTab(routePath) {
 :deep(div.ant-tabs-content-holder) {
     display: none;
     /*隐藏标签页内容，标签页内容由<router-view>内容替代*/
-}
-
-.tags-view-container {
-    position: relative;
-    height: 100%;
-    width: 100%;
-    background: #fff;
-
-    .left-caret,
-    .right-caret {
-        position: absolute;
-        display: inline-block;
-        transition: all 0.5s;
-    }
-
-    .left-caret:hover,
-    .right-caret:hover {
-        cursor: pointer;
-        transform: scale(1.8);
-    }
-
-    .left-caret {
-        left: 0;
-    }
-
-    .right-caret {
-        right: 0;
-    }
-
-    .tags-view-item {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        height: 26px;
-        line-height: 26px;
-        border: 1px solid #d8dce5;
-        color: #495060;
-        background: #fff;
-        padding: 0 8px;
-        font-size: 12px;
-        margin-left: 5px;
-        margin-top: 4px;
-
-        &:first-of-type {
-            margin-left: 30px;
-        }
-
-        &:last-of-type {
-            margin-right: 30px;
-        }
-
-        &.active {
-            background-color: #42b983;
-            color: #fff;
-            border-color: #42b983;
-
-            &::before {
-                content: '';
-                background: #fff;
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                position: relative;
-                margin-right: 2px;
-            }
-        }
-    }
 }
 </style>
