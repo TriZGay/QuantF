@@ -211,6 +211,15 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/trade/k/RealTimeKLineMin30.vue")
       },
       {
+        path: "/realtime/rtk_min60",
+        name: "RealTimeKMin60",
+        meta: {
+          title: "60分钟实时K线图",
+          icon: "sliders-outlined"
+        },
+        component: () => import("@/views/trade/k/RealTimeKLineMin60.vue")
+      },
+      {
         path: "/realtime/rto",
         name: "RealTimeBaseQuote",
         meta: {

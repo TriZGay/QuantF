@@ -135,6 +135,33 @@ export const useWsKLine = defineStore("ws-k", () => {
         return JSON.parse(min30Data.value)
     })
 
+    const { data: min60Data, open: min60RTConnect } = useWebSocket("ws://localhost:9093/websocket/kl_min60", {
+        immediate: false,
+        onDisconnected(ws, event) {
+            notification.info({
+                message: "实时60分K线Ws disconnected:" + event.type,
+                placement: "bottomRight"
+            })
+        },
+        onError(ws, event) {
+            notification.error({
+                message: "实时60分K线Ws error:" + event.type,
+                placement: "bottomRight"
+            })
+        },
+        onConnected(websocket) {
+            let message: Message = {
+                type: "JOIN_IN"
+            };
+            websocket.send(JSON.stringify(message))
+        }
+    })
+
+    const rtKlineMin60 = computed(() => {
+        return JSON.parse(min60Data.value)
+    })
+
+
     return {
         rtKlineMin1,
         min1RTConnect,
@@ -145,6 +172,8 @@ export const useWsKLine = defineStore("ws-k", () => {
         rtKlineMin15,
         min15RTConnect,
         rtKlineMin30,
-        min30RTConnect
+        min30RTConnect,
+        rtKlineMin60,
+        min60RTConnect
     }
 })
