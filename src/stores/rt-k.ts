@@ -87,13 +87,13 @@ export const useWsKLine = defineStore("ws-k", () => {
         immediate: false,
         onDisconnected(ws, event) {
             notification.info({
-                message: "实时5分K线Ws disconnected:" + event.type,
+                message: "实时15分K线Ws disconnected:" + event.type,
                 placement: "bottomRight"
             })
         },
         onError(ws, event) {
             notification.error({
-                message: "实时5分K线Ws error:" + event.type,
+                message: "实时15分K线Ws error:" + event.type,
                 placement: "bottomRight"
             })
         },
@@ -109,6 +109,32 @@ export const useWsKLine = defineStore("ws-k", () => {
         return JSON.parse(min15Data.value)
     })
 
+    const { data: min30Data, open: min30RTConnect } = useWebSocket("ws://localhost:9093/websocket/kl_min30", {
+        immediate: false,
+        onDisconnected(ws, event) {
+            notification.info({
+                message: "实时30分K线Ws disconnected:" + event.type,
+                placement: "bottomRight"
+            })
+        },
+        onError(ws, event) {
+            notification.error({
+                message: "实时30分K线Ws error:" + event.type,
+                placement: "bottomRight"
+            })
+        },
+        onConnected(websocket) {
+            let message: Message = {
+                type: "JOIN_IN"
+            };
+            websocket.send(JSON.stringify(message))
+        }
+    })
+
+    const rtKlineMin30 = computed(() => {
+        return JSON.parse(min30Data.value)
+    })
+
     return {
         rtKlineMin1,
         min1RTConnect,
@@ -117,6 +143,8 @@ export const useWsKLine = defineStore("ws-k", () => {
         rtKlineMin5,
         min5RTConnect,
         rtKlineMin15,
-        min15RTConnect
+        min15RTConnect,
+        rtKlineMin30,
+        min30RTConnect
     }
 })
