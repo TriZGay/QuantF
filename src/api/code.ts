@@ -104,6 +104,16 @@ export const FT_POSITION_SIDE = {
     4: "买回"
 }
 
+export const FT_REHABTYPE = {
+    0: "不复权",
+    1: "前复权",
+    2: "后复权"
+}
+
+export function parseRehabType(value: Number) {
+    return FT_REHABTYPE[value]
+}
+
 export function parsePositionSide(value: Number) {
     return FT_POSITION_SIDE[value];
 }

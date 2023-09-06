@@ -1,6 +1,7 @@
 //@ts-nocheck
 import type { EChartsOption } from 'echarts'
 import { reactive, ref } from 'vue'
+import { parseRehabType } from '@/api/code'
 
 export type RehabTypesWithOptions = {
     rehabType: number,
@@ -58,7 +59,7 @@ export function useDrawKLine() {
             if (typeof foundOptions !== 'undefined') {
                 foundOptions.options = {
                     title: {
-                        text: key + ":" + rehabType + "K线图"
+                        text: key + ":" + parseRehabType(rehabType) + "K线图"
                     },
                     tooltip: {
                         trigger: 'axis',
