@@ -87,7 +87,7 @@ export function useDrawKLine() {
                         }
                     },
                     series: [{
-                        name: key + ":" + rehabType + "K线图",
+                        name: key + ":" + parseRehabType(rehabType) + "K线图",
                         type: "candlestick",
                         data: kArray,
                     }]
