@@ -28,12 +28,17 @@ export interface PlateResult {
     total: number
 }
 
-export interface MarketCodeUnique {
+export interface CapitalFlowReq {
     periodType: 1 | 2 | 3 | 4, //1实时 2日 3周 4月
     market: number,
     code: string,
     beginDate?: string,
     endDate?: string
+}
+
+export interface CapitalDtbReq {
+    market: number,
+    code: string,
 }
 
 export function fetchStocks(data: StockQueryRequest) {
@@ -52,6 +57,10 @@ export function syncPlates() {
     return request.get<string>("/api/sync/plates")
 }
 
-export function syncCapitalFlow(syncReq: MarketCodeUnique) {
+export function syncCapitalFlow(syncReq: CapitalFlowReq) {
     return request.post<string>("/api/sync/capitalFlow", syncReq)
+}
+
+export function syncCapitalDistribution(syncReq: CapitalDtbReq) {
+    return request.post<string>("/api/sync/capitalDtb", syncReq)
 }

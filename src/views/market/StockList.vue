@@ -10,7 +10,7 @@ import { parseMarket, parseExchangeType, FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYP
 import { message, type FormInstance } from 'ant-design-vue';
 import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { subscribe } from '@/api/sub'
-import { syncCapitalFlow } from '@/api/stock'
+import { syncCapitalFlow, syncCapitalDistribution } from '@/api/stock'
 
 const stockStore = useStockStore()
 const queryStocks = stockStore.run;
@@ -178,6 +178,18 @@ function onSyncCapitalFlow(row) {
 
 }
 
+function onSyncCapitalDtb(row) {
+    let { market, code } = row;
+    syncCapitalDistribution({
+        market: market,
+        code: code
+    }).then(res => {
+        message.success(res.data)
+    }).catch(err => {
+        message.error(err.response.data)
+    })
+}
+
 watch(() => selectedSubType, (val) => {
     indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
     checkAll.value = val.value.length === subTypes.value.length;
@@ -278,6 +290,8 @@ watch(() => selectedSubType, (val) => {
                                 </a-menu>
                             </template>
                         </a-dropdown>
+                        <a-divider type="vertical" />
+                        <a @click="onSyncCapitalDtb(record)">查询资金分布</a>
                     </span>
                 </template>
             </template>
