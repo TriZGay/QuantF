@@ -15,3 +15,7 @@ export function fetchGlobalMartketState() {
 export function syncTradeDate() {
     return request.get<string>("/api/sync/tradeDate")
 }
+
+export function fetchHistoryKDetail() {
+    return request.get<string>("/api/global/historyKDetail")
+}

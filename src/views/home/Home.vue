@@ -8,7 +8,8 @@ import * as dayjs from 'dayjs';
 
 const marketState = useMarketState();
 const refreshMartketState = marketState.run;
-const { loading, rtMarketState } = storeToRefs(marketState)
+const refreshHistoryKDetail = marketState.requestHistoryKDetail;
+const { loading, rtMarketState, nowHistoryKDetail } = storeToRefs(marketState)
 
 const globalMarketState = ref({
   time: "",
@@ -22,26 +23,63 @@ const globalMarketState = ref({
   marketJPFuture: ""
 })
 
+const historyKDetailRef = ref({
+  usedQuota: 0,
+  remainQuota: 0,
+  itemList: []
+})
+
+watch(() => nowHistoryKDetail, (message) => {
+  historyKDetailRef.value = message.value
+}, { deep: true })
+
 watch(() => rtMarketState, (message) => {
   globalMarketState.value = message.value
 }, { deep: true })
 
 onMounted(() => {
-  refreshMartketState()
+  refreshMartketState();
+  refreshHistoryKDetail();
 })
+
+function refreshInfo() {
+  refreshMartketState();
+  refreshHistoryKDetail();
+}
 
 function parseNow(now: Object) {
   return dayjs(now).format("DD-MM-YYYY HH:mm:ss")
 }
+
+const showHistoryKDetail = ref<boolean>(false)
+
+function showHistoryKDetailDrawer() {
+  showHistoryKDetail.value = true
+}
+
 </script>
 <template>
   <div>
-    <a-button size="small" @click="refreshMartketState" style="margin-bottom: 8px;">
+    <a-button size="small" @click="refreshInfo" style="margin-bottom: 8px;">
       刷新
       <template #icon>
         <reload-outlined />
       </template>
     </a-button>
+    <a-button size="small" @click="showHistoryKDetailDrawer" style="margin-bottom: 8px">
+      历史K线额度明细
+    </a-button>
+    <a-drawer v-model:visible="showHistoryKDetail" title="历史K线额度明细">
+      <a-row>
+        <a-col :span="12">
+          <a-statistic title="已用额度" :value="historyKDetailRef.usedQuota" />
+        </a-col>
+        <a-col :span="12">
+          <a-statistic title="剩余额度" :value="historyKDetailRef.remainQuota" />
+        </a-col>
+      </a-row>
+      {{ historyKDetailRef.itemList }}
+    </a-drawer>
     <a-row style="margin-bottom: 8px;">
       <a-col :span="24">
         <a-card title="时间" size="small" :loading="loading">
