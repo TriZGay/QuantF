@@ -7,8 +7,8 @@ import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
 import { parseMarket, parseExchangeType, FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE, FT_KL_TYPE } from '@/api/code'
-import { message, type FormInstance } from 'ant-design-vue';
-import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue';
+import { DownOutlined } from '@ant-design/icons-vue'
 import { subscribe } from '@/api/sub'
 import { syncCapitalFlow, syncCapitalDistribution, syncRehabs, syncHistoryKL } from '@/api/stock'
 
@@ -104,6 +104,7 @@ const formState = reactive({
         bindValue: '0'
     }
 });
+
 function onFinish(queryForm) {
     queryStocks({
         ...queryForm,

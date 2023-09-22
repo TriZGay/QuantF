@@ -7,8 +7,10 @@ import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
 import { FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
-import { message, type FormInstance } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 import { subscribe } from '@/api/sub';
+
+import SearchArea from '@/components/SearchArea/SearchArea.vue'
 
 const indiesStore = useIndiesStore()
 const queryIndies = indiesStore.run;
@@ -78,8 +80,6 @@ function parseExchangeType(exchangeValue: Number) {
     return FT_EXCHANGE_TYPE[exchangeValue];
 }
 
-const expand = ref<boolean>(false);
-const formRef = ref<FormInstance>();
 const formState = reactive({
     market: {
         name: "行情市场",
@@ -108,21 +108,13 @@ const formState = reactive({
         bindValue: ""
     }
 });
-function onFinish(values: any) {
-    let queryForm = handleSearchFormState();
+function onFinish(queryForm) {
     queryIndies({
         ...queryForm,
         stockType: 6,
         size: 10,
         current: 1
     })
-}
-function handleSearchFormState() {
-    let queryForm: Object = {};
-    Object.keys(formState).forEach(formStateKey => {
-        queryForm[formStateKey] = formState[formStateKey].bindValue
-    })
-    return queryForm;
 }
 
 const subTypes = computed(() => {
@@ -171,42 +163,7 @@ watch(() => selectedSubType, (val) => {
 </script>
 <template>
     <div class="stock-list-container">
-        <a-form ref="formRef" :model="formState" :label-col="{ style: { width: '65px' } }" @finish="onFinish">
-            <a-row :gutter="24">
-                <template v-for="(value, key, index) in formState" :key="key">
-                    <a-col v-show="expand || index <= 6" :span="8">
-                        <a-form-item :name="key" :label="value.name">
-                            <template v-if="value.type === 'select'">
-                                <a-select v-model:value="value.bindValue">
-                                    <a-select-option v-for="(option, index) in Object.keys(value.kv) " :value="option"
-                                        :key="index">
-                                        {{ value.kv[option] }}
-                                    </a-select-option>
-                                </a-select>
-                            </template>
-                            <template v-if="value.type === 'input'">
-                                <a-input v-model:value="value.bindValue" placeholder="请输入名称" />
-                            </template>
-                        </a-form-item>
-                    </a-col>
-                </template>
-            </a-row>
-            <a-row>
-                <a-col :span="24" style="text-align:right">
-                    <a-button type="primary" html-type="submit">搜索</a-button>
-                    <a-button style="margin:0 8px" @click="() => formRef.resetFields()">清空</a-button>
-                    <a style="font-size:12px" @click="expand = !expand">
-                        <template v-if="expand">
-                            <UpOutlined />
-                        </template>
-                        <template v-else>
-                            <DownOutlined />
-                        </template>
-                        展开
-                    </a>
-                </a-col>
-            </a-row>
-        </a-form>
+        <SearchArea :form="formState" @on-finish="onFinish" />
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
             :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable">
             <template #bodyCell="{ column, record }">

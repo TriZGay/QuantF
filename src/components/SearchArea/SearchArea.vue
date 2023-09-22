@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { type FormInstance } from 'ant-design-vue';
 
 const expand = ref<boolean>(false);
 const formRef = ref<FormInstance>();
@@ -49,6 +50,9 @@ function onFinish(values: any) {
                                     {{ value.kv[option] }}
                                 </a-select-option>
                             </a-select>
+                        </template>
+                        <template v-if="value.type === 'input'">
+                            <a-input v-model:value="value.bindValue" placeholder="请输入名称" />
                         </template>
                     </a-form-item>
                 </a-col>
