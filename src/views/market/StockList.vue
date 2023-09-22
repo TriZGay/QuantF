@@ -12,6 +12,8 @@ import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { subscribe } from '@/api/sub'
 import { syncCapitalFlow, syncCapitalDistribution, syncRehabs, syncHistoryKL } from '@/api/stock'
 
+import SearchArea from '@/components/SearchArea/SearchArea.vue'
+
 const stockStore = useStockStore()
 const queryStocks = stockStore.run;
 const { list, loading, pageSize, current, total } = storeToRefs(stockStore);
@@ -20,7 +22,8 @@ const stocksColumns = ref([
     {
         title: "股票代码",
         dataIndex: "code",
-        fixed: "left"
+        fixed: "left",
+        width: 100
     },
     {
         title: "名称",
@@ -28,7 +31,8 @@ const stocksColumns = ref([
     },
     {
         title: "每手数量",
-        dataIndex: "lotSize"
+        dataIndex: "lotSize",
+        width: 100
     },
     {
         title: "上市日期",
@@ -36,15 +40,18 @@ const stocksColumns = ref([
     },
     {
         title: "是否退市",
-        dataIndex: "delisting"
+        dataIndex: "delisting",
+        width: 100
     },
     {
         title: "行情市场",
-        dataIndex: "market"
+        dataIndex: "market",
+        width: 100
     },
     {
         title: "所属交易所",
-        dataIndex: "exchangeType"
+        dataIndex: "exchangeType",
+        width: 120
     },
     {
         title: "操作",
@@ -74,8 +81,6 @@ function parseDate(date: Array<Number>) {
     return dayjs(date).format("DD/MM/YYYY")
 }
 
-const expand = ref<boolean>(false);
-const formRef = ref<FormInstance>();
 const formState = reactive({
     market: {
         name: "行情市场",
@@ -99,8 +104,7 @@ const formState = reactive({
         bindValue: '0'
     }
 });
-function onFinish(values: any) {
-    let queryForm = handleSearchFormState();
+function onFinish(queryForm) {
     queryStocks({
         ...queryForm,
         stockType: 3,
@@ -108,13 +112,7 @@ function onFinish(values: any) {
         current: 1
     })
 }
-function handleSearchFormState() {
-    let queryForm: Object = {};
-    Object.keys(formState).forEach(formStateKey => {
-        queryForm[formStateKey] = formState[formStateKey].bindValue
-    })
-    return queryForm;
-}
+
 const subTypes = computed(() => {
     let arr = []
     Object.keys(FT_SUB_TYPE).forEach(key => {
@@ -243,39 +241,7 @@ watch(() => selectedSubType, (val) => {
 </script>
 <template>
     <div class="stock-list-container">
-        <a-form ref="formRef" :model="formState" @finish="onFinish">
-            <a-row :gutter="24">
-                <template v-for="(value, key, index) in formState" :key="key">
-                    <a-col v-show="expand || index <= 6" :span="8">
-                        <a-form-item :name="key" :label="value.name">
-                            <template v-if="value.type === 'select'">
-                                <a-select v-model:value="value.bindValue">
-                                    <a-select-option v-for="(option, index) in Object.keys(value.kv) " :value="option"
-                                        :key="index">
-                                        {{ value.kv[option] }}
-                                    </a-select-option>
-                                </a-select>
-                            </template>
-                        </a-form-item>
-                    </a-col>
-                </template>
-            </a-row>
-            <a-row>
-                <a-col :span="24" style="text-align:right">
-                    <a-button type="primary" html-type="submit">搜索</a-button>
-                    <a-button style="margin:0 8px" @click="() => formRef.resetFields()">清空</a-button>
-                    <a style="font-size:12px" @click="expand = !expand">
-                        <template v-if="expand">
-                            <UpOutlined />
-                        </template>
-                        <template v-else>
-                            <DownOutlined />
-                        </template>
-                        展开
-                    </a>
-                </a-col>
-            </a-row>
-        </a-form>
+        <SearchArea :form="formState" @on-finish="onFinish" />
         <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
             :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable">
             <template #bodyCell="{ column, record }">
