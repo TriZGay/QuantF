@@ -46,6 +46,14 @@ export interface RehabsReq {
     code: string,
 }
 
+export interface HistoryKReq {
+    market: number,
+    code: string,
+    klType: number,
+    beginDate: string,
+    endDate: string
+}
+
 export function fetchStocks(data: StockQueryRequest) {
     return request.post<StockResult>("/api/base/stocks", data)
 }
@@ -72,4 +80,8 @@ export function syncCapitalDistribution(syncReq: CapitalDtbReq) {
 
 export function syncRehabs(syncReq: RehabsReq) {
     return request.post<string>("/api/sync/rehabs", syncReq)
+}
+
+export function syncHistoryKL(syncHistoryKReq: HistoryKReq) {
+    return request.post<string>("/api/sync/historyK", syncHistoryKReq)
 }

@@ -6,11 +6,11 @@ import { computed, reactive, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
-import { parseMarket, parseExchangeType, FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
+import { parseMarket, parseExchangeType, FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE, FT_KL_TYPE } from '@/api/code'
 import { message, type FormInstance } from 'ant-design-vue';
 import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { subscribe } from '@/api/sub'
-import { syncCapitalFlow, syncCapitalDistribution, syncRehabs } from '@/api/stock'
+import { syncCapitalFlow, syncCapitalDistribution, syncRehabs, syncHistoryKL } from '@/api/stock'
 
 const stockStore = useStockStore()
 const queryStocks = stockStore.run;
@@ -202,6 +202,40 @@ function onSyncRehabs(row) {
     })
 }
 
+const historyKForm = ref({
+    klType: 0,
+    dateRange: []
+})
+
+const kTypes = computed(() => {
+    let arr = [];
+    Object.keys(FT_KL_TYPE)
+        .filter(key => {
+            return parseInt(key) !== 0
+        }).forEach(key => {
+            arr.push({
+                value: key,
+                label: FT_KL_TYPE[key]
+            })
+        })
+    return arr;
+})
+
+function onSyncHistoryK(row) {
+    let { market, code } = row
+    syncHistoryKL({
+        market: market,
+        code: code,
+        klType: historyKForm.value.klType,
+        beginDate: historyKForm.value.dateRange[0],
+        endDate: historyKForm.value.dateRange[1]
+    }).then(res => {
+        message.error(res.data)
+    }).catch(err => {
+        message.error(err.response.data)
+    })
+}
+
 watch(() => selectedSubType, (val) => {
     indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
     checkAll.value = val.value.length === subTypes.value.length;
@@ -307,7 +341,26 @@ watch(() => selectedSubType, (val) => {
                         <a-divider type="vertical" />
                         <a @click="onSyncRehabs(record)">查询复权因子</a>
                         <a-divider type="vertical" />
-                        <a @click="">查询历史K线</a>
+                        <a-dropdown :trigger="['click']">
+                            <a @click.prevent>
+                                查询历史K线
+                                <DownOutlined />
+                            </a>
+                            <template #overlay>
+                                <a-menu style="padding: 10px 10px;">
+                                    <a-form layout="horizontal" :model="historyKForm">
+                                        <a-form-item label="K线类型">
+                                            <a-radio-group v-model:value="historyKForm.klType" :options="kTypes" />
+                                        </a-form-item>
+                                        <a-form-item label="时间范围">
+                                            <a-range-picker v-model:value="historyKForm.dateRange"
+                                                value-format="YYYY-MM-DD" />
+                                        </a-form-item>
+                                    </a-form>
+                                    <a-button type="primary" size="small" @click="onSyncHistoryK(record)">确定</a-button>
+                                </a-menu>
+                            </template>
+                        </a-dropdown>
                     </span>
                 </template>
             </template>

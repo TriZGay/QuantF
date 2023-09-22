@@ -110,6 +110,21 @@ export const FT_REHABTYPE = {
     2: "后复权"
 }
 
+export const FT_KL_TYPE = {
+    0: "未知",
+    1: "1分K",
+    2: "日K",
+    3: "周K",
+    4: "月K",
+    5: "年K",
+    6: "5分K",
+    7: "15分K",
+    8: "30分K",
+    9: "60分K",
+    10: "3分K",
+    11: "季K",
+}
+
 export function parseRehabType(value: Number) {
     return FT_REHABTYPE[value]
 }
