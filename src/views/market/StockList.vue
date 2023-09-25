@@ -12,7 +12,8 @@ import { DownOutlined } from '@ant-design/icons-vue'
 import { subscribe } from '@/api/sub'
 import { syncCapitalFlow, syncCapitalDistribution, syncRehabs, syncHistoryKL } from '@/api/stock'
 
-import SearchArea from '@/components/SearchArea/SearchArea.vue'
+// import SearchArea from '@/components/SearchArea/SearchArea.vue'
+import AdvancedTable from '@/components/AdvancedTable/AdvancedTable.vue'
 
 const stockStore = useStockStore()
 const queryStocks = stockStore.run;
@@ -68,15 +69,16 @@ const pagination = computed<Object>(() => {
         showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
     }
 })
-function onChangeTable(pagination, filters, sorter, { currentDataSource }) {
-    let queryForm = handleSearchFormState();
-    queryStocks({
-        ...queryForm,
-        stockType: 3,
-        size: pagination.pageSize,
-        current: pagination.current
-    })
+function onChangeTable(tableProps: Object) {
+    console.log(tableProps)
+    // queryStocks({
+    //     ...queryForm,
+    //     stockType: 3,
+    //     size: pagination.pageSize,
+    //     current: pagination.current
+    // })
 }
+
 function parseDate(date: Array<Number>) {
     return dayjs(date).format("DD/MM/YYYY")
 }
@@ -242,9 +244,8 @@ watch(() => selectedSubType, (val) => {
 </script>
 <template>
     <div class="stock-list-container">
-        <SearchArea :form="formState" @on-finish="onFinish" />
-        <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable">
+        <AdvancedTable :form="formState" @on-finish="onFinish" :columns="stocksColumns" :data-source="list"
+            :loading="loading" :row-key="(record) => record.id" :pagination="pagination" @on-change-table="onChangeTable">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'listingDate'">
                     {{ parseDate(record.listingDate) }}
@@ -331,13 +332,7 @@ watch(() => selectedSubType, (val) => {
                     </span>
                 </template>
             </template>
-        </a-table>
+        </AdvancedTable>
     </div>
 </template>
-<style lang="less" scoped>
-.searchResult {
-    margin-top: 16px;
-    border: 1px dashed #e9e9e9;
-    border-radius: 2px;
-}
-</style>
+<style lang="less" scoped></style>
