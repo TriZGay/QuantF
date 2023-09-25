@@ -5,6 +5,7 @@ import { ref, watch, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMarketState } from '@/stores/market';
 import * as dayjs from 'dayjs';
+import { parseMarket } from '@/api/code'
 
 const marketState = useMarketState();
 const refreshMartketState = marketState.run;
@@ -78,7 +79,20 @@ function showHistoryKDetailDrawer() {
           <a-statistic title="剩余额度" :value="historyKDetailRef.remainQuota" />
         </a-col>
       </a-row>
-      {{ historyKDetailRef.itemList }}
+      <a-list item-layout="horizontal" :data-source="historyKDetailRef.itemList">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a-list-item-meta :description="'代码:' + item.code + '市场:' + parseMarket(item.market)">
+              <template #title>
+                {{ item.name }}
+              </template>
+            </a-list-item-meta>
+            <a-list-item>
+              {{ item.requestTime }}
+            </a-list-item>
+          </a-list-item>
+        </template>
+      </a-list>
     </a-drawer>
     <a-row style="margin-bottom: 8px;">
       <a-col :span="24">
