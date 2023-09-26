@@ -25,16 +25,16 @@ function onEmitFinish(values: any) {
 }
 
 function onEmitChangeTable(pagination, filters, sorter, { currentDataSource }) {
-    let queryForm = handleSearchFormState();
+    let queryForm = handleSearchFormState(attrs.form);
     emit('onChangeTable', {
-        ...pagination,
-        ...queryForm,
-        ...filters,
-        ...sorter,
-        ...currentDataSource
+        pagination: pagination,
+        form: queryForm,
+        filters: filters,
+        sorter: sorter,
+        data: currentDataSource
     })
 }
-console.log(attrs, slots)
+console.log(attrs.form, slots)
 </script>
 <template>
     <SearchArea v-bind="attrs" @on-finish="onEmitFinish" />

@@ -70,13 +70,14 @@ const pagination = computed<Object>(() => {
     }
 })
 function onChangeTable(tableProps: Object) {
-    console.log(tableProps)
-    // queryStocks({
-    //     ...queryForm,
-    //     stockType: 3,
-    //     size: pagination.pageSize,
-    //     current: pagination.current
-    // })
+    let queryForm = tableProps.form
+    let { pageSize, current } = tableProps.pagination
+    queryStocks({
+        ...queryForm,
+        stockType: 3,
+        size: pageSize,
+        current: current
+    })
 }
 
 function parseDate(date: Array<Number>) {
