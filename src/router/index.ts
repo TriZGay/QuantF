@@ -89,7 +89,7 @@ const routes: RouteRecordRaw[] = [
         name: "WarrantList",
         meta: {
           title: "窝轮",
-          icon: "bank-filled"
+          icon: "chrome-outlined"
         },
         component: () => import("@/views/market/Warrant.vue")
       }, {
