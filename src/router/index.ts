@@ -84,8 +84,15 @@ const routes: RouteRecordRaw[] = [
           icon: "audit-outlined"
         },
         component: () => import("@/views/market/Bond.vue")
-      },
-      {
+      }, {
+        path: "/market/warrant",
+        name: "WarrantList",
+        meta: {
+          title: "窝轮",
+          icon: "bank-filled"
+        },
+        component: () => import("@/views/market/Warrant.vue")
+      }, {
         path: "/market/plates",
         name: "PlateList",
         meta: {
