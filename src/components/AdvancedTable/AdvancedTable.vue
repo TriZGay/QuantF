@@ -34,7 +34,7 @@ function onEmitChangeTable(pagination, filters, sorter, { currentDataSource }) {
         data: currentDataSource
     })
 }
-console.log(attrs.form, slots)
+
 </script>
 <template>
     <SearchArea v-bind="attrs" @on-finish="onEmitFinish" />

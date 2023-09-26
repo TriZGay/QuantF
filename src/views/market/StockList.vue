@@ -12,7 +12,6 @@ import { DownOutlined } from '@ant-design/icons-vue'
 import { subscribe } from '@/api/sub'
 import { syncCapitalFlow, syncCapitalDistribution, syncRehabs, syncHistoryKL } from '@/api/stock'
 
-// import SearchArea from '@/components/SearchArea/SearchArea.vue'
 import AdvancedTable from '@/components/AdvancedTable/AdvancedTable.vue'
 
 const stockStore = useStockStore()

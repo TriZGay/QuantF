@@ -10,7 +10,7 @@ import { FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
 import { message } from 'ant-design-vue';
 import { subscribe } from '@/api/sub';
 
-import SearchArea from '@/components/SearchArea/SearchArea.vue'
+import AdvancedTable from '@/components/AdvancedTable/AdvancedTable.vue'
 
 const indiesStore = useIndiesStore()
 const queryIndies = indiesStore.run;
@@ -61,13 +61,14 @@ const pagination = computed<Object>(() => {
         showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
     }
 })
-function onChangeTable(pagination, filters, sorter, { currentDataSource }) {
-    let queryForm = handleSearchFormState();
+function onChangeTable(tableProps: Object) {
+    let queryForm = tableProps.form
+    let { pageSize, current } = tableProps.pagination
     queryIndies({
         ...queryForm,
         stockType: 6,
-        size: pagination.pageSize,
-        current: pagination.current
+        size: pageSize,
+        current: current
     })
 }
 function parseDate(date: Array<Number>) {
@@ -163,9 +164,8 @@ watch(() => selectedSubType, (val) => {
 </script>
 <template>
     <div class="stock-list-container">
-        <SearchArea :form="formState" @on-finish="onFinish" />
-        <a-table class="searchResult" :columns="stocksColumns" :data-source="list" :loading="loading"
-            :row-key="(record) => record.id" :pagination="pagination" @change="onChangeTable">
+        <AdvancedTable :form="formState" @on-finish="onFinish" :columns="stocksColumns" :data-source="list"
+            :loading="loading" :row-key="(record) => record.id" :pagination="pagination" @on-change-table="onChangeTable">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'listingDate'">
                     {{ parseDate(record.listingDate) }}
@@ -202,14 +202,9 @@ watch(() => selectedSubType, (val) => {
                     </span>
                 </template>
             </template>
-        </a-table>
+        </AdvancedTable>
+    
     </div>
 </template>
 
-<style lang="less" scoped>
-.searchResult {
-    margin-top: 16px;
-    border: 1px dashed #e9e9e9;
-    border-radius: 2px;
-}
-</style>
+<style lang="less" scoped></style>
