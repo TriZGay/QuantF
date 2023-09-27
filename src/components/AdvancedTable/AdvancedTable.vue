@@ -19,8 +19,7 @@ const emit = defineEmits<{
     (e: 'onChangeTable', tableProps: Object): void
 }>()
 
-function onEmitFinish(values: any) {
-    let queryForm = handleSearchFormState(values)
+function onEmitFinish(queryForm: Object) {
     emit('onFinish', queryForm)
 }
 
