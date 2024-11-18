@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 //@ts-nocheck
 import { storeToRefs } from "pinia";
-import { reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
-import type { FormInstance } from "ant-design-vue";
 import * as dayjs from "dayjs";
+import SearchArea from "@/components/SearchArea/SearchArea.vue";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -15,6 +15,14 @@ const analyzeKStores = useAnalyzeKline();
 const fetchMethod = analyzeKStores.requestK;
 const { kLines, kLoading } = storeToRefs(analyzeKStores);
 const kLineOptions = ref({});
+
+const metaCodeMap = computed(() => {
+  let map = {};
+  metaCodes.value.forEach((item) => {
+    map[item.code] = item.market + "+" + item.code;
+  });
+  return map;
+});
 
 watch(() => kLines, kline => {
   let xAxisTime = [];
@@ -176,13 +184,11 @@ watch(() => kLines, kline => {
   };
 }, { deep: true });
 
-const expand = ref<boolean>(false);
-const formRef = ref<FormInstance>();
 const formState = reactive({
   code: {
     name: "标的物代码",
     type: "select",
-    kv: metaCodes,
+    kv: metaCodeMap,
     bindValue: ""
   },
   range: {
@@ -199,9 +205,9 @@ function onFinish(values: any) {
   fetchMethod({
     rehabType: 1,
     granularity: 1,
-    code: values.code.bindValue,
-    start: dayjs(values.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-    end: dayjs(values.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
+    code: values.code,
+    start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+    end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
   });
 }
 
@@ -210,42 +216,7 @@ fetchCodes({
 });
 </script>
 <template>
-  <a-form ref="formRef" :model="formState" @finish="onFinish">
-    <a-row :gutter="24">
-      <template v-for="(value, key, index) in formState" :key="key">
-        <a-col v-show="expand || index <= 6" :span="8">
-          <a-form-item :name="key" :label="value.name">
-            <template v-if="value.type === 'select'">
-              <a-select v-model:value="value.bindValue">
-                <a-select-option v-for="(option, index) in value.kv " :value="option.code" :key="index">
-                  {{ option.code }}
-                </a-select-option>
-              </a-select>
-            </template>
-            <template v-if="value.type === 'date-range'">
-              <a-range-picker style="width: 350px;" v-model:value="value.bindValue" :ranges="value.ranges"
-                              show-time />
-            </template>
-          </a-form-item>
-        </a-col>
-      </template>
-    </a-row>
-    <a-row>
-      <a-col :span="24" style="text-align:right">
-        <a-button type="primary" html-type="submit">搜索</a-button>
-        <a-button style="margin:0 8px" @click="() => formRef.resetFields()">清空</a-button>
-        <a style="font-size:12px" @click="expand = !expand">
-          <template v-if="expand">
-            <UpOutlined />
-          </template>
-          <template v-else>
-            <DownOutlined />
-          </template>
-          展开
-        </a>
-      </a-col>
-    </a-row>
-  </a-form>
+  <SearchArea :form="formState" @onFinish="onFinish" />
   <v-chart style="height: 400px;" :loading="kLoading" :autoresize="true" :option="kLineOptions"></v-chart>
 </template>
 <style lang="less" scoped></style>
