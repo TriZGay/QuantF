@@ -1,8 +1,9 @@
 import {
-  createRouter,
+  createRouter, createWebHashHistory,
   createWebHistory,
-  type RouteRecordRaw,
+  type RouteRecordRaw
 } from "vue-router";
+import * as process from "node:process";
 
 declare module "vue-router" {
   interface RouteMeta {
@@ -22,7 +23,7 @@ const routes: RouteRecordRaw[] = [
     name: "LoginPage",
     component: () => import("@/views/login/Login.vue"),
     meta: {
-      hidden: true,
+      hidden: true
     }
   },
   {
@@ -37,8 +38,8 @@ const routes: RouteRecordRaw[] = [
         icon: "home-filled",
         closable: false
       },
-      component: () => import("@/views/home/Home.vue"),
-    }],
+      component: () => import("@/views/home/Home.vue")
+    }]
   },
   {
     path: "/market",
@@ -57,7 +58,7 @@ const routes: RouteRecordRaw[] = [
           title: "正股",
           icon: "container-filled"
         },
-        component: () => import("@/views/market/StockList.vue"),
+        component: () => import("@/views/market/StockList.vue")
       },
       {
         path: "/market/futuresList",
@@ -66,7 +67,7 @@ const routes: RouteRecordRaw[] = [
           title: "期货",
           icon: "bank-filled"
         },
-        component: () => import("@/views/market/FuturesList.vue"),
+        component: () => import("@/views/market/FuturesList.vue")
       },
       {
         path: "/market/indies",
@@ -101,7 +102,7 @@ const routes: RouteRecordRaw[] = [
         },
         component: () => import("@/views/market/PlateList.vue")
       }
-    ],
+    ]
   },
   {
     path: "/operation",
@@ -165,7 +166,6 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/realtime",
-    redirect: "/realtime/rtk",
     meta: {
       title: "实时",
       icon: "fund-outlined"
@@ -236,9 +236,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/trade/RealTimeBaseQuote.vue")
       }
     ]
-  }, {
+  },
+  {
     path: "/analyze",
-    redirect: "/analyze/k",
     meta: {
       title: "统计分析",
       icon: "stock-outlined"
@@ -251,13 +251,21 @@ const routes: RouteRecordRaw[] = [
         icon: "sliders-outlined"
       },
       component: () => import("@/views/analyze/K.vue")
+    }, {
+      path: "/analyze/strategy",
+      meta: {
+        title: "策略",
+        icon: "code-sandbox-outlined"
+      },
+      component: () => import("@/views/analyze/Strategy.vue")
     }]
   }
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes,
+  history: process.env.NODE_ENV === "development" ? createWebHashHistory(import.meta.env.BASE_URL) :
+    createWebHistory(import.meta.env.BASE_URL),
+  routes: routes
 });
 
 export { router, routes };

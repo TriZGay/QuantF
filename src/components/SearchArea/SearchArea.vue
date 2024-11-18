@@ -60,6 +60,9 @@ function onFinish(values: any) {
                               :ranges="value.ranges"
                               show-time />
             </template>
+            <template v-if="value.type==='radio-group'">
+              <a-radio-group v-model:value="value.bindValue" :options="value.radioOptions" />
+            </template>
           </a-form-item>
         </a-col>
       </template>

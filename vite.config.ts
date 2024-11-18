@@ -8,21 +8,21 @@ export default defineConfig({
   server: {
     port: 8888,
     proxy: {
-      '/api': {
+      "/api": {
         target: "http://localhost:9090",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, "")
       },
-      '/ana': {
+      "/ana": {
         target: "http://localhost:9091",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ana/, '')
+        rewrite: (path) => path.replace(/^\/ana/, "")
       }
     }
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
-  },
+      "@": fileURLToPath(new URL("./src", import.meta.url))
+    }
+  }
 });

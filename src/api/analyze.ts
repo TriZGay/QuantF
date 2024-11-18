@@ -61,8 +61,7 @@ export interface MaData {
   code: string,
   rehabType: number,
   maValue: number,
-  updateTime: string,
-  addTime: string
+  datetime: string,
 }
 
 export interface MetaRequest {
