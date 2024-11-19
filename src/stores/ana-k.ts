@@ -7,7 +7,7 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
   const {
     loading: kLoading,
     data,
-    run: requestK
+    runAsync: requestK
   } = useRequest(fetchKLineData, {
     manual: true
   });

@@ -7,6 +7,7 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
 import * as dayjs from "dayjs";
+import type { KLine, MaData } from "@/api/analyze";
 
 
 const analyzeMetaStores = useAnalyzeMeta();
@@ -30,62 +31,42 @@ const metaCodeMap = computed(() => {
   return map;
 });
 
-watch(() => kLines, kline => {
+const formState = reactive({
+  code: {
+    name: "标的物代码",
+    type: "select",
+    kv: metaCodeMap,
+    bindValue: ""
+  },
+  rehabType: {
+    name: "复权类型",
+    type: "radio-group",
+    radioOptions: [
+      { label: "前复权", value: "1" },
+      { label: "后复权", value: "2" },
+      { label: "无复权", value: "0" }],
+    bindValue: "1"
+  },
+  range: {
+    name: "时间范围",
+    type: "date-range",
+    bindValue: [dayjs(), dayjs().subtract(1, "minute")],
+    ranges: {
+      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(0).second(0)]
+    }
+  }
+});
+
+function drawAnalyzePic(kLines: KLine[], maLines: MaData[]) {
   let xAxisTime = [];
   let candelstickArray = [];
   let volumes = [];
-  kline.value.forEach((k, index) => {
+  kLines.forEach((k, index) => {
     xAxisTime.push(k.datetime);
     candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice]);
     volumes.push([index, k.volume, k.openPrice > k.closePrice ? 1 : -1]);
   });
   kLineOptions.value = {
-    toolbox: {
-      feature: {
-        myTool1: {
-          show: true,
-          title: "前复权",
-          icon: "path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891",
-          onclick: function() {
-            fetchMethod({
-              rehabType: 1,
-              granularity: 1,
-              code: formState.code.bindValue,
-              start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-              end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
-            });
-          }
-        },
-        myTool2: {
-          show: true,
-          title: "后复权",
-          icon: "path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891",
-          onclick: function() {
-            fetchMethod({
-              rehabType: 2,
-              granularity: 1,
-              code: formState.code.bindValue,
-              start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-              end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
-            });
-          }
-        },
-        myTool3: {
-          show: true,
-          title: "不复权",
-          icon: "path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891",
-          onclick: function() {
-            fetchMethod({
-              rehabType: 0,
-              granularity: 1,
-              code: formState.code.bindValue,
-              start: dayjs(formState.range.bindValue[0]).format("YYYY-MM-DD HH:mm:ss"),
-              end: dayjs(formState.range.bindValue[1]).format("YYYY-MM-DD HH:mm:ss")
-            });
-          }
-        }
-      }
-    },
     xAxis: [{
       type: "category",
       data: xAxisTime,
@@ -185,52 +166,37 @@ watch(() => kLines, kline => {
         xAxisIndex: 1,
         yAxisIndex: 1,
         data: volumes
-      }
+      },
+      {
+        name: "MA5",
+        type: "line",
+        data: maLines.map(ma => ma.maValue),
+      },
     ]
   };
-}, { deep: true });
-
-const formState = reactive({
-  code: {
-    name: "标的物代码",
-    type: "select",
-    kv: metaCodeMap,
-    bindValue: ""
-  },
-  rehabType: {
-    name: "复权类型",
-    type: "radio-group",
-    radioOptions: [
-      { label: "前复权", value: "1" },
-      { label: "后复权", value: "2" },
-      { label: "无复权", value: "0" }],
-    bindValue: "1"
-  },
-  range: {
-    name: "时间范围",
-    type: "date-range",
-    bindValue: [dayjs(), dayjs().subtract(1, "minute")],
-    ranges: {
-      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(0).second(0)]
-    }
-  }
-});
+}
 
 function onFinish(values: any) {
-  fetchMethod({
-    rehabType: 1,
+  Promise.allSettled([fetchMethod({
+    rehabType: values.rehabType,
     granularity: 1,
     code: values.code,
     start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
     end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-  });
-  fetchMa({
-    rehabType: 1,
+  }), fetchMa({
+    rehabType: values.rehabType,
     granularity: 1,
     span: 1,
     code: values.code,
     start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
     end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+  })]).then(([kData, maData]) => {
+    if (kData.status === "fulfilled"
+      && maData.status === "fulfilled") {
+      let kLines = kData.value.data;
+      let maLines = maData.value.data;
+      drawAnalyzePic(kLines, maLines);
+    }
   });
 }
 

@@ -7,7 +7,7 @@ export const useAnalyzeMa = defineStore("ana-ma", () => {
   const {
     loading: maLoading,
     data,
-    run: requestMaData
+    runAsync: requestMaData
   } = useRequest(fetchMaData, {
     manual: true
   });
