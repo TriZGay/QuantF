@@ -64,6 +64,11 @@ export interface MaData {
   datetime: string,
 }
 
+export declare type MaLines = {
+  name: string,
+  data: Array<MaData>
+}
+
 export interface MetaRequest {
   granularity: number;
 }
@@ -85,5 +90,5 @@ export function fetchKLineData(kLineRequest: KLineRequest) {
 
 //查询不同粒度的ma线数据
 export function fetchMaData(maRequest: MaRequest) {
-  return request.post<MaData[]>("ana/ma/n", maRequest);
+  return request.post<MaData[]>("/ana/ma/n", maRequest);
 }

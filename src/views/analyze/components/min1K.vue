@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-//@ts-nocheck
 import SearchArea from "@/components/SearchArea/SearchArea.vue";
 import { storeToRefs } from "pinia";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
-import { useAnalyzeMa } from "@/stores/ana-ma";
 import * as dayjs from "dayjs";
-import type { KLine, MaData } from "@/api/analyze";
-
+import type { KLine, MaLines } from "@/api/analyze";
+import { fetchMaData } from "@/api/analyze";
+import { isAll200 } from "@/utils/web";
+import { MA_TYPE, maTypeToCheckBoxOptions, rehabTypeToRadioOptions } from "@/api/code";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -16,12 +16,10 @@ const { metaCodes } = storeToRefs(analyzeMetaStores);
 
 const analyzeKStores = useAnalyzeKline();
 const fetchMethod = analyzeKStores.requestK;
-const { kLines, kLoading } = storeToRefs(analyzeKStores);
+const { kLoading } = storeToRefs(analyzeKStores);
 const kLineOptions = ref({});
 
-const analyzeMaStores = useAnalyzeMa();
-const fetchMa = analyzeMaStores.requestMaData;
-const { maData, maLoading } = storeToRefs(analyzeMaStores);
+const fetchMa = fetchMaData;
 
 const metaCodeMap = computed(() => {
   let map = {};
@@ -41,23 +39,26 @@ const formState = reactive({
   rehabType: {
     name: "复权类型",
     type: "radio-group",
-    radioOptions: [
-      { label: "前复权", value: "1" },
-      { label: "后复权", value: "2" },
-      { label: "无复权", value: "0" }],
+    radioOptions: rehabTypeToRadioOptions(),
     bindValue: "1"
   },
   range: {
     name: "时间范围",
-    type: "date-range",
+    type: "datetime-range",
     bindValue: [dayjs(), dayjs().subtract(1, "minute")],
     ranges: {
       "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(0).second(0)]
     }
+  },
+  span: {
+    name: "MA线跨度",
+    type: "checkbox-group",
+    checkboxOptions: maTypeToCheckBoxOptions(),
+    bindValue: ["1"]
   }
 });
 
-function drawAnalyzePic(kLines: KLine[], maLines: MaData[]) {
+function drawAnalyzePic(kLines: KLine[], maLines: MaLines[]) {
   let xAxisTime = [];
   let candelstickArray = [];
   let volumes = [];
@@ -167,36 +168,61 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[]) {
         yAxisIndex: 1,
         data: volumes
       },
-      {
-        name: "MA5",
-        type: "line",
-        data: maLines.map(ma => ma.maValue),
-      },
+      ...maLines.map(ma => {
+        return {
+          name: ma.name,
+          type: "line",
+          data: ma.data.map(value => value.maValue)
+        };
+      })
     ]
   };
 }
 
 function onFinish(values: any) {
-  Promise.allSettled([fetchMethod({
-    rehabType: values.rehabType,
-    granularity: 1,
-    code: values.code,
-    start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-    end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-  }), fetchMa({
-    rehabType: values.rehabType,
-    granularity: 1,
-    span: 1,
-    code: values.code,
-    start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-    end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-  })]).then(([kData, maData]) => {
-    if (kData.status === "fulfilled"
-      && maData.status === "fulfilled") {
-      let kLines = kData.value.data;
-      let maLines = maData.value.data;
+  Promise.all([
+    fetchMethod({
+      rehabType: values.rehabType,
+      granularity: 1,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }), ...formState.span.bindValue.map(s => fetchMa({
+      rehabType: values.rehabType,
+      granularity: 1,
+      span: s,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }))
+  ]).then(allPromises => {
+    let kPromises = [];
+    let maPromises = [];
+    allPromises.forEach(promise => {
+      if (promise.config.url.includes("/ana/k/n")) {
+        kPromises.push(promise);
+      } else if (promise.config.url.includes("/ana/ma/n")) {
+        maPromises.push(promise);
+      }
+    });
+    if (isAll200(kPromises) && isAll200(maPromises)) {
+      //todo 直接取数组第一个也许不妥当
+      let kLines = kPromises[0].data;
+      let maLines = maPromises.map(maPromise => {
+        let requestJson = JSON.parse(maPromise.config.data);
+        return {
+          name: MA_TYPE[requestJson.span],
+          data: maPromise.data
+        };
+      });
       drawAnalyzePic(kLines, maLines);
     }
+    // if (kData.status === "fulfilled"
+    //   && maData.status === "fulfilled") {
+    //   let kLines = kData.value.data;
+    //   let maLines = maData.value.data;
+    //   drawAnalyzePic(kLines, maLines);
+    // }
   });
 }
 

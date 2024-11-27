@@ -12,7 +12,8 @@ interface FormState {
 
 interface FormStateValue {
   name: string,
-  type: "select" | "input",
+  type: "select" | "input" | "datetime-range"
+    | "radio-group" | "checkbox-group",
   kv?: any,
   bindValue: any
 }
@@ -40,7 +41,8 @@ function onFinish(values: any) {
 </script>
 <template>
   <a-form ref="formRef" :model="formState.form" @finish="onFinish">
-    <a-row :gutter="24">
+    <a-row type="flex" align="middle" justify="start"
+           :gutter="24" :wrap="true">
       <template v-for="(value, key, index) in formState.form" :key="key">
         <a-col v-show="expand || index <= 6" :span="8">
           <a-form-item :name="key" :label="value.name">
@@ -55,13 +57,16 @@ function onFinish(values: any) {
             <template v-if="value.type === 'input'">
               <a-input v-model:value="value.bindValue" placeholder="请输入名称" />
             </template>
-            <template v-if="value.type === 'date-range'">
-              <a-range-picker style="width: 350px;" v-model:value="value.bindValue"
+            <template v-if="value.type === 'datetime-range'">
+              <a-range-picker v-model:value="value.bindValue"
                               :ranges="value.ranges"
                               show-time />
             </template>
             <template v-if="value.type==='radio-group'">
               <a-radio-group v-model:value="value.bindValue" :options="value.radioOptions" />
+            </template>
+            <template v-if="value.type==='checkbox-group'">
+              <a-checkbox-group v-model:value="value.bindValue" :options="value.checkboxOptions" />
             </template>
           </a-form-item>
         </a-col>
