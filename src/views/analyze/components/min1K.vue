@@ -197,15 +197,14 @@ function onFinish(values: any) {
       amEnd: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
       pmStart: dayjs(values.range2[0]).format("YYYY-MM-DD HH:mm:ss"),
       pmEnd: dayjs(values.range2[1]).format("YYYY-MM-DD HH:mm:ss")
-    }),
-    // ...formState.span.bindValue.map(s => fetchMa({
-    //   rehabType: values.rehabType,
-    //   granularity: 1,
-    //   span: s,
-    //   code: values.code,
-    //   start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-    //   end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    // }))
+    }), ...formState.span.bindValue.map(s => fetchMa({
+      rehabType: values.rehabType,
+      granularity: 1,
+      span: s,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range2[1]).format("YYYY-MM-DD HH:mm:ss")
+    }))
   ]).then(allPromises => {
     let kPromises = [];
     let maPromises = [];
