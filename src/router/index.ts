@@ -107,6 +107,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/operation",
     name: "OperationPage",
+    redirect: "/operation/sync",
     meta: {
       title: "操作中心",
       icon: "bank-filled"
@@ -118,10 +119,17 @@ const routes: RouteRecordRaw[] = [
         name: "SyncCenter",
         meta: {
           title: "数据同步",
-          icon: "tool-outlined",
-          noCache: true
+          icon: "tool-outlined"
         },
         component: () => import("@/views/operation/SyncCenter.vue")
+      }, {
+        path: "/operation/cleaning",
+        name: "DataClean",
+        meta: {
+          title: "数据清洗",
+          icon: "bg-colors-outlined"
+        },
+        component: () => import("@/views/operation/DataCleaning.vue")
       }
     ]
   },
@@ -166,6 +174,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/realtime",
+    name: "RTMonitor",
     meta: {
       title: "实时",
       icon: "fund-outlined"
@@ -239,6 +248,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/analyze",
+    name: "AnalyzeData",
     meta: {
       title: "统计分析",
       icon: "stock-outlined"
@@ -246,6 +256,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     children: [{
       path: "/analyze/k",
+      name: "KLineAnalyze",
       meta: {
         title: "K线",
         icon: "sliders-outlined"
@@ -253,6 +264,7 @@ const routes: RouteRecordRaw[] = [
       component: () => import("@/views/analyze/K.vue")
     }, {
       path: "/analyze/strategy",
+      name: "StrategyAnalyze",
       meta: {
         title: "策略",
         icon: "code-sandbox-outlined"
