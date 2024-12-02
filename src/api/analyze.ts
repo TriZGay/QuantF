@@ -10,8 +10,10 @@ export interface KLineRequest {
   code: string,
   rehabType: number,
   granularity: number,
-  start: string,
-  end: string
+  amStart: string,
+  amEnd: string,
+  pmStart: string,
+  pmEnd: string
 }
 
 export interface BasicQuote {

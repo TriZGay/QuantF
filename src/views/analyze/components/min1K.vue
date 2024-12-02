@@ -47,7 +47,15 @@ const formState = reactive({
     type: "datetime-range",
     bindValue: [dayjs(), dayjs().subtract(1, "minute")],
     ranges: {
-      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(0).second(0)]
+      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(11).minute(30).second(0)]
+    }
+  },
+  range2: {
+    name: "时间范围",
+    type: "datetime-range",
+    bindValue: [dayjs(), dayjs().subtract(1, "minute")],
+    ranges: {
+      "大A交易时段": [dayjs().hour(13).minute(0).second(0), dayjs().hour(15).minute(0).second(0)]
     }
   },
   span: {
@@ -185,16 +193,19 @@ function onFinish(values: any) {
       rehabType: values.rehabType,
       granularity: 1,
       code: values.code,
-      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    }), ...formState.span.bindValue.map(s => fetchMa({
-      rehabType: values.rehabType,
-      granularity: 1,
-      span: s,
-      code: values.code,
-      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    }))
+      amStart: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      amEnd: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
+      pmStart: dayjs(values.range2[0]).format("YYYY-MM-DD HH:mm:ss"),
+      pmEnd: dayjs(values.range2[1]).format("YYYY-MM-DD HH:mm:ss")
+    }),
+    // ...formState.span.bindValue.map(s => fetchMa({
+    //   rehabType: values.rehabType,
+    //   granularity: 1,
+    //   span: s,
+    //   code: values.code,
+    //   start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+    //   end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    // }))
   ]).then(allPromises => {
     let kPromises = [];
     let maPromises = [];
