@@ -40,7 +40,7 @@ const formState = reactive({
     name: "复权类型",
     type: "radio-group",
     radioOptions: rehabTypeToRadioOptions(),
-    bindValue: '1'
+    bindValue: "1"
   },
   range: {
     name: "时间范围",
@@ -113,7 +113,6 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaLines[]) {
           xAxisIndex: "all"
         }
       ]
-
     },
     visualMap: {
       show: false,
@@ -172,6 +171,8 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaLines[]) {
         return {
           name: ma.name,
           type: "line",
+          showSymbol: false,
+          smooth: true,
           data: ma.data.map(value => value.maValue)
         };
       })
