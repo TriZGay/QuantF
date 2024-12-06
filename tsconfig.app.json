@@ -9,6 +9,8 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "composite": true,
     "baseUrl": ".",
     "paths": {

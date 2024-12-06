@@ -10,10 +10,8 @@ export interface KLineRequest {
   code: string,
   rehabType: number,
   granularity: number,
-  amStart: string,
-  amEnd: string,
-  pmStart: string,
-  pmEnd: string
+  start: string,
+  end: string,
 }
 
 export interface BasicQuote {
@@ -54,6 +52,7 @@ export interface MaRequest {
   code: string,
   rehabType: number,
   granularity: number,
+  span: number,
   start: string,
   end: string
 }
@@ -78,6 +77,11 @@ export interface MetaRequest {
 export interface MetaResponse {
   market: number,
   code: string
+}
+
+//查询ck的表
+export function fetchMetaTables() {
+  return request.get("/ana/meta/tables");
 }
 
 //查询有数据的标的物代码

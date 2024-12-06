@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import type { KLine, MaLines } from "@/api/analyze";
 import { fetchMaData } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
@@ -40,7 +40,7 @@ const formState = reactive({
     name: "复权类型",
     type: "radio-group",
     radioOptions: rehabTypeToRadioOptions(),
-    bindValue: "1"
+    bindValue: '1'
   },
   range: {
     name: "时间范围",
@@ -48,14 +48,6 @@ const formState = reactive({
     bindValue: [dayjs(), dayjs().subtract(1, "minute")],
     ranges: {
       "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(11).minute(30).second(0)]
-    }
-  },
-  range2: {
-    name: "时间范围",
-    type: "datetime-range",
-    bindValue: [dayjs(), dayjs().subtract(1, "minute")],
-    ranges: {
-      "大A交易时段": [dayjs().hour(13).minute(0).second(0), dayjs().hour(15).minute(0).second(0)]
     }
   },
   span: {
@@ -193,17 +185,15 @@ function onFinish(values: any) {
       rehabType: values.rehabType,
       granularity: 1,
       code: values.code,
-      amStart: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-      amEnd: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      pmStart: dayjs(values.range2[0]).format("YYYY-MM-DD HH:mm:ss"),
-      pmEnd: dayjs(values.range2[1]).format("YYYY-MM-DD HH:mm:ss")
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     }), ...formState.span.bindValue.map(s => fetchMa({
       rehabType: values.rehabType,
       granularity: 1,
-      span: s,
+      span: parseInt(s),
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-      end: dayjs(values.range2[1]).format("YYYY-MM-DD HH:mm:ss")
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     }))
   ]).then(allPromises => {
     let kPromises = [];
