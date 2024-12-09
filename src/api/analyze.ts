@@ -79,6 +79,12 @@ export interface MetaResponse {
   code: string
 }
 
+export interface TansRequest {
+  tableName: string,
+  start: string,
+  end: string
+}
+
 //查询ck的表
 export function fetchMetaTables() {
   return request.get("/ana/meta/tables");
@@ -97,4 +103,9 @@ export function fetchKLineData(kLineRequest: KLineRequest) {
 //查询不同粒度的ma线数据
 export function fetchMaData(maRequest: MaRequest) {
   return request.post<MaData[]>("/ana/ma/n", maRequest);
+}
+
+//从raw表清洗K线数据到归档表
+export function fetchKLineTrans(transReq: TansRequest) {
+  return request.post<string>("/ana/trans/klineArchive", transReq);
 }
