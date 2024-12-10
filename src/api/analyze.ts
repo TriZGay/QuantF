@@ -90,6 +90,11 @@ export function fetchMetaTables() {
   return request.get("/ana/meta/tables");
 }
 
+//查询ck的数据库各表容量
+export function fetchMetaDbInfo() {
+  return request.get("/ana/meta/dbInfo");
+}
+
 //查询有数据的标的物代码
 export function fetchMetaData(metaRequest: MetaRequest) {
   return request.post<MetaResponse[]>("/ana/meta/codes", metaRequest);

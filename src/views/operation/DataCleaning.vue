@@ -5,16 +5,53 @@ import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import dayjs from "dayjs";
 import { message } from "ant-design-vue";
+import type { ColumnProps } from "ant-design-vue/es/table";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchTables = analyzeMetaStores.requestTables;
-const { metaTables } = storeToRefs(analyzeMetaStores);
+const fetchDbInfos = analyzeMetaStores.requestMetaDbInfo;
+const { metaTables, metaDnInfos } = storeToRefs(analyzeMetaStores);
 
 const analyzeKStores = useAnalyzeKline();
 const fetchKLinesTrans = analyzeKStores.requestKTrans;
 
 const start = ref<string>();
 const end = ref<string>();
+const dbInfoColumns = ref<ColumnProps[]>([{
+  title: "数据库",
+  dataIndex: "database",
+  key: "database"
+}, {
+  title: "表格",
+  dataIndex: "table",
+  key: "table"
+}, {
+  title: "大小",
+  dataIndex: "size",
+  key: "size"
+}, {
+  title: "硬盘里的大小",
+  dataIndex: "bytesOnDisk",
+  key: "bytesOnDisk"
+}, {
+  title: "未压缩大小",
+  dataIndex: "dataUncompressedBytes",
+  key: "dataUncompressedBytes"
+}, {
+  title: "压缩大小",
+  dataIndex: "dataCompressedBytes",
+  key: "dataCompressedBytes"
+}, {
+  title: "压缩比率(%)",
+  dataIndex: "compressedRate",
+  key: "compressedRate"
+}, {
+  title: "数据行数",
+  dataIndex: "rows",
+  key: "rows"
+}
+]);
+
 
 const dataClean = (tableName: string): void => {
   fetchKLinesTrans({
@@ -30,12 +67,15 @@ const dataClean = (tableName: string): void => {
   });
 };
 
+fetchDbInfos();
 fetchTables();
 </script>
 
 <template>
   <div class="container">数据清洗
-    <a-date-picker show-time v-model:value="start"  />
+    <a-table :data-source="metaDnInfos" :columns="dbInfoColumns"
+             size="small" />
+    <a-date-picker show-time v-model:value="start" />
     -
     <a-date-picker show-time v-model:value="end" />
     <a-list size="small"
