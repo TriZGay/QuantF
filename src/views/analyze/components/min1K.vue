@@ -47,7 +47,7 @@ const formState = reactive({
     type: "datetime-range",
     bindValue: [dayjs(), dayjs().subtract(1, "minute")],
     ranges: {
-      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(11).minute(30).second(0)]
+      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(30).second(0)]
     }
   },
   span: {

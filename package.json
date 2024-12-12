@@ -17,6 +17,7 @@
     "@vueuse/components": "^10.1.2",
     "@vueuse/core": "^10.1.2",
     "ant-design-vue": "^3.2.15",
+    "cron-parser": "^4.9.0",
     "dayjs": "^1.11.7",
     "echarts": "^5.4.2",
     "path-browserify": "^1.0.1",

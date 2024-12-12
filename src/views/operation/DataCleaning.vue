@@ -6,6 +6,7 @@ import { ref } from "vue";
 import dayjs from "dayjs";
 import { message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
+import Cron from "@/components/CronPicker/Cron.vue";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchTables = analyzeMetaStores.requestTables;
@@ -15,6 +16,7 @@ const { metaTables, metaDnInfos } = storeToRefs(analyzeMetaStores);
 const analyzeKStores = useAnalyzeKline();
 const fetchKLinesTrans = analyzeKStores.requestKTrans;
 
+const expression = ref<string>();
 const start = ref<string>();
 const end = ref<string>();
 const dbInfoColumns = ref<ColumnProps[]>([{
@@ -75,6 +77,7 @@ fetchTables();
   <div class="container">数据清洗
     <a-table :data-source="metaDnInfos" :columns="dbInfoColumns"
              size="small" />
+    <Cron v-model="expression" />
     <a-date-picker show-time v-model:value="start" />
     -
     <a-date-picker show-time v-model:value="end" />
