@@ -6,7 +6,7 @@ export interface AddKLineRaw2ArcTaskRequest {
   triggerName?: string,
   triggerGroup?: string,
   cron?: string,
-  fromTable:string,
+  fromTable: string,
   toTable: string,
   updateTimeStart?: string,
   updateTimeEnd?: string
@@ -15,4 +15,3 @@ export interface AddKLineRaw2ArcTaskRequest {
 export function fetchAddKLineRaw2ArcTask(addRequest: AddKLineRaw2ArcTaskRequest) {
   return request.post<string>("/ana/task/addKLineRaw2ArcTask", addRequest);
 }
-

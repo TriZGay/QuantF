@@ -12,7 +12,7 @@ import type { AddKLineRaw2ArcTaskRequest } from "@/api/task";
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchTables = analyzeMetaStores.requestTables;
 const fetchDbInfos = analyzeMetaStores.requestMetaDbInfo;
-const { metaTables, metaDnInfos } = storeToRefs(analyzeMetaStores);
+const { metaTables, metaDbInfos, dbInfoLoading } = storeToRefs(analyzeMetaStores);
 
 const taskStores = useTaskStore();
 const fetchKLineRaw2Arc = taskStores.requestAddKLineRaw2ArcTask;
@@ -56,6 +56,10 @@ const dbInfoColumns = ref<ColumnProps[]>([
 fetchDbInfos();
 fetchTables();
 
+const refreshDbInfo = (): void => {
+  fetchTables();
+};
+
 const showModal = ref<boolean>(false);
 const taskForm = ref<FormInstance>();
 const isImmediate = ref<Number>(1);
@@ -97,8 +101,15 @@ const handleKLineRaw2ArcOk = (): void => {
 </script>
 
 <template>
-  <div class="container">数据清洗
-    <a-table :data-source="metaDnInfos" :columns="dbInfoColumns"
+  <div class="container">
+    <a-typography-title :level="3">数据清洗</a-typography-title>
+    <a-button size="small" @click="refreshDbInfo()">
+      <template #icon>
+        <reload-outlined />
+      </template>
+    </a-button>
+    <a-table :data-source="metaDbInfos" :columns="dbInfoColumns"
+             :loading="dbInfoLoading"
              size="small" />
     <a-button type="primary" shape="round" size="small" @click="showModal=true">
       <template #icon>
@@ -117,7 +128,13 @@ const handleKLineRaw2ArcOk = (): void => {
         <a-form-item name="toTable" label="目的表">
           <a-select v-model:value="kLineRaw2ArcTaskModel.toTable" :options="kLineArcTablesOptions" />
         </a-form-item>
-        <a-form-item name="updateRange" label="数据时间">
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
           <a-date-picker :show-time="{defaultValue:dayjs('09:30:00','HH:mm:ss')}"
                          v-model:value="kLineRaw2ArcTaskModel.updateTimeStart"
                          value-format="YYYY-MM-DD HH:mm:ss"
@@ -128,32 +145,29 @@ const handleKLineRaw2ArcOk = (): void => {
                          value-format="YYYY-MM-DD HH:mm:ss"
                          :show-now="false" />
         </a-form-item>
-        <a-form-item name="isImmediate" label="是否立即执行">
-          <a-radio-group v-model:value="isImmediate">
-            <a-radio :value="1">是</a-radio>
-            <a-radio :value="0">否</a-radio>
-          </a-radio-group>
-        </a-form-item>
         <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
-          <Cron v-model="taskModel.cron" />
+          <a-input v-model:value="kLineRaw2ArcTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="kLineRaw2ArcTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
         </a-form-item>
       </a-form>
     </a-modal>
-    <!--    <a-list size="small"-->
-    <!--            :data-source="metaTables"-->
-    <!--            item-layout="horizontal">-->
-    <!--      <template #renderItem="{item}">-->
-    <!--        <a-list-item>-->
-    <!--          <template #actions>-->
-    <!--            <a key="list-loadmore-edit" @click="dataClean(item)">trans</a>-->
-    <!--          </template>-->
-    <!--          {{ item }}-->
-    <!--        </a-list-item>-->
-    <!--      </template>-->
-    <!--    </a-list>-->
   </div>
 </template>
 
 <style scoped lang="less">
+.cronWrapper {
+  height: 360px;
+  overflow: scroll;
+}
 
 </style>

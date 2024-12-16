@@ -19,14 +19,15 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
   });
 
   const {
-    data: dnInfos,
+    data: dbInfos,
+    loading: dbInfoLoading,
     run: requestMetaDbInfo
   } = useRequest(fetchMetaDbInfo, {
     manual: true
   });
 
-  const metaDnInfos = computed(() => {
-    return dnInfos.value?.data || [];
+  const metaDbInfos = computed(() => {
+    return dbInfos.value?.data || [];
   });
 
   const metaTables = computed(() => {
@@ -42,7 +43,8 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
     requestMetaData,
     metaTables,
     requestTables,
-    metaDnInfos,
+    metaDbInfos,
+    dbInfoLoading,
     requestMetaDbInfo
   };
 });
