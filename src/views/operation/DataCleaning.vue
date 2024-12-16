@@ -16,6 +16,9 @@ const { metaTables, metaDbInfos, dbInfoLoading } = storeToRefs(analyzeMetaStores
 
 const taskStores = useTaskStore();
 const fetchKLineRaw2Arc = taskStores.requestAddKLineRaw2ArcTask;
+const fetchTasks = taskStores.requestTasks;
+const fetchDelTask = taskStores.requestDelTask;
+const { tasks, taskLoading } = storeToRefs(taskStores);
 
 const dbInfoColumns = ref<ColumnProps[]>([
   {
@@ -52,9 +55,49 @@ const dbInfoColumns = ref<ColumnProps[]>([
     key: "rows"
   }
 ]);
+const tasksColumns = ref<ColumnProps[]>([
+  {
+    title: "任务名称",
+    dataIndex: "jobName",
+    key: "jobName"
+  }, {
+    title: "任务组",
+    dataIndex: "jobGroup",
+    key: "jobGroup"
+  }, {
+    title: "触发器名称",
+    dataIndex: "triggerName",
+    key: "triggerName"
+  }, {
+    title: "触发器组",
+    dataIndex: "triggerGroup",
+    key: "triggerGroup"
+  }, {
+    title: "Cron表达式",
+    dataIndex: "cron",
+    key: "cron"
+  }, {
+    title: "状态",
+    dataIndex: "state",
+    key: "state"
+  }, {
+    title: "任务附加数据",
+    dataIndex: "jobDataMap",
+    key: "jobDataMap",
+    ellipsis: true
+  }, {
+    title: "下次执行时间",
+    dataIndex: "nextFireTime",
+    key: "nextFireTime"
+  }, {
+    title: "操作",
+    key: "action"
+  }
+]);
 
 fetchDbInfos();
 fetchTables();
+fetchTasks();
 
 const refreshDbInfo = (): void => {
   fetchTables();
@@ -93,8 +136,21 @@ const handleKLineRaw2ArcOk = (): void => {
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
+        fetchTasks();
       }
     }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+const handleDelJob = (jobName: string): void => {
+  fetchDelTask({
+    jobName
+  }).then(res => {
+    if (res.status === 200) {
+      message.success(res.data.toString());
+      fetchTasks();
+    }
+  }).catch(err => {
     message.error(err.response.data.toString());
   });
 };
@@ -161,6 +217,21 @@ const handleKLineRaw2ArcOk = (): void => {
         </a-form-item>
       </a-form>
     </a-modal>
+    <a-table :data-source="tasks" :columns="tasksColumns"
+             :loading="taskLoading"
+             size="small">
+      <template #bodyCell="{column,record}">
+        <template v-if="column.key==='nextFireTime'">
+          <span>{{ dayjs(record.nextFireTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
+        </template>
+        <template v-if="column.key==='action'">
+          <span>
+            <a @click="handleDelJob(record.jobName)">删除</a>
+          </span>
+        </template>
+      </template>
+
+    </a-table>
   </div>
 </template>
 
