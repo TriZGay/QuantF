@@ -12,11 +12,6 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
     manual: true
   });
 
-  const {
-    runAsync: requestKTrans
-  } = useRequest(fetchKLineTrans, {
-    manual: true
-  });
 
   const kLines = computed(() => {
     return data.value?.data || [];
@@ -25,7 +20,6 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
   return {
     kLoading,
     kLines,
-    requestK,
-    requestKTrans
+    requestK
   };
 });
