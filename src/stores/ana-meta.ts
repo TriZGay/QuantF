@@ -1,4 +1,4 @@
-import { fetchMetaData, fetchMetaDbInfo, fetchMetaTables } from "@/api/analyze";
+import { fetchMetaData, fetchMetaDbInfo, fetchMetaTables, fetchTableInfo } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useRequest } from "vue-request";
@@ -26,6 +26,18 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
     manual: true
   });
 
+  const {
+    data: tableInfos,
+    loading: tableInfoLoading,
+    runAsync: requestTableInfo
+  } = useRequest(fetchTableInfo, {
+    manual: true
+  });
+
+  const metaTableInfo = computed(() => {
+    return tableInfos.value?.data || [];
+  });
+
   const metaDbInfos = computed(() => {
     return dbInfos.value?.data || [];
   });
@@ -45,6 +57,9 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
     requestTables,
     metaDbInfos,
     dbInfoLoading,
-    requestMetaDbInfo
+    requestMetaDbInfo,
+    metaTableInfo,
+    tableInfoLoading,
+    requestTableInfo
   };
 });

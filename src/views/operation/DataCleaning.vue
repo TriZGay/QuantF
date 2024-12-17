@@ -8,11 +8,16 @@ import { type FormInstance, message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
 import Cron from "@/components/CronPicker/Cron.vue";
 import type { AddKLineRaw2ArcTaskRequest } from "@/api/task";
+import { FT_REHABTYPE } from "@/api/code";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchTables = analyzeMetaStores.requestTables;
 const fetchDbInfos = analyzeMetaStores.requestMetaDbInfo;
-const { metaTables, metaDbInfos, dbInfoLoading } = storeToRefs(analyzeMetaStores);
+const fetchTableInfo = analyzeMetaStores.requestTableInfo;
+const {
+  metaTables, metaDbInfos, dbInfoLoading,
+  tableInfoLoading, metaTableInfo
+} = storeToRefs(analyzeMetaStores);
 
 const taskStores = useTaskStore();
 const fetchKLineRaw2Arc = taskStores.requestAddKLineRaw2ArcTask;
@@ -53,6 +58,10 @@ const dbInfoColumns = ref<ColumnProps[]>([
     title: "数据行数",
     dataIndex: "rows",
     key: "rows"
+  }, {
+    title: "操作",
+    dataIndex: "action",
+    key: "action"
   }
 ]);
 const tasksColumns = ref<ColumnProps[]>([
@@ -94,13 +103,31 @@ const tasksColumns = ref<ColumnProps[]>([
     key: "action"
   }
 ]);
+const metaTableColumns = ref<ColumnProps[]>([
+  {
+    title: "数据最大时间",
+    dataIndex: "maxTime",
+    key: "maxTime"
+  }, {
+    title: "数据最小",
+    dataIndex: "minTime",
+    key: "minTime"
+  }, {
+    title: "标的物代码",
+    dataIndex: "code",
+    key: "code"
+  }, {
+    title: "复权类型",
+    dataIndex: "rehabType",
+    key: "rehabType"
+  }]);
 
 fetchDbInfos();
 fetchTables();
 fetchTasks();
 
 const refreshDbInfo = (): void => {
-  fetchTables();
+  fetchDbInfos();
 };
 
 const showModal = ref<boolean>(false);
@@ -111,6 +138,7 @@ const kLineRaw2ArcTaskModel = ref<AddKLineRaw2ArcTaskRequest>({
   fromTable: "",
   toTable: ""
 });
+
 const kLineRawTablesOptions = computed(() => {
   return metaTables.value.filter((tableName: string) => {
     return tableName.includes("kl") && tableName.includes("raw");
@@ -131,6 +159,7 @@ const kLineArcTablesOptions = computed(() => {
     };
   });
 });
+
 const handleKLineRaw2ArcOk = (): void => {
   fetchKLineRaw2Arc(kLineRaw2ArcTaskModel.value)
     .then(res => {
@@ -154,19 +183,52 @@ const handleDelJob = (jobName: string): void => {
     message.error(err.response.data.toString());
   });
 };
+
+const handleTableInfo = (tableName: string): void => {
+  fetchTableInfo({
+    tableName
+  }).then(res => {
+    if (res.status === 200) {
+      showTableInfo.value = true;
+    }
+  }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+
+const showTableInfo = ref<boolean>(false);
 </script>
 
 <template>
   <div class="container">
     <a-typography-title :level="3">数据清洗</a-typography-title>
-    <a-button size="small" @click="refreshDbInfo()">
+    <a-button size="small" @click="refreshDbInfo">
       <template #icon>
         <reload-outlined />
       </template>
     </a-button>
     <a-table :data-source="metaDbInfos" :columns="dbInfoColumns"
              :loading="dbInfoLoading"
-             size="small" />
+             size="small">
+      <template #bodyCell="{column,record}">
+        <template v-if="column.key==='action'">
+          <span>
+            <a @click="handleTableInfo(record.table)">概览</a>
+          </span>
+        </template>
+      </template>
+    </a-table>
+    <a-modal v-model:visible="showTableInfo" title="表信息">
+      <a-table :data-source="metaTableInfo" :columns="metaTableColumns"
+               :loading="tableInfoLoading"
+               size="small">
+        <template #bodyCell="{column,record}">
+          <template v-if="column.key==='rehabType'">
+            <span>{{ FT_REHABTYPE [record.rehabType] }}</span>
+          </template>
+        </template>
+      </a-table>
+    </a-modal>
     <a-button type="primary" shape="round" size="small" @click="showModal=true">
       <template #icon>
         <PlusOutlined />

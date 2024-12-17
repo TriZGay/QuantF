@@ -1,4 +1,4 @@
-import { fetchKLineData, fetchKLineTrans } from "@/api/analyze";
+import { fetchKLineData } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useRequest } from "vue-request";

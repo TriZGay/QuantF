@@ -79,15 +79,25 @@ export interface MetaResponse {
   code: string
 }
 
-export interface TansRequest {
+export interface TableInfoRequest {
   tableName: string,
-  start: string,
-  end: string
+}
+
+export interface TableInfoResponse {
+  maxTime: string,
+  minTime: string,
+  code: string,
+  rehabType: number;
 }
 
 //查询ck的表
 export function fetchMetaTables() {
   return request.get("/ana/meta/tables");
+}
+
+//查询ck的表的数据边界情况
+export function fetchTableInfo(req: TableInfoRequest) {
+  return request.post<TableInfoResponse>("/ana/meta/tableInfo", req);
 }
 
 //查询ck的数据库各表容量
@@ -108,9 +118,4 @@ export function fetchKLineData(kLineRequest: KLineRequest) {
 //查询不同粒度的ma线数据
 export function fetchMaData(maRequest: MaRequest) {
   return request.post<MaData[]>("/ana/ma/n", maRequest);
-}
-
-//从raw表清洗K线数据到归档表
-export function fetchKLineTrans(transReq: TansRequest) {
-  return request.post<string>("/ana/trans/klineArchive", transReq);
 }
