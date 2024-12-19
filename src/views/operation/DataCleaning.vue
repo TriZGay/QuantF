@@ -14,6 +14,7 @@ const analyzeMetaStores = useAnalyzeMeta();
 const fetchTables = analyzeMetaStores.requestTables;
 const fetchDbInfos = analyzeMetaStores.requestMetaDbInfo;
 const fetchTableInfo = analyzeMetaStores.requestTableInfo;
+const fetchTruncateTable = analyzeMetaStores.requestTruncateTable;
 const {
   metaTables, metaDbInfos, dbInfoLoading,
   tableInfoLoading, metaTableInfo
@@ -197,6 +198,19 @@ const handleTableInfo = (tableName: string): void => {
 };
 
 const showTableInfo = ref<boolean>(false);
+
+const handleTruncateTable = (tableName: string): void => {
+  fetchTruncateTable({
+    tableName
+  }).then(res => {
+    if (res.status === 200) {
+      message.success(res.data.toString());
+      fetchDbInfos();
+    }
+  }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
 </script>
 
 <template>
@@ -212,8 +226,11 @@ const showTableInfo = ref<boolean>(false);
              size="small">
       <template #bodyCell="{column,record}">
         <template v-if="column.key==='action'">
-          <span>
+          <span style="margin-right: 8px">
             <a @click="handleTableInfo(record.table)">概览</a>
+          </span>
+          <span>
+            <a @click="handleTruncateTable(record.table)">清空</a>
           </span>
         </template>
       </template>

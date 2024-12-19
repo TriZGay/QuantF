@@ -100,6 +100,11 @@ export function fetchTableInfo(req: TableInfoRequest) {
   return request.post<TableInfoResponse>("/ana/meta/tableInfo", req);
 }
 
+//truncate表
+export function fetchTruncateTable(req: TableInfoRequest) {
+  return request.post<string>("/ana/meta/truncateTable", req);
+}
+
 //查询ck的数据库各表容量
 export function fetchMetaDbInfo() {
   return request.get("/ana/meta/dbInfo");
@@ -119,3 +124,4 @@ export function fetchKLineData(kLineRequest: KLineRequest) {
 export function fetchMaData(maRequest: MaRequest) {
   return request.post<MaData[]>("/ana/ma/n", maRequest);
 }
+
