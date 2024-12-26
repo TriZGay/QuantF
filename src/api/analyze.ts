@@ -90,6 +90,16 @@ export interface TableInfoResponse {
   rehabType: number;
 }
 
+export interface DataQaRequest {
+  start: string,
+  end: string,
+}
+
+//查询每日数据质量
+export function fetchDataQaPerDay(dataQaReq: DataQaRequest) {
+  return request.post<Map<String, boolean>>("/ana/meta/dataQaPerDay", dataQaReq);
+}
+
 //查询ck的表
 export function fetchMetaTables() {
   return request.get("/ana/meta/tables");

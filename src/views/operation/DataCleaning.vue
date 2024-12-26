@@ -2,7 +2,7 @@
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useTaskStore } from "@/stores/task";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import dayjs, { Dayjs } from "dayjs";
 import { type FormInstance, message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
@@ -15,9 +15,10 @@ const fetchTables = analyzeMetaStores.requestTables;
 const fetchDbInfos = analyzeMetaStores.requestMetaDbInfo;
 const fetchTableInfo = analyzeMetaStores.requestTableInfo;
 const fetchTruncateTable = analyzeMetaStores.requestTruncateTable;
+const fetchDataQa = analyzeMetaStores.requestDataQa;
 const {
   metaTables, metaDbInfos, dbInfoLoading,
-  tableInfoLoading, metaTableInfo
+  tableInfoLoading, metaTableInfo, dataQaPerDay
 } = storeToRefs(analyzeMetaStores);
 
 const taskStores = useTaskStore();
@@ -214,7 +215,16 @@ const handleTruncateTable = (tableName: string): void => {
 };
 
 const eventsClass = (date: Dayjs): string => {
-  console.log(date.format("YYYY-MM-DD"));
+  let dateStr = date.format("YYYY-MM-DD");
+  if (dataQaPerDay.value.hasOwnProperty(dateStr)) {
+    if (dataQaPerDay.value[dateStr]) {
+      return "alarmDate";
+    } else {
+      return "normalDate";
+    }
+  } else {
+    return "";
+  }
 };
 
 const showModalRepeat = ref<boolean>(false);
@@ -234,6 +244,11 @@ const handleKLineRepeatOk = (): void => {
     message.error(err.response.data.toString());
   });
 };
+
+fetchDataQa({
+  start: dayjs().startOf("month").format("YYYY-MM-DD"),
+  end: dayjs().endOf("month").format("YYYY-MM-DD")
+});
 </script>
 
 <template>
@@ -272,7 +287,7 @@ const handleKLineRepeatOk = (): void => {
     <div class="calendarWrapper">
       <a-calendar :fullscreen="false">
         <template #dateFullCellRender="{current}">
-          <span :class="eventsClass(current)">{{ current.date() }}</span>
+          <div :class="eventsClass(current)">{{ current.date() }}</div>
         </template>
       </a-calendar>
     </div>
@@ -399,6 +414,14 @@ const handleKLineRepeatOk = (): void => {
 .cronWrapper {
   height: 360px;
   overflow: scroll;
+}
+
+.alarmDate {
+  background-color: orangered;
+}
+
+.normalDate {
+  background-color: greenyellow;
 }
 
 </style>
