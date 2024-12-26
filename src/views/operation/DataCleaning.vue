@@ -3,11 +3,11 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useTaskStore } from "@/stores/task";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { type FormInstance, message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
 import Cron from "@/components/CronPicker/Cron.vue";
-import type { AddKLineRaw2ArcTaskRequest } from "@/api/task";
+import type { AddKLineRaw2ArcTaskRequest, AddKLineRepeatCheckTaskRequest } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
 
 const analyzeMetaStores = useAnalyzeMeta();
@@ -22,6 +22,7 @@ const {
 
 const taskStores = useTaskStore();
 const fetchKLineRaw2Arc = taskStores.requestAddKLineRaw2ArcTask;
+const fetchKLineRepeatCheck = taskStores.requestAddKLineRepeatCheckTask;
 const fetchTasks = taskStores.requestTasks;
 const fetchDelTask = taskStores.requestDelTask;
 const { tasks, taskLoading } = storeToRefs(taskStores);
@@ -211,6 +212,28 @@ const handleTruncateTable = (tableName: string): void => {
     message.error(err.response.data.toString());
   });
 };
+
+const eventsClass = (date: Dayjs): string => {
+  console.log(date.format("YYYY-MM-DD"));
+};
+
+const showModalRepeat = ref<boolean>(false);
+const taskKLineRepeatForm = ref<FormInstance>();
+const kLineRepeatTaskModel = ref<AddKLineRepeatCheckTaskRequest>({
+  jobName: "",
+  table: ""
+});
+const handleKLineRepeatOk = (): void => {
+  fetchKLineRepeatCheck(kLineRepeatTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
 </script>
 
 <template>
@@ -246,6 +269,13 @@ const handleTruncateTable = (tableName: string): void => {
         </template>
       </a-table>
     </a-modal>
+    <div class="calendarWrapper">
+      <a-calendar :fullscreen="false">
+        <template #dateFullCellRender="{current}">
+          <span :class="eventsClass(current)">{{ current.date() }}</span>
+        </template>
+      </a-calendar>
+    </div>
     <a-button type="primary" shape="round" size="small" @click="showModal=true">
       <template #icon>
         <PlusOutlined />
@@ -270,12 +300,12 @@ const handleTruncateTable = (tableName: string): void => {
           </a-radio-group>
         </a-form-item>
         <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
-          <a-date-picker :show-time="{defaultValue:dayjs('09:30:00','HH:mm:ss')}"
+          <a-date-picker :show-time="{defaultValue:dayjs('09:00:00','HH:mm:ss')}"
                          v-model:value="kLineRaw2ArcTaskModel.updateTimeStart"
                          value-format="YYYY-MM-DD HH:mm:ss"
                          :show-now="false" />
           -
-          <a-date-picker :show-time="{defaultValue:dayjs('15:00:00','HH:mm:ss')}"
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
                          v-model:value="kLineRaw2ArcTaskModel.updateTimeEnd"
                          value-format="YYYY-MM-DD HH:mm:ss"
                          :show-now="false" />
@@ -287,6 +317,51 @@ const handleTruncateTable = (tableName: string): void => {
                 <template #content>
                   <div class="cronWrapper">
                     <Cron v-model="kLineRaw2ArcTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-button type="primary" shape="round" size="small" @click="showModalRepeat=true">
+      <template #icon>
+        <PlusOutlined />
+      </template>
+      K线重复数据检查[arc]
+    </a-button>
+    <a-modal v-model:visible="showModalRepeat" title="新建定时任务" @ok="handleKLineRepeatOk">
+      <a-form :ref="taskKLineRepeatForm" :model="kLineRepeatTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="kLineRepeatTaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="toTable" label="表">
+          <a-select v-model:value="kLineRepeatTaskModel.table" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker v-model:value="kLineRepeatTaskModel.startDate"
+                         value-format="YYYY-MM-DD"
+                         :show-now="false" />
+          -
+          <a-date-picker v-model:value="kLineRepeatTaskModel.endDate"
+                         value-format="YYYY-MM-DD"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="kLineRepeatTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="kLineRepeatTaskModel.cron" />
                   </div>
                 </template>
                 <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
@@ -315,6 +390,12 @@ const handleTruncateTable = (tableName: string): void => {
 </template>
 
 <style scoped lang="less">
+.calendarWrapper {
+  width: 300px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px
+}
+
 .cronWrapper {
   height: 360px;
   overflow: scroll;

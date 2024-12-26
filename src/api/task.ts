@@ -1,11 +1,14 @@
 import request from "@/utils/request";
 
-export interface AddKLineRaw2ArcTaskRequest {
+export interface TaskRequest {
   jobName: string,
   jobGroup?: string,
   triggerName?: string,
   triggerGroup?: string,
   cron?: string,
+}
+
+export interface AddKLineRaw2ArcTaskRequest extends TaskRequest {
   fromTable: string,
   toTable: string,
   updateTimeStart?: string,
@@ -25,6 +28,16 @@ export interface TaskResponse {
 
 export interface DelTaskRequest {
   jobName: string,
+}
+
+export interface AddKLineRepeatCheckTaskRequest extends TaskRequest {
+  table: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export function fetchAddKLineRepeatCheckTask(addRequest: AddKLineRepeatCheckTaskRequest) {
+  return request.post<string>("/ana/task/addKLineCheckTask", addRequest);
 }
 
 export function fetchAddKLineRaw2ArcTask(addRequest: AddKLineRaw2ArcTaskRequest) {

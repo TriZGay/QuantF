@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
-import { fetchAddKLineRaw2ArcTask, fetchDelTask, fetchTasks } from "@/api/task";
+import {
+  fetchAddKLineRaw2ArcTask,
+  fetchAddKLineRepeatCheckTask,
+  fetchDelTask,
+  fetchTasks
+} from "@/api/task";
 import { computed } from "vue";
 
 export const useTaskStore = defineStore("taskStore", () => {
@@ -28,11 +33,18 @@ export const useTaskStore = defineStore("taskStore", () => {
     return tasksRaw.value?.data || [];
   });
 
+  const {
+    runAsync: requestAddKLineRepeatCheckTask
+  } = useRequest(fetchAddKLineRepeatCheckTask, {
+    manual: true
+  });
+
   return {
     requestAddKLineRaw2ArcTask,
     requestTasks,
     taskLoading,
     tasks,
-    requestDelTask
+    requestDelTask,
+    requestAddKLineRepeatCheckTask
   };
 });
