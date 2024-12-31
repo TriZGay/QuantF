@@ -16,9 +16,11 @@ const fetchDbInfos = analyzeMetaStores.requestMetaDbInfo;
 const fetchTableInfo = analyzeMetaStores.requestTableInfo;
 const fetchTruncateTable = analyzeMetaStores.requestTruncateTable;
 const fetchDataQa = analyzeMetaStores.requestDataQa;
+const fetchDataQaDetails = analyzeMetaStores.requestDataQaDetails;
 const {
   metaTables, metaDbInfos, dbInfoLoading,
-  tableInfoLoading, metaTableInfo, dataQaPerDay
+  tableInfoLoading, metaTableInfo, dataQaPerDay,
+  dataQaDetails
 } = storeToRefs(analyzeMetaStores);
 
 const taskStores = useTaskStore();
@@ -249,6 +251,37 @@ fetchDataQa({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
   end: dayjs().endOf("month").format("YYYY-MM-DD")
 });
+
+const showDetailsModal = ref<boolean>(false);
+const dataQaRepeatDetails = ref<ColumnProps[]>([{
+  title: "日期",
+  dataIndex: "checkDate",
+  key: "checkDate"
+}, {
+  title: "标的物代码",
+  dataIndex: "code",
+  key: "code"
+}, {
+  title: "复权类型",
+  dataIndex: "rehabType",
+  key: "rehabType"
+}, {
+  title: "数据时间",
+  dataIndex: "updateTime",
+  key: "updateTime"
+}]);
+const onSelectDate = (date: Dayjs): void => {
+  fetchDataQaDetails({
+    date: date.format("YYYY-MM-DD")
+  });
+  showDetailsModal.value = true;
+};
+const onPanelChange = (date: Dayjs, mode: string): void => {
+  fetchDataQa({
+    start: date.startOf("month").format("YYYY-MM-DD"),
+    end: date.endOf("month").format("YYYY-MM-DD")
+  });
+};
 </script>
 
 <template>
@@ -268,7 +301,10 @@ fetchDataQa({
             <a @click="handleTableInfo(record.table)">概览</a>
           </span>
           <span>
-            <a @click="handleTruncateTable(record.table)">清空</a>
+            <a-popconfirm title="确认清空该表?"
+                          @confirm="handleTruncateTable(record.table)">
+               <a href="#">清空</a>
+            </a-popconfirm>
           </span>
         </template>
       </template>
@@ -285,12 +321,16 @@ fetchDataQa({
       </a-table>
     </a-modal>
     <div class="calendarWrapper">
-      <a-calendar :fullscreen="false">
+      <a-calendar :fullscreen="false" @select="onSelectDate" @panelChange="onPanelChange">
         <template #dateFullCellRender="{current}">
           <div :class="eventsClass(current)">{{ current.date() }}</div>
         </template>
       </a-calendar>
     </div>
+    <a-modal v-model:visible="showDetailsModal" title="数据细节">
+      <a-typography-title :level="4">重复数据</a-typography-title>
+      <a-table :data-source="dataQaDetails.repeatDetails" :columns="dataQaRepeatDetails" size="small" />
+    </a-modal>
     <a-button type="primary" shape="round" size="small" @click="showModal=true">
       <template #icon>
         <PlusOutlined />

@@ -95,6 +95,26 @@ export interface DataQaRequest {
   end: string,
 }
 
+export interface DataQaDetailsRequest {
+  date: string;
+}
+
+export interface DataQaDetailsResponse {
+  repeatDetails: Array<RepeatDetails>;
+}
+
+export interface RepeatDetails {
+  checkDate: string,
+  code: string,
+  rehabType: Number,
+  updateTime: string
+}
+
+//查询某一日的数据质量细节如是否重复
+export function fetchDataQaDetails(detailsReq: DataQaDetailsRequest) {
+  return request.post<DataQaDetailsResponse>("/ana/meta/dataQaDetails", detailsReq);
+}
+
 //查询每日数据质量
 export function fetchDataQaPerDay(dataQaReq: DataQaRequest) {
   return request.post<Map<String, boolean>>("/ana/meta/dataQaPerDay", dataQaReq);

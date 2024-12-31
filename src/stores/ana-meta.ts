@@ -1,7 +1,8 @@
 import {
   fetchMetaData, fetchMetaDbInfo,
   fetchMetaTables, fetchTableInfo,
-  fetchTruncateTable, fetchDataQaPerDay
+  fetchTruncateTable, fetchDataQaPerDay,
+  fetchDataQaDetails, type DataQaDetailsResponse
 } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
@@ -51,6 +52,17 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
     manual: true
   });
 
+  const {
+    run: requestDataQaDetails,
+    data: qaDetails
+  } = useRequest(fetchDataQaDetails, {
+    manual: true
+  });
+
+  const dataQaDetails = computed(() => {
+    return qaDetails.value?.data || { repeatDetails: [] };
+  });
+
   const dataQaPerDay = computed(() => {
     return dataQa.value?.data || {};
   });
@@ -84,6 +96,8 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
     requestTableInfo,
     requestTruncateTable,
     dataQaPerDay,
-    requestDataQa
+    requestDataQa,
+    requestDataQaDetails,
+    dataQaDetails
   };
 });
