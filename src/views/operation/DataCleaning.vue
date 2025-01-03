@@ -258,6 +258,10 @@ const dataQaRepeatDetails = ref<ColumnProps[]>([{
   dataIndex: "checkDate",
   key: "checkDate"
 }, {
+  title: "表格",
+  dataIndex: "tableName",
+  key: "tableName"
+}, {
   title: "标的物代码",
   dataIndex: "code",
   key: "code"
@@ -327,8 +331,8 @@ const onPanelChange = (date: Dayjs, mode: string): void => {
         </template>
       </a-calendar>
     </div>
-    <a-modal v-model:visible="showDetailsModal" title="数据细节">
-      <a-typography-title :level="4">重复数据</a-typography-title>
+    <a-modal :width="648" v-model:visible="showDetailsModal" title="数据细节">
+      <a-typography-title :level="5">重复数据</a-typography-title>
       <a-table :data-source="dataQaDetails.repeatDetails" :columns="dataQaRepeatDetails" size="small" />
     </a-modal>
     <a-button type="primary" shape="round" size="small" @click="showModal=true">

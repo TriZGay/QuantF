@@ -159,7 +159,56 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaLines[]) {
       {
         name: formState.code.bindValue,
         type: "candlestick",
-        data: candelstickArray
+        data: candelstickArray,
+        markPoint: {
+          data: [
+            {
+              name: "highest value",
+              type: "max",
+              valueDim: "highest"
+            }, {
+              name: "lowest value",
+              type: "min",
+              valueDim: "lowest"
+            }
+          ]
+        },
+        markLine: {
+          symbol: ["none", "none"],
+          data: [
+            [
+              {
+                name: "from lowest to highest",
+                type: "min",
+                valueDim: "lowest",
+                symbol: "circle",
+                symbolSize: 10,
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: false
+                  }
+                }
+              },
+              {
+                type: "max",
+                valueDim: "highest",
+                symbol: "circle",
+                symbolSize: 10,
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: false
+                  }
+                }
+              }
+            ]
+          ]
+        }
       },
       {
         name: "成交量",

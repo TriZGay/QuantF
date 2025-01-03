@@ -107,7 +107,8 @@ export interface RepeatDetails {
   checkDate: string,
   code: string,
   rehabType: Number,
-  updateTime: string
+  updateTime: string,
+  tableName: string
 }
 
 //查询某一日的数据质量细节如是否重复
