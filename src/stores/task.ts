@@ -3,6 +3,7 @@ import { useRequest } from "vue-request";
 import {
   fetchAddKLineRaw2ArcTask,
   fetchAddKLineRepeatCheckTask,
+  fetchAddKLineTransToMaTask,
   fetchDelTask,
   fetchTasks
 } from "@/api/task";
@@ -39,12 +40,19 @@ export const useTaskStore = defineStore("taskStore", () => {
     manual: true
   });
 
+  const {
+    runAsync: requestAddKLineTransToMaTask
+  } = useRequest(fetchAddKLineTransToMaTask, {
+    manual: true
+  });
+
   return {
     requestAddKLineRaw2ArcTask,
     requestTasks,
     taskLoading,
     tasks,
     requestDelTask,
-    requestAddKLineRepeatCheckTask
+    requestAddKLineRepeatCheckTask,
+    requestAddKLineTransToMaTask
   };
 });

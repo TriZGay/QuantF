@@ -2,12 +2,16 @@
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useTaskStore } from "@/stores/task";
 import { storeToRefs } from "pinia";
-import { computed, nextTick, ref } from "vue";
+import { computed, ref } from "vue";
 import dayjs, { Dayjs } from "dayjs";
 import { type FormInstance, message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
 import Cron from "@/components/CronPicker/Cron.vue";
-import type { AddKLineRaw2ArcTaskRequest, AddKLineRepeatCheckTaskRequest } from "@/api/task";
+import type {
+  AddKLineRaw2ArcTaskRequest,
+  AddKLineRepeatCheckTaskRequest,
+  AddKLineTransToMaTaskRequest
+} from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
 
 const analyzeMetaStores = useAnalyzeMeta();
@@ -26,6 +30,7 @@ const {
 const taskStores = useTaskStore();
 const fetchKLineRaw2Arc = taskStores.requestAddKLineRaw2ArcTask;
 const fetchKLineRepeatCheck = taskStores.requestAddKLineRepeatCheckTask;
+const fetchKLineTransToMaTask = taskStores.requestAddKLineTransToMaTask;
 const fetchTasks = taskStores.requestTasks;
 const fetchDelTask = taskStores.requestDelTask;
 const { tasks, taskLoading } = storeToRefs(taskStores);
@@ -165,6 +170,16 @@ const kLineArcTablesOptions = computed(() => {
   });
 });
 
+const maTablesOptions = computed(() => {
+  return metaTables.value.filter((name: string) => {
+    return name.includes("ma") && name.includes("arc");
+  }).map((filter: string) => {
+    return {
+      label: filter,
+      value: filter
+    };
+  });
+});
 const handleKLineRaw2ArcOk = (): void => {
   fetchKLineRaw2Arc(kLineRaw2ArcTaskModel.value)
     .then(res => {
@@ -253,27 +268,28 @@ fetchDataQa({
 });
 
 const showDetailsModal = ref<boolean>(false);
-const dataQaRepeatDetails = ref<ColumnProps[]>([{
-  title: "日期",
-  dataIndex: "checkDate",
-  key: "checkDate"
-}, {
-  title: "表格",
-  dataIndex: "tableName",
-  key: "tableName"
-}, {
-  title: "标的物代码",
-  dataIndex: "code",
-  key: "code"
-}, {
-  title: "复权类型",
-  dataIndex: "rehabType",
-  key: "rehabType"
-}, {
-  title: "数据时间",
-  dataIndex: "updateTime",
-  key: "updateTime"
-}]);
+const dataQaRepeatDetails = ref<ColumnProps[]>([
+  {
+    title: "日期",
+    dataIndex: "checkDate",
+    key: "checkDate"
+  }, {
+    title: "表格",
+    dataIndex: "tableName",
+    key: "tableName"
+  }, {
+    title: "标的物代码",
+    dataIndex: "code",
+    key: "code"
+  }, {
+    title: "复权类型",
+    dataIndex: "rehabType",
+    key: "rehabType"
+  }, {
+    title: "数据时间",
+    dataIndex: "updateTime",
+    key: "updateTime"
+  }]);
 const onSelectDate = (date: Dayjs): void => {
   fetchDataQaDetails({
     date: date.format("YYYY-MM-DD")
@@ -286,6 +302,29 @@ const onPanelChange = (date: Dayjs, mode: string): void => {
     end: date.endOf("month").format("YYYY-MM-DD")
   });
 };
+
+const showModalTransMa = ref<boolean>(false);
+const taskMaForm = ref<FormInstance>();
+const kLine2MaTaskModel = ref<AddKLineTransToMaTaskRequest>({
+  jobName: "",
+  fromTableName: "",
+  toTableName: "",
+  startDateTime: "",
+  endDateTime: ""
+});
+const handleKLineArc2MaOk = (): void => {
+  fetchKLineTransToMaTask(kLine2MaTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+
+
 </script>
 
 <template>
@@ -421,6 +460,56 @@ const onPanelChange = (date: Dayjs, mode: string): void => {
                 <template #content>
                   <div class="cronWrapper">
                     <Cron v-model="kLineRepeatTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-button type="primary" shape="round" size="small" @click="showModalTransMa=true">
+      <template #icon>
+        <PlusOutlined />
+      </template>
+      K线->MA[arc->ma_arc]
+    </a-button>
+    <a-modal v-model:visible="showModalTransMa" title="新建定时任务" @ok="handleKLineArc2MaOk">
+      <a-form :ref="taskMaForm" :model="kLine2MaTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="kLine2MaTaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="fromTable" label="源表">
+          <a-select v-model:value="kLine2MaTaskModel.fromTableName" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="toTable" label="目的表">
+          <a-select v-model:value="kLine2MaTaskModel.toTableName" :options="maTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker :show-time="{defaultValue:dayjs('09:00:00','HH:mm:ss')}"
+                         v-model:value="kLine2MaTaskModel.startDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+          -
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
+                         v-model:value="kLine2MaTaskModel.endDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="kLine2MaTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="kLine2MaTaskModel.cron" />
                   </div>
                 </template>
                 <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />

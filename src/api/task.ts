@@ -36,6 +36,17 @@ export interface AddKLineRepeatCheckTaskRequest extends TaskRequest {
   endDate?: string;
 }
 
+export interface AddKLineTransToMaTaskRequest extends TaskRequest {
+  toTableName: string,
+  fromTableName: string,
+  startDateTime: string,
+  endDateTime: string,
+}
+
+export function fetchAddKLineTransToMaTask(addRequest: AddKLineTransToMaTaskRequest) {
+  return request.post<string>("/ana/task/addKLineTransToMaTask", addRequest);
+}
+
 export function fetchAddKLineRepeatCheckTask(addRequest: AddKLineRepeatCheckTaskRequest) {
   return request.post<string>("/ana/task/addKLineCheckTask", addRequest);
 }
