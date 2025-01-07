@@ -12,14 +12,8 @@ export const useAnalyzeKline = defineStore("ana-k", () => {
     manual: true
   });
 
-
-  const kLines = computed(() => {
-    return data.value?.data || [];
-  });
-
   return {
     kLoading,
-    kLines,
     requestK
   };
 });

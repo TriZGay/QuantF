@@ -52,7 +52,6 @@ export interface MaRequest {
   code: string,
   rehabType: number,
   granularity: number,
-  span: number,
   start: string,
   end: string
 }
@@ -61,13 +60,13 @@ export interface MaData {
   market: number,
   code: string,
   rehabType: number,
-  maValue: number,
-  datetime: string,
-}
-
-export declare type MaLines = {
-  name: string,
-  data: Array<MaData>
+  ma5Value: number,
+  ma10Value: number,
+  ma20Value: number,
+  ma30Value: number,
+  ma60Value: number,
+  ma120Value: number,
+  updateTime: string,
 }
 
 export interface MetaRequest {
