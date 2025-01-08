@@ -2,17 +2,11 @@ import request from "@/utils/request";
 
 export interface TaskRequest {
   jobName: string,
+  jobType: "KLINE_RAW_TO_ARC" | "KLINE_REPEAT_CHECK" | "KLINE_ARC_TO_MA",
   jobGroup?: string,
   triggerName?: string,
   triggerGroup?: string,
   cron?: string,
-}
-
-export interface AddKLineRaw2ArcTaskRequest extends TaskRequest {
-  fromTable: string,
-  toTable: string,
-  updateTimeStart?: string,
-  updateTimeEnd?: string
 }
 
 export interface TaskResponse {
@@ -30,6 +24,13 @@ export interface DelTaskRequest {
   jobName: string,
 }
 
+export interface AddKLineRaw2ArcTaskRequest extends TaskRequest {
+  fromTable: string,
+  toTable: string,
+  updateTimeStart?: string,
+  updateTimeEnd?: string
+}
+
 export interface AddKLineRepeatCheckTaskRequest extends TaskRequest {
   table: string;
   startDate?: string;
@@ -43,16 +44,8 @@ export interface AddKLineTransToMaTaskRequest extends TaskRequest {
   endDateTime: string,
 }
 
-export function fetchAddKLineTransToMaTask(addRequest: AddKLineTransToMaTaskRequest) {
-  return request.post<string>("/ana/task/addKLineTransToMaTask", addRequest);
-}
-
-export function fetchAddKLineRepeatCheckTask(addRequest: AddKLineRepeatCheckTaskRequest) {
-  return request.post<string>("/ana/task/addKLineCheckTask", addRequest);
-}
-
-export function fetchAddKLineRaw2ArcTask(addRequest: AddKLineRaw2ArcTaskRequest) {
-  return request.post<string>("/ana/task/addKLineRaw2ArcTask", addRequest);
+export function fetchAddTask(addTaskRequest: TaskRequest) {
+  return request.post<string>("/ana/task/addTask", addTaskRequest);
 }
 
 export function fetchTasks() {

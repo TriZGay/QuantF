@@ -28,9 +28,7 @@ const {
 } = storeToRefs(analyzeMetaStores);
 
 const taskStores = useTaskStore();
-const fetchKLineRaw2Arc = taskStores.requestAddKLineRaw2ArcTask;
-const fetchKLineRepeatCheck = taskStores.requestAddKLineRepeatCheckTask;
-const fetchKLineTransToMaTask = taskStores.requestAddKLineTransToMaTask;
+const fetchAddTask = taskStores.requestAddTask;
 const fetchTasks = taskStores.requestTasks;
 const fetchDelTask = taskStores.requestDelTask;
 const { tasks, taskLoading } = storeToRefs(taskStores);
@@ -145,6 +143,7 @@ const taskForm = ref<FormInstance>();
 const isImmediate = ref<Number>(1);
 const kLineRaw2ArcTaskModel = ref<AddKLineRaw2ArcTaskRequest>({
   jobName: "",
+  jobType: "KLINE_RAW_TO_ARC",
   fromTable: "",
   toTable: ""
 });
@@ -181,7 +180,7 @@ const maTablesOptions = computed(() => {
   });
 });
 const handleKLineRaw2ArcOk = (): void => {
-  fetchKLineRaw2Arc(kLineRaw2ArcTaskModel.value)
+  fetchAddTask(kLineRaw2ArcTaskModel.value)
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
@@ -248,10 +247,11 @@ const showModalRepeat = ref<boolean>(false);
 const taskKLineRepeatForm = ref<FormInstance>();
 const kLineRepeatTaskModel = ref<AddKLineRepeatCheckTaskRequest>({
   jobName: "",
+  jobType: "KLINE_REPEAT_CHECK",
   table: ""
 });
 const handleKLineRepeatOk = (): void => {
-  fetchKLineRepeatCheck(kLineRepeatTaskModel.value)
+  fetchAddTask(kLineRepeatTaskModel.value)
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
@@ -307,13 +307,14 @@ const showModalTransMa = ref<boolean>(false);
 const taskMaForm = ref<FormInstance>();
 const kLine2MaTaskModel = ref<AddKLineTransToMaTaskRequest>({
   jobName: "",
+  jobType: "KLINE_ARC_TO_MA",
   fromTableName: "",
   toTableName: "",
   startDateTime: "",
   endDateTime: ""
 });
 const handleKLineArc2MaOk = (): void => {
-  fetchKLineTransToMaTask(kLine2MaTaskModel.value)
+  fetchAddTask(kLine2MaTaskModel.value)
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
