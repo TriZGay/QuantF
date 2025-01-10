@@ -110,6 +110,33 @@ export interface RepeatDetails {
   tableName: string
 }
 
+export interface BollRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface BollResponse {
+  market: number,
+  code: String,
+  rehabType: number;
+  ma20Mid: number;
+  doubleUpper: number;
+  doubleLower: number;
+  oneUpper: number;
+  oneLower: number;
+  tripleUpper: number;
+  tripleLower: number;
+  updateTime: string;
+}
+
+//查询boll通道
+export function fetchBoll2002(bollReq: BollRequest) {
+  return request.post<BollResponse[]>("/ana/boll/boll2002", bollReq);
+}
+
 //查询某一日的数据质量细节如是否重复
 export function fetchDataQaDetails(detailsReq: DataQaDetailsRequest) {
   return request.post<DataQaDetailsResponse>("/ana/meta/dataQaDetails", detailsReq);

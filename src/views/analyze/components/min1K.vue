@@ -6,9 +6,10 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
 import dayjs from "dayjs";
-import type { KLine, MaData } from "@/api/analyze";
+import type { BollResponse, KLine, MaData } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
-import { maTypeToCheckBoxOptions, rehabTypeToRadioOptions } from "@/api/code";
+import { rehabTypeToRadioOptions } from "@/api/code";
+import { useAnalyzeBoll } from "@/stores/ana-boll";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -21,6 +22,9 @@ const kLineOptions = ref({});
 
 const analyzeMaStores = useAnalyzeMa();
 const fetchMaLine = analyzeMaStores.requestMaData;
+
+const analyzeBollStores = useAnalyzeBoll();
+const fetchBolls = analyzeBollStores.requestBoll2002;
 
 const metaCodeMap = computed(() => {
   let map = {};
@@ -54,7 +58,7 @@ const formState = reactive({
   }
 });
 
-function drawAnalyzePic(kLines: KLine[], maLines: MaData[]) {
+function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollResponse[]) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
   let volumes: Array = [];
@@ -253,6 +257,27 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[]) {
         showSymbol: false,
         smooth: true,
         data: maLines.map(ma => ma.ma120Value)
+      },
+      {
+        name: "MID",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: bollLines.map(ma => ma.ma20Mid)
+      },
+      {
+        name: "UPPER",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: bollLines.map(ma => ma.doubleUpper)
+      },
+      {
+        name: "LOWER",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: bollLines.map(ma => ma.doubleLower)
       }
     ]
   };
@@ -272,12 +297,19 @@ function onFinish(values: any) {
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }), fetchBolls({
+      rehabType: values.rehabType,
+      granularity: 1,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     })
   ]).then(allPromises => {
     if (isAll200(allPromises)) {
       let kLines = allPromises[0].data;
       let maLines = allPromises[1].data;
-      drawAnalyzePic(kLines, maLines);
+      let bollLines = allPromises[2].data;
+      drawAnalyzePic(kLines, maLines, bollLines);
     }
   });
 }
