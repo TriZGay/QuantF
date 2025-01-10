@@ -9,7 +9,7 @@ import type { ColumnProps } from "ant-design-vue/es/table";
 import Cron from "@/components/CronPicker/Cron.vue";
 import type {
   AddKLineRaw2ArcTaskRequest,
-  AddKLineRepeatCheckTaskRequest,
+  AddKLineRepeatCheckTaskRequest, AddKLineTransToBollTaskRequest,
   AddKLineTransToMaTaskRequest
 } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
@@ -179,6 +179,18 @@ const maTablesOptions = computed(() => {
     };
   });
 });
+
+const bollTablesOptions = computed(() => {
+  return metaTables.value.filter((name: string) => {
+    return name.includes("boll") && name.includes("arc");
+  }).map((filter: string) => {
+    return {
+      label: filter,
+      value: filter
+    };
+  });
+});
+
 const handleKLineRaw2ArcOk = (): void => {
   fetchAddTask(kLineRaw2ArcTaskModel.value)
     .then(res => {
@@ -325,7 +337,27 @@ const handleKLineArc2MaOk = (): void => {
   });
 };
 
-
+const showModalTransBoll = ref<boolean>(false);
+const taskBollForm = ref<FormInstance>();
+const kLine2BollTaskModel = ref<AddKLineTransToBollTaskRequest>({
+  jobName: "",
+  jobType: "KLINE_ARC_TO_BOLL",
+  fromTableName: "",
+  toTableName: "",
+  startDateTime: "",
+  endDateTime: ""
+});
+const handleKLineArc2BollOk = (): void => {
+  fetchAddTask(kLine2BollTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
 </script>
 
 <template>
@@ -511,6 +543,56 @@ const handleKLineArc2MaOk = (): void => {
                 <template #content>
                   <div class="cronWrapper">
                     <Cron v-model="kLine2MaTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-button type="primary" shape="round" size="small" @click="showModalTransBoll=true">
+      <template #icon>
+        <PlusOutlined />
+      </template>
+      K线->BOLL[arc->boll_arc]
+    </a-button>
+    <a-modal v-model:visible="showModalTransBoll" title="新建定时任务" @ok="handleKLineArc2BollOk">
+      <a-form :ref="taskBollForm" :model="kLine2BollTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="kLine2BollTaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="fromTable" label="源表">
+          <a-select v-model:value="kLine2BollTaskModel.fromTableName" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="toTable" label="目的表">
+          <a-select v-model:value="kLine2BollTaskModel.toTableName" :options="bollTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker :show-time="{defaultValue:dayjs('09:00:00','HH:mm:ss')}"
+                         v-model:value="kLine2BollTaskModel.startDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+          -
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
+                         v-model:value="kLine2BollTaskModel.endDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="kLine2BollTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="kLine2BollTaskModel.cron" />
                   </div>
                 </template>
                 <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
