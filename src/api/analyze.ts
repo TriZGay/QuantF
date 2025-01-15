@@ -132,6 +132,32 @@ export interface BollResponse {
   updateTime: string;
 }
 
+export interface EMaRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface EMaData {
+  market: number,
+  code: string,
+  rehabType: number,
+  ema5Value: number,
+  ema10Value: number,
+  ema20Value: number,
+  ema30Value: number,
+  ema60Value: number,
+  ema120Value: number,
+  updateTime: string,
+}
+
+//查询ema数据
+export function fetchEMAData(emaReq: EMaRequest) {
+  return request.post<EMaData[]>("/ana/ema/n", emaReq);
+}
+
 //查询boll通道
 export function fetchBoll2002(bollReq: BollRequest) {
   return request.post<BollResponse[]>("/ana/boll/boll2002", bollReq);

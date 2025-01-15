@@ -6,10 +6,11 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
 import dayjs from "dayjs";
-import type { BollResponse, KLine, MaData } from "@/api/analyze";
+import type { BollResponse, EMaData, KLine, MaData } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
 import { rehabTypeToRadioOptions } from "@/api/code";
 import { useAnalyzeBoll } from "@/stores/ana-boll";
+import { useAnalyzeEma } from "@/stores/ana-ema";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -25,6 +26,9 @@ const fetchMaLine = analyzeMaStores.requestMaData;
 
 const analyzeBollStores = useAnalyzeBoll();
 const fetchBolls = analyzeBollStores.requestBoll2002;
+
+const analyzeEmaStores = useAnalyzeEma();
+const fetchEmaData = analyzeEmaStores.requestEma;
 
 const metaCodeMap = computed(() => {
   let map = {};
@@ -58,7 +62,7 @@ const formState = reactive({
   }
 });
 
-function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollResponse[]) {
+function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollResponse[], emaLines: EMaData[]) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
   let volumes: Array = [];
@@ -278,6 +282,47 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
         showSymbol: false,
         smooth: true,
         data: bollLines.map(ma => ma.doubleLower)
+      }, {
+        name: "EMA5",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: emaLines.map(ema => ema.ema5Value)
+      },
+      {
+        name: "EMA10",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: emaLines.map(ema => ema.ema10Value)
+      },
+      {
+        name: "EMA20",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: emaLines.map(ema => ema.ema20Value)
+      },
+      {
+        name: "EMA30",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: emaLines.map(ema => ema.ema30Value)
+      },
+      {
+        name: "EMA60",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: emaLines.map(ema => ema.ema60Value)
+      },
+      {
+        name: "EMA120",
+        type: "line",
+        showSymbol: false,
+        smooth: true,
+        data: emaLines.map(ema => ema.ema120Value)
       }
     ]
   };
@@ -303,13 +348,20 @@ function onFinish(values: any) {
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }), fetchEmaData({
+      rehabType: values.rehabType,
+      granularity: 1,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     })
   ]).then(allPromises => {
     if (isAll200(allPromises)) {
       let kLines = allPromises[0].data;
       let maLines = allPromises[1].data;
       let bollLines = allPromises[2].data;
-      drawAnalyzePic(kLines, maLines, bollLines);
+      let emaLines = allPromises[3].data;
+      drawAnalyzePic(kLines, maLines, bollLines, emaLines);
     }
   });
 }
