@@ -10,7 +10,7 @@ import Cron from "@/components/CronPicker/Cron.vue";
 import type {
   AddKLineRaw2ArcTaskRequest,
   AddKLineRepeatCheckTaskRequest, AddKLineTransToBollTaskRequest,
-  AddKLineTransToMaTaskRequest
+  AddKLineTransToMaTaskRequest, AddKMaTransToEmaTaskRequest
 } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
 
@@ -191,6 +191,17 @@ const bollTablesOptions = computed(() => {
   });
 });
 
+const emaTablesOptions = computed(() => {
+  return metaTables.value.filter((name: string) => {
+    return name.includes("ema") && name.includes("arc");
+  }).map((filter: string) => {
+    return {
+      label: filter,
+      value: filter
+    };
+  });
+});
+
 const handleKLineRaw2ArcOk = (): void => {
   fetchAddTask(kLineRaw2ArcTaskModel.value)
     .then(res => {
@@ -349,6 +360,28 @@ const kLine2BollTaskModel = ref<AddKLineTransToBollTaskRequest>({
 });
 const handleKLineArc2BollOk = (): void => {
   fetchAddTask(kLine2BollTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+
+const showModalTransEMA = ref<boolean>(false);
+const taskEMAForm = ref<FormInstance>();
+const k2EMATaskModel = ref<AddKMaTransToEmaTaskRequest>({
+  jobName: "",
+  jobType: "KLINE_ARC_TO_EMA",
+  fromTableName: "",
+  toTableName: "",
+  startDateTime: "",
+  endDateTime: ""
+});
+const handleKArc2EmaOk = (): void => {
+  fetchAddTask(k2EMATaskModel.value)
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
@@ -593,6 +626,56 @@ const handleKLineArc2BollOk = (): void => {
                 <template #content>
                   <div class="cronWrapper">
                     <Cron v-model="kLine2BollTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-button type="primary" shape="round" size="small" @click="showModalTransEMA=true">
+      <template #icon>
+        <PlusOutlined />
+      </template>
+      K线->EMA[k_arc->ema_arc]
+    </a-button>
+    <a-modal v-model:visible="showModalTransEMA" title="新建定时任务" @ok="handleKArc2EmaOk">
+      <a-form :ref="taskEMAForm" :model="k2EMATaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="k2EMATaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="fromTable" label="源表">
+          <a-select v-model:value="k2EMATaskModel.fromTableName" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="toTable" label="目的表">
+          <a-select v-model:value="k2EMATaskModel.toTableName" :options="emaTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker :show-time="{defaultValue:dayjs('09:00:00','HH:mm:ss')}"
+                         v-model:value="k2EMATaskModel.startDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+          -
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
+                         v-model:value="k2EMATaskModel.endDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="k2EMATaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="k2EMATaskModel.cron" />
                   </div>
                 </template>
                 <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
