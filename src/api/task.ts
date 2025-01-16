@@ -2,7 +2,8 @@ import request from "@/utils/request";
 
 export interface TaskRequest {
   jobName: string,
-  jobType: "KLINE_RAW_TO_ARC" | "KLINE_REPEAT_CHECK" | "KLINE_ARC_TO_MA" | "KLINE_ARC_TO_BOLL" | "KLINE_ARC_TO_EMA",
+  jobType: "KLINE_RAW_TO_ARC" | "KLINE_REPEAT_CHECK" | "KLINE_ARC_TO_MA"
+    | "KLINE_ARC_TO_BOLL" | "KLINE_ARC_TO_EMA" | "KLINE_ARC_TO_MACD",
   jobGroup?: string,
   triggerName?: string,
   triggerGroup?: string,
@@ -51,13 +52,20 @@ export interface AddKLineTransToBollTaskRequest extends TaskRequest {
   endDateTime: string,
 }
 
-export interface AddKMaTransToEmaTaskRequest extends TaskRequest {
+export interface AddKLineTransToEmaTaskRequest extends TaskRequest {
+  toTableName: string,
+  kTableName: string,
+  maTableName:string,
+  startDateTime: string,
+  endDateTime: string,
+}
+
+export interface AddKLineTransToMacdTaskRequest extends TaskRequest {
   toTableName: string,
   fromTableName: string,
   startDateTime: string,
   endDateTime: string,
 }
-
 
 export function fetchAddTask(addTaskRequest: TaskRequest) {
   return request.post<string>("/ana/task/addTask", addTaskRequest);
