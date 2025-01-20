@@ -11,6 +11,7 @@ import { isAll200 } from "@/utils/web";
 import { rehabTypeToRadioOptions } from "@/api/code";
 import { useAnalyzeBoll } from "@/stores/ana-boll";
 import { useAnalyzeEma } from "@/stores/ana-ema";
+import type { AxiosResponse } from "axios";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -59,6 +60,18 @@ const formState = reactive({
       "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(30).second(0)],
       "港股交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(16).minute(0).second(0)]
     }
+  },
+  indies: {
+    name: "指标",
+    type: "checkbox-group",
+    bindValue: ["k"],
+    checkboxOptions: [
+      { label: "K", value: "k" },
+      { label: "MA(5/10/20/30/60/120)", value: "ma" },
+      { label: "BOLL(20,0.2)", value: "boll" },
+      { label: "EMA(5/10/20/60/120)", value: "ema" },
+      { label: "MACD(12,26,9)", value: "macd" }
+    ]
   }
 });
 
@@ -304,13 +317,6 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
         data: emaLines.map(ema => ema.ema20Value)
       },
       {
-        name: "EMA30",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: emaLines.map(ema => ema.ema30Value)
-      },
-      {
         name: "EMA60",
         type: "line",
         showSymbol: false,
@@ -329,38 +335,65 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
 }
 
 function onFinish(values: any) {
-  Promise.all([
-    fetchKLine({
+  let fetchMethods: Array<Promise<AxiosResponse>> = [];
+  if (values.indies.includes("k")) {
+    fetchMethods.push(fetchKLine({
       rehabType: values.rehabType,
       granularity: 1,
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    }), fetchMaLine({
+    }));
+  }
+  if (values.indies.includes("ma")) {
+    fetchMethods.push(fetchMaLine({
       rehabType: values.rehabType,
       granularity: 1,
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    }), fetchBolls({
+    }));
+  }
+  if (values.indies.includes("boll")) {
+    fetchMethods.push(fetchBolls({
       rehabType: values.rehabType,
       granularity: 1,
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    }), fetchEmaData({
+    }));
+  }
+  if (values.indies.includes("ema")) {
+    fetchMethods.push(fetchEmaData({
       rehabType: values.rehabType,
       granularity: 1,
       code: values.code,
       start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    })
-  ]).then(allPromises => {
+    }));
+  }
+  Promise.all(fetchMethods).then(allPromises => {
     if (isAll200(allPromises)) {
-      let kLines = allPromises[0].data;
-      let maLines = allPromises[1].data;
-      let bollLines = allPromises[2].data;
-      let emaLines = allPromises[3].data;
+      let kLines: KLine[] = [];
+      let kPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/k/n");
+      if (kPromiseIndex != -1) {
+        kLines = allPromises[kPromiseIndex].data;
+      }
+      let maLines: MaData[] = [];
+      let maPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/ma/n");
+      if (maPromiseIndex != -1) {
+        maLines = allPromises[maPromiseIndex].data;
+      }
+      let bollLines: BollResponse[] = [];
+      let bollPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/boll/boll2002");
+      if (bollPromiseIndex != -1) {
+        bollLines = allPromises[bollPromiseIndex].data;
+      }
+      let emaLines: EMaData[] = [];
+      let emaPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/ema/n");
+      if (emaPromiseIndex != -1) {
+        emaLines = allPromises[emaPromiseIndex].data;
+      }
       drawAnalyzePic(kLines, maLines, bollLines, emaLines);
     }
   });

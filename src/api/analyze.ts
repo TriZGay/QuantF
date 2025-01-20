@@ -147,7 +147,6 @@ export interface EMaData {
   ema5Value: number,
   ema10Value: number,
   ema20Value: number,
-  ema30Value: number,
   ema60Value: number,
   ema120Value: number,
   updateTime: string,

@@ -55,7 +55,6 @@ export interface AddKLineTransToBollTaskRequest extends TaskRequest {
 export interface AddKLineTransToEmaTaskRequest extends TaskRequest {
   toTableName: string,
   kTableName: string,
-  maTableName:string,
   startDateTime: string,
   endDateTime: string,
 }

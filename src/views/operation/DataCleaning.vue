@@ -182,7 +182,10 @@ const macdTablesOptions = computed(() => {
 
 const maTablesOptions = computed(() => {
   return metaTables.value.filter((name: string) => {
-    return name.includes("t_ma") && name.includes("arc");
+    return name.includes("ma")
+      && !name.includes("e")
+      && !name.includes("cd")
+      && name.includes("arc");
   }).map((filter: string) => {
     return {
       label: filter,
@@ -387,7 +390,6 @@ const k2EMATaskModel = ref<AddKLineTransToEmaTaskRequest>({
   jobName: "",
   jobType: "KLINE_ARC_TO_EMA",
   kTableName: "",
-  maTableName: "",
   toTableName: "",
   startDateTime: "",
   endDateTime: ""
@@ -681,10 +683,7 @@ const handleKArc2MacdOk = (): void => {
           <a-input v-model:value="k2EMATaskModel.jobName" />
         </a-form-item>
         <a-form-item name="fromTable" label="源表">
-          <span>K线表:</span>
           <a-select v-model:value="k2EMATaskModel.kTableName" :options="kLineArcTablesOptions" />
-          <span>MA表:</span>
-          <a-select v-model:value="k2EMATaskModel.maTableName" :options="maTablesOptions" />
         </a-form-item>
         <a-form-item name="toTable" label="目的表">
           <a-select v-model:value="k2EMATaskModel.toTableName" :options="emaTablesOptions" />
@@ -734,7 +733,7 @@ const handleKArc2MacdOk = (): void => {
           <a-input v-model:value="k2MacdTaskModel.jobName" />
         </a-form-item>
         <a-form-item name="fromTable" label="源表">
-          <a-select v-model:value="k2MacdTaskModel.fromTableName" :options="kLineArcTablesOptions" />
+          <a-select v-model:value="k2MacdTaskModel.fromTableName" :options="emaTablesOptions" />
         </a-form-item>
         <a-form-item name="toTable" label="目的表">
           <a-select v-model:value="k2MacdTaskModel.toTableName" :options="macdTablesOptions" />
@@ -746,7 +745,7 @@ const handleKArc2MacdOk = (): void => {
           </a-radio-group>
         </a-form-item>
         <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
-          <a-date-picker :show-time="{defaultValue:dayjs('09:00:00','HH:mm:ss')}"
+          <a-date-picker :show-time="{defaultValue:dayjs('09:30:00','HH:mm:ss')}"
                          v-model:value="k2MacdTaskModel.startDateTime"
                          value-format="YYYY-MM-DD HH:mm:ss"
                          :show-now="false" />
