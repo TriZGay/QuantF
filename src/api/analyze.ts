@@ -152,6 +152,29 @@ export interface EMaData {
   updateTime: string,
 }
 
+export interface MacdRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface MacdResponse {
+  market: number,
+  code: string,
+  rehabType: number,
+  dif: number,
+  dea: number,
+  macd: number,
+  updateTime: string
+}
+
+//查询macd数据
+export function fetchMacdData(macdReq: MacdRequest) {
+  return request.post<MacdResponse[]>("/ana/macd/macd12269", macdReq);
+}
+
 //查询ema数据
 export function fetchEMAData(emaReq: EMaRequest) {
   return request.post<EMaData[]>("/ana/ema/n", emaReq);

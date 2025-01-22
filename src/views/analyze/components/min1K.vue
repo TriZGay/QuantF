@@ -6,12 +6,13 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
 import dayjs from "dayjs";
-import type { BollResponse, EMaData, KLine, MaData } from "@/api/analyze";
+import type { BollResponse, EMaData, KLine, MacdResponse, MaData } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
 import { rehabTypeToRadioOptions } from "@/api/code";
 import { useAnalyzeBoll } from "@/stores/ana-boll";
 import { useAnalyzeEma } from "@/stores/ana-ema";
 import type { AxiosResponse } from "axios";
+import { useAnalyzeMacd } from "@/stores/ana-macd";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -30,6 +31,9 @@ const fetchBolls = analyzeBollStores.requestBoll2002;
 
 const analyzeEmaStores = useAnalyzeEma();
 const fetchEmaData = analyzeEmaStores.requestEma;
+
+const analyzeMacdStores = useAnalyzeMacd();
+const fetchMacdData = analyzeMacdStores.requestMacdData;
 
 const metaCodeMap = computed(() => {
   let map = {};
@@ -75,7 +79,9 @@ const formState = reactive({
   }
 });
 
-function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollResponse[], emaLines: EMaData[]) {
+function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
+                        bollLines: BollResponse[], emaLines: EMaData[],
+                        macdLines: MacdResponse[]) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
   let volumes: Array = [];
@@ -103,6 +109,15 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
       axisTick: { show: false },
       splitLine: { show: false },
       axisLabel: { show: false }
+    }, {
+      type: "category",
+      data: xAxisTime,
+      boundaryGap: false,
+      gridIndex: 2,
+      axisLine: { onZero: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: { show: false }
     }],
     yAxis: [{
       scale: true,
@@ -112,6 +127,14 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
     }, {
       scale: true,
       gridIndex: 1,
+      splitNumber: 2,
+      axisLabel: { show: false },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false }
+    }, {
+      scale: true,
+      gridIndex: 2,
       splitNumber: 2,
       axisLabel: { show: false },
       axisLine: { show: false },
@@ -153,19 +176,23 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
       {
         top: "65%",
         height: "25%"
+      },
+      {
+        top: "80%",
+        height: "25%"
       }
     ],
     dataZoom: [
       {
         type: "inside",
-        xAxisIndex: [0, 1],
+        xAxisIndex: [0, 1, 2],
         start: 0,
         end: 100
       },
       {
         show: true,
         type: "slider",
-        xAxisIndex: [0, 1],
+        xAxisIndex: [0, 1, 2],
         top: "90%",
         start: 0,
         end: 100
@@ -329,6 +356,31 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[], bollLines: BollRespo
         showSymbol: false,
         smooth: true,
         data: emaLines.map(ema => ema.ema120Value)
+      },
+      {
+        name: "DIF",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        showSymbol: false,
+        smooth: true,
+        data: macdLines.map(macd => macd.dif)
+      },
+      {
+        name: "DEA",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        showSymbol: false,
+        smooth: true,
+        data: macdLines.map(macd => macd.dea)
+      },
+      {
+        name: "MACD",
+        type: "bar",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: macdLines.map(macd => macd.macd)
       }
     ]
   };
@@ -372,6 +424,15 @@ function onFinish(values: any) {
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     }));
   }
+  if (values.indies.includes("macd")) {
+    fetchMethods.push(fetchMacdData({
+      rehabType: values.rehabType,
+      granularity: 1,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }));
+  }
   Promise.all(fetchMethods).then(allPromises => {
     if (isAll200(allPromises)) {
       let kLines: KLine[] = [];
@@ -394,7 +455,12 @@ function onFinish(values: any) {
       if (emaPromiseIndex != -1) {
         emaLines = allPromises[emaPromiseIndex].data;
       }
-      drawAnalyzePic(kLines, maLines, bollLines, emaLines);
+      let macdLines: MacdResponse[] = [];
+      let macdPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/macd/macd12269");
+      if (macdPromiseIndex != -1) {
+        macdLines = allPromises[macdPromiseIndex].data;
+      }
+      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines);
     }
   });
 }
