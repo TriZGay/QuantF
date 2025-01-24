@@ -154,7 +154,7 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
         }
       ]
     },
-    visualMap: {
+    visualMap: [{
       show: false,
       seriesIndex: 1,
       dimension: 2,
@@ -168,18 +168,32 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
           color: "#ec0000"
         }
       ]
-    },
+    }, {
+      show: false,
+      seriesIndex: 18,
+      pieces: [
+        { lt: 0, color: "#00da3c" },
+        { gt: 0, color: "#ec0000" }
+      ]
+    }],
     grid: [
       {
-        height: "50%"
+        top: "8%",
+        left: "5%",
+        right: "5%",
+        height: "40%"
       },
       {
-        top: "65%",
-        height: "25%"
+        top: "50%",
+        left: "5%",
+        right: "5%",
+        height: "20%"
       },
       {
-        top: "80%",
-        height: "25%"
+        top: "73%",
+        left: "5%",
+        right: "5%",
+        height: "20%"
       }
     ],
     dataZoom: [
@@ -471,6 +485,6 @@ fetchCodes({
 </script>
 <template>
   <SearchArea :form="formState" @onFinish="onFinish" />
-  <v-chart style="height: 400px;" :loading="kLoading" :autoresize="true" :option="kLineOptions"></v-chart>
+  <v-chart style="height: 500px;" :loading="kLoading" :autoresize="true" :option="kLineOptions"></v-chart>
 </template>
 <style lang="less" scoped></style>
