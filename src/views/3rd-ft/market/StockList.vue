@@ -9,7 +9,7 @@ dayjs.extend(arraySupport);
 import { parseMarket, parseExchangeType, FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE, FT_KL_TYPE } from '@/api/code'
 import { message } from 'ant-design-vue';
 import { DownOutlined } from '@ant-design/icons-vue'
-import { subscribe } from '@/api/sub'
+import { subscribe } from '@/api/futu'
 import { syncCapitalFlow, syncCapitalDistribution, syncRehabs, syncHistoryKL } from '@/api/stock'
 
 import AdvancedTable from '@/components/AdvancedTable/AdvancedTable.vue'

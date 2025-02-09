@@ -44,13 +44,22 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/thirdFutu",
     name: "ThirdFutuPage",
-    redirect: "/thirdFutu/market",
+    redirect: "/thirdFutu/index",
     meta: {
       title: "第三方-富途",
       icon: "account-book-filled"
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
+      {
+        path: "/thirdFutu/index",
+        name: "FutuIndex",
+        meta: {
+          title: "概况",
+          icon: "laptop-outlined"
+        },
+        component: () => import("@/views/3rd-ft/Ovr.vue")
+      },
       {
         path: "/thirdFutu/market",
         name: "MartetPage",
@@ -67,7 +76,7 @@ const routes: RouteRecordRaw[] = [
               title: "正股",
               icon: "container-filled"
             },
-            component: () => import("@/views/market/StockList.vue")
+            component: () => import("@/views/3rd-ft/market/StockList.vue")
           },
           {
             path: "/thirdFutu/market/futuresList",
@@ -76,7 +85,7 @@ const routes: RouteRecordRaw[] = [
               title: "期货",
               icon: "bank-filled"
             },
-            component: () => import("@/views/market/FuturesList.vue")
+            component: () => import("@/views/3rd-ft/market/FuturesList.vue")
           },
           {
             path: "/thirdFutu/market/indies",
@@ -85,7 +94,7 @@ const routes: RouteRecordRaw[] = [
               title: "指数",
               icon: "line-chart-outlined"
             },
-            component: () => import("@/views/market/Indies.vue")
+            component: () => import("@/views/3rd-ft/market/Indies.vue")
           }, {
             path: "/thirdFutu/market/bond",
             name: "BondList",
@@ -93,7 +102,7 @@ const routes: RouteRecordRaw[] = [
               title: "债券",
               icon: "audit-outlined"
             },
-            component: () => import("@/views/market/Bond.vue")
+            component: () => import("@/views/3rd-ft/market/Bond.vue")
           }, {
             path: "/thirdFutu/market/warrant",
             name: "WarrantList",
@@ -101,7 +110,7 @@ const routes: RouteRecordRaw[] = [
               title: "窝轮",
               icon: "chrome-outlined"
             },
-            component: () => import("@/views/market/Warrant.vue")
+            component: () => import("@/views/3rd-ft/market/Warrant.vue")
           }, {
             path: "/thirdFutu/market/plates",
             name: "PlateList",
@@ -109,7 +118,7 @@ const routes: RouteRecordRaw[] = [
               title: "板块",
               icon: "pie-chart-outlined"
             },
-            component: () => import("@/views/market/PlateList.vue")
+            component: () => import("@/views/3rd-ft/market/PlateList.vue")
           }
         ]
       },
@@ -129,7 +138,7 @@ const routes: RouteRecordRaw[] = [
               title: "账户管理",
               icon: "credit-card-outlined"
             },
-            component: () => import("@/views/trade/AccountPage.vue")
+            component: () => import("@/views/3rd-ft/trade/AccountPage.vue")
           },
           {
             path: "/thirdFutu/trade/position",
@@ -138,7 +147,7 @@ const routes: RouteRecordRaw[] = [
               title: "持仓管理",
               icon: "table-outlined"
             },
-            component: () => import("@/views/trade/PositionPage.vue")
+            component: () => import("@/views/3rd-ft/trade/PositionPage.vue")
           },
           {
             path: "/thirdFutu/trade/sub",
@@ -147,7 +156,7 @@ const routes: RouteRecordRaw[] = [
               title: "富途订阅",
               icon: "bank-filled"
             },
-            component: () => import("@/views/trade/SubscribePage.vue")
+            component: () => import("@/views/3rd-ft/trade/SubscribePage.vue")
           }
         ]
       },
@@ -167,7 +176,7 @@ const routes: RouteRecordRaw[] = [
               title: "1分钟实时K线图",
               icon: "sliders-outlined"
             },
-            component: () => import("@/views/trade/k/RealTimeKLine.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLine.vue")
           },
           {
             path: "/thirdFutu/realtime/rtk_min3",
@@ -176,7 +185,7 @@ const routes: RouteRecordRaw[] = [
               title: "3分钟实时K线图",
               icon: "sliders-outlined"
             },
-            component: () => import("@/views/trade/k/RealTimeKLineMin3.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin3.vue")
           },
           {
             path: "/thirdFutu/realtime/rtk_min5",
@@ -185,7 +194,7 @@ const routes: RouteRecordRaw[] = [
               title: "5分钟实时K线图",
               icon: "sliders-outlined"
             },
-            component: () => import("@/views/trade/k/RealTimeKLineMin5.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin5.vue")
           },
           {
             path: "/thirdFutu/realtime/rtk_min15",
@@ -194,7 +203,7 @@ const routes: RouteRecordRaw[] = [
               title: "15分钟实时K线图",
               icon: "sliders-outlined"
             },
-            component: () => import("@/views/trade/k/RealTimeKLineMin15.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin15.vue")
           },
           {
             path: "/thirdFutu/realtime/rtk_min30",
@@ -203,7 +212,7 @@ const routes: RouteRecordRaw[] = [
               title: "30分钟实时K线图",
               icon: "sliders-outlined"
             },
-            component: () => import("@/views/trade/k/RealTimeKLineMin30.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin30.vue")
           },
           {
             path: "/thirdFutu/realtime/rtk_min60",
@@ -212,7 +221,7 @@ const routes: RouteRecordRaw[] = [
               title: "60分钟实时K线图",
               icon: "sliders-outlined"
             },
-            component: () => import("@/views/trade/k/RealTimeKLineMin60.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin60.vue")
           },
           {
             path: "/thirdFutu/realtime/rto",
@@ -221,7 +230,7 @@ const routes: RouteRecordRaw[] = [
               title: "实时报价",
               icon: "area-chart-outlined"
             },
-            component: () => import("@/views/trade/RealTimeBaseQuote.vue")
+            component: () => import("@/views/3rd-ft/trade/RealTimeBaseQuote.vue")
           }
         ]
       }

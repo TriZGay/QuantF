@@ -22,7 +22,7 @@ service.interceptors.response.use(
     return response;
   },
   error => {
-    message.error("请求失败(response):" + error);
+    message.error("请求失败(response):" + error.response.data);
     return Promise.reject(error);
   }
 );

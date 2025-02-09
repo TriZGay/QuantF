@@ -9,7 +9,7 @@ import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
 import { FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
 import { message } from 'ant-design-vue';
-import { subscribe } from '@/api/sub';
+import { subscribe } from '@/api/futu';
 
 const warrantStore = useWarrantStore();
 const queryWarrants = warrantStore.run;

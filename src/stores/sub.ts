@@ -1,4 +1,4 @@
-import { cancelSubscribeInfo, fetchSubscribeInfos, syncSubscribeInfo } from "@/api/sub";
+import { cancelSubscribeInfo, fetchSubscribeInfos, syncSubscribeInfo } from "@/api/futu";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { usePagination, useRequest } from "vue-request";

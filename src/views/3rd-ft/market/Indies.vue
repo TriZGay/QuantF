@@ -1,6 +1,6 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 //@ts-nocheck
-import { usePlatesStore } from '@/stores/plates';
+import { useIndiesStore } from '@/stores/indies';
 import { storeToRefs } from 'pinia';
 import { computed, reactive, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
@@ -8,13 +8,14 @@ import * as arraySupport from 'dayjs/plugin/arraySupport';
 dayjs.extend(arraySupport);
 import { FT_MARKET, FT_EXCHANGE_TYPE, FT_SUB_TYPE } from '@/api/code'
 import { message } from 'ant-design-vue';
-import { subscribe } from '@/api/sub';
+import { subscribe } from '@/api/futu';
 
 import AdvancedTable from '@/components/AdvancedTable/AdvancedTable.vue'
 
-const platesStore = usePlatesStore();
-const queryPlates = platesStore.run;
-const { list, loading, pageSize, current, total } = storeToRefs(platesStore);
+const indiesStore = useIndiesStore()
+const queryIndies = indiesStore.run;
+const { list, loading, pageSize, current, total } = storeToRefs(indiesStore);
+
 const stocksColumns = ref([
     {
         title: "股票代码",
@@ -60,13 +61,12 @@ const pagination = computed<Object>(() => {
         showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
     }
 })
-
 function onChangeTable(tableProps: Object) {
     let queryForm = tableProps.form
     let { pageSize, current } = tableProps.pagination
-    queryPlates({
+    queryIndies({
         ...queryForm,
-        stockType: 7,
+        stockType: 6,
         size: pageSize,
         current: current
     })
@@ -80,6 +80,7 @@ function parseMarket(marketValue: Number) {
 function parseExchangeType(exchangeValue: Number) {
     return FT_EXCHANGE_TYPE[exchangeValue];
 }
+
 const formState = reactive({
     market: {
         name: "行情市场",
@@ -101,12 +102,17 @@ const formState = reactive({
             0: "否"
         },
         bindValue: '0'
+    },
+    name: {
+        name: "名称",
+        type: "input",
+        bindValue: ""
     }
 });
 function onFinish(queryForm) {
-    queryPlates({
+    queryIndies({
         ...queryForm,
-        stockType: 7,
+        stockType: 6,
         size: 10,
         current: 1
     })
@@ -154,6 +160,7 @@ watch(() => selectedSubType, (val) => {
     indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
     checkAll.value = val.value.length === subTypes.value.length;
 }, { deep: true })
+
 </script>
 <template>
     <div class="stock-list-container">
@@ -199,4 +206,5 @@ watch(() => selectedSubType, (val) => {
 
     </div>
 </template>
-<style scoped lang="less"></style>
+
+<style lang="less" scoped></style>
