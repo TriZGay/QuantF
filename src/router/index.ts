@@ -73,44 +73,10 @@ const routes: RouteRecordRaw[] = [
             path: "/thirdFutu/market/stockList",
             name: "StockList",
             meta: {
-              title: "正股",
+              title: "标的物",
               icon: "container-filled"
             },
             component: () => import("@/views/3rd-ft/market/StockList.vue")
-          },
-          {
-            path: "/thirdFutu/market/futuresList",
-            name: "FuturesList",
-            meta: {
-              title: "期货",
-              icon: "bank-filled"
-            },
-            component: () => import("@/views/3rd-ft/market/FuturesList.vue")
-          },
-          {
-            path: "/thirdFutu/market/indies",
-            name: "IndexList",
-            meta: {
-              title: "指数",
-              icon: "line-chart-outlined"
-            },
-            component: () => import("@/views/3rd-ft/market/Indies.vue")
-          }, {
-            path: "/thirdFutu/market/bond",
-            name: "BondList",
-            meta: {
-              title: "债券",
-              icon: "audit-outlined"
-            },
-            component: () => import("@/views/3rd-ft/market/Bond.vue")
-          }, {
-            path: "/thirdFutu/market/warrant",
-            name: "WarrantList",
-            meta: {
-              title: "窝轮",
-              icon: "chrome-outlined"
-            },
-            component: () => import("@/views/3rd-ft/market/Warrant.vue")
           }, {
             path: "/thirdFutu/market/plates",
             name: "PlateList",

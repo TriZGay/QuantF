@@ -1,18 +1,5 @@
 import request from "@/utils/request";
 
-export interface SubscribeRequest {
-  securityList: Array<Security>,
-  subTypeList: Array<Number>,
-  unsub?: boolean
-}
-
-export interface Security {
-  market: Number,
-  code: string,
-  name: string,
-  type: Number
-}
-
 export interface QuerySubscribeInfo {
   size?: number,
   current?: number
@@ -33,6 +20,43 @@ export interface SubscribeInfo {
   subTypes: string
 }
 
+export interface Stock {
+  name: string,
+  code: string
+  delisting: string,
+  exchangeType: string,
+  id: number,
+  indexOptionType: string,
+  lastTradeTime: string,
+  listingDate: string,
+  lotSize: number,
+  mainContract: string,
+  market: string,
+  optionType: string,
+  stockChildType: string,
+  stockId: string,
+  stockOwner: string,
+  stockType: string,
+  strikePrice: string,
+  strikeTime: string,
+  suspension: string,
+}
+
+export interface StockResult {
+  records: Stock[],
+  total: number
+}
+
+export interface StockQueryRequest {
+  exchangeType?: number,
+  delisting?: number,
+  stockType?: number,
+  market?: number,
+  name?: string,
+  size?: number,
+  current?: number
+}
+
 export function fetchSubscribeDetails(data: QuerySubscribeInfo) {
   return request.post<SubscribeDetailsResult>("/api/sub/details", data);
 }
@@ -41,15 +65,6 @@ export function fetchSubscribeInfos(data: QuerySubscribeInfo) {
   return request.post<SubscribeDetailsResult>("/api/sub/list", data);
 }
 
-
-export function subscribe(data: SubscribeRequest) {
-  return request.post<string>("/api/sub/", data);
-}
-
-export function syncSubscribeInfo() {
-  return request.get<string>("/api/sub/refresh");
-}
-
-export function cancelSubscribeInfo(data: SubscribeRequest) {
-  return request.post<string>("/api/sub/cancel", data);
+export function fetchStocks(data: StockQueryRequest) {
+  return request.post<StockResult>("/api/base/stocks", data);
 }

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { usePagination } from "vue-request";
-import { fetchSubscribeDetails, fetchSubscribeInfos } from "@/api/futu";
+import { fetchStocks, fetchSubscribeDetails, fetchSubscribeInfos } from "@/api/futu";
 import { computed } from "vue";
 
 export const useFutuApi = defineStore("futu-api", () => {
@@ -45,10 +45,35 @@ export const useFutuApi = defineStore("futu-api", () => {
 
   const subscribeDetails = computed(() => {
     return {
-      pageSize: detailsPageSize,
-      current: detailsCurrent,
-      total: detailsTotal,
+      pageSize: detailsPageSize.value,
+      current: detailsCurrent.value,
+      total: detailsTotal.value,
       data: details.value?.data.records || []
+    };
+  });
+
+  const {
+    data: stocksData,
+    run: queryStocks,
+    loading: stockLoading,
+    pageSize: stocksPageSize,
+    total: stocksTotal,
+    current: stocksCurrent
+  } = usePagination(fetchStocks, {
+    pagination: {
+      currentKey: "current",
+      pageSizeKey: "size",
+      totalKey: "data.total"
+    },
+    manual: true
+  });
+
+  const stocks = computed(() => {
+    return {
+      pageSize: stocksPageSize.value,
+      current: stocksCurrent.value,
+      total: stocksTotal.value,
+      data: stocksData.value?.data.records || []
     };
   });
 
@@ -58,7 +83,10 @@ export const useFutuApi = defineStore("futu-api", () => {
     subscribeDetails,
     subscribeInfoLoading,
     querySubscribeInfo,
-    subscribeInfos
+    subscribeInfos,
+    stockLoading,
+    queryStocks,
+    stocks
   };
 
 });

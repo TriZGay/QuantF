@@ -2,11 +2,13 @@
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
-import type { Message } from "@/types/message";
+import type { HistoryKLCommand, Message } from "@/types/message";
 import { ReloadOutlined } from "@ant-design/icons-vue";
 import { useFutuApi } from "@/stores/futu-api";
-import { parseFTsubType, parseSecurityType } from "@/api/code";
+import { klTypeToSelectOptions, parseFTsubType, parseSecurityType } from "@/api/code";
 import { TableColumnProps } from "ant-design-vue";
+import type { SubscribeInfo } from "@/api/futu";
+import type { Dayjs } from "dayjs";
 
 const {
   sendFtCommandOnNotifyEndPoint
@@ -73,6 +75,10 @@ const subscribeInfoColumns = ref<TableColumnProps[]>([
   {
     title: "订阅类型",
     dataIndex: "subTypes"
+  },
+  {
+    title: "操作",
+    key: "action"
   }
 ]);
 
@@ -91,6 +97,21 @@ const pagination = computed<Object>(() => {
     showTotal: (total: Number, range: Array<any>) => `${range[0]}-${range[1]} of ${total} items`
   };
 });
+const klType = ref<string>("1");
+const beginDate = ref<Dayjs>();
+const endDate = ref<Dayjs>();
+
+const requestHistoryK = (row: SubscribeInfo): void => {
+  let historyKLCommand: HistoryKLCommand = {
+    type: "KL_HISTORY",
+    market: row.securityMarket,
+    code: row.securityCode,
+    klType: parseInt(klType.value),
+    beginDate: beginDate.value.format("YYYY-MM-DD"),
+    endDate: endDate.value.format("YYYY-MM-DD")
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(historyKLCommand));
+};
 </script>
 
 <template>
@@ -154,6 +175,24 @@ const pagination = computed<Object>(() => {
         </template>
         <template v-if="column.dataIndex === 'subType'">
           {{ parseFTsubType(record.subType) }}
+        </template>
+        <template v-if="column.key === 'action'">
+          <a-space>
+            <a-popover
+              title="选择时间段"
+              trigger="click">
+              <a-button type="link" size="small">请求历史K</a-button>
+              <template #content>
+                <a-space>
+                  <a-select style="width: 100px" v-model:value="klType" size="small" :options="klTypeToSelectOptions()">
+                  </a-select>
+                  <a-date-picker size="small" v-model:value="beginDate" />
+                  <a-date-picker size="small" v-model:value="endDate" />
+                  <a-button type="primary" size="small" @click="requestHistoryK(record)">确定</a-button>
+                </a-space>
+              </template>
+            </a-popover>
+          </a-space>
         </template>
       </template>
     </a-table>

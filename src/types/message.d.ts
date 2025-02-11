@@ -1,9 +1,18 @@
 export declare interface Message {
-  type: "CONNECT" | "MARKET_STATE" | "KL_HISTORY_DETAIL";
+  type: "CONNECT" | "MARKET_STATE" | "KL_HISTORY_DETAIL"
+    | "REFRESH_SUB" | "SUBSCRIPTION" | "TRADE_DATE" | "KL_HISTORY";
 }
 
 export interface ConnectCommand extends Message {
   isConnect: boolean;
+}
+
+export interface HistoryKLCommand extends Message {
+  market: number,
+  code: string,
+  klType: number,
+  beginDate: string,
+  endDate: string
 }
 
 export interface FutuHistoryKQuota {
