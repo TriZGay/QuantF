@@ -59,6 +59,7 @@
 // }
 </script>
 <template>
+  <div>首页</div>
   <!--  <div>-->
   <!--    <a-button size="small" @click="refreshInfo" style="margin-bottom: 8px;">-->
   <!--      刷新-->

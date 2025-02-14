@@ -1,8 +1,12 @@
 import request from "@/utils/request";
 
-export interface QuerySubscribeInfo {
+interface PaginationRequest {
   size?: number,
   current?: number
+}
+
+export interface QuerySubscribeInfo extends PaginationRequest {
+
 }
 
 export interface SubscribeDetailsResult {
@@ -40,6 +44,8 @@ export interface Stock {
   strikePrice: string,
   strikeTime: string,
   suspension: string,
+  marketCode: number,
+  stockTypeCode: number
 }
 
 export interface StockResult {
@@ -47,14 +53,33 @@ export interface StockResult {
   total: number
 }
 
-export interface StockQueryRequest {
+export interface Plate {
+  id: number,
+  name: string,
+  code: string,
+  market: string,
+  marketCode: number,
+  plateType: string,
+  plateTypeCode: number
+}
+
+export interface PlateResult {
+  records: Plate[],
+  total: number
+}
+
+export interface StockQueryRequest extends PaginationRequest {
   exchangeType?: number,
   delisting?: number,
   stockType?: number,
   market?: number,
   name?: string,
-  size?: number,
-  current?: number
+}
+
+export interface PlateQueryRequest extends PaginationRequest {
+  name?: string,
+  market?: number,
+  type?: number
 }
 
 export function fetchSubscribeDetails(data: QuerySubscribeInfo) {
@@ -67,4 +92,8 @@ export function fetchSubscribeInfos(data: QuerySubscribeInfo) {
 
 export function fetchStocks(data: StockQueryRequest) {
   return request.post<StockResult>("/api/base/stocks", data);
+}
+
+export function fetchPlates(req: PlateQueryRequest) {
+  return request.post<PlateResult>("/api/base/plates", req);
 }

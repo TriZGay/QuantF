@@ -55,7 +55,7 @@ function onFinish(values: any) {
               </a-select>
             </template>
             <template v-if="value.type === 'input'">
-              <a-input v-model:value="value.bindValue" placeholder="请输入名称" />
+              <a-input v-model:value="value.bindValue" placeholder="请输入名称" allow-clear/>
             </template>
             <template v-if="value.type === 'datetime-range'">
               <a-range-picker v-model:value="value.bindValue"

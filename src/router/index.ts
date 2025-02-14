@@ -61,6 +61,15 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/3rd-ft/Ovr.vue")
       },
       {
+        path: "/thirdFutu/sub",
+        name: "SubscribePage",
+        meta: {
+          title: "订阅",
+          icon: "bank-filled"
+        },
+        component: () => import("@/views/3rd-ft/SubscribePage.vue")
+      },
+      {
         path: "/thirdFutu/market",
         name: "MartetPage",
         redirect: "/thirdFutu/market/stockList",
@@ -114,15 +123,6 @@ const routes: RouteRecordRaw[] = [
               icon: "table-outlined"
             },
             component: () => import("@/views/3rd-ft/trade/PositionPage.vue")
-          },
-          {
-            path: "/thirdFutu/trade/sub",
-            name: "SubscribePage",
-            meta: {
-              title: "富途订阅",
-              icon: "bank-filled"
-            },
-            component: () => import("@/views/3rd-ft/trade/SubscribePage.vue")
           }
         ]
       },

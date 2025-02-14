@@ -152,6 +152,15 @@ export function maTypeToCheckBoxOptions() {
   });
 }
 
+export function marketTypeToCheckBoxOptions() {
+  return Object.keys(FT_MARKET).map(marketType => {
+    return {
+      label: FT_MARKET[marketType],
+      value: marketType
+    };
+  });
+}
+
 export function rehabTypeToRadioOptions() {
   return Object.keys(FT_REHABTYPE).map(rehabType => {
     return {
