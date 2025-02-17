@@ -159,13 +159,14 @@ import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
 //   indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
 //   checkAll.value = val.value.length === subTypes.value.length;
 // }, { deep: true });
-import { FT_MARKET, FT_SECURITY_TYPE, marketTypeToCheckBoxOptions } from "@/api/code";
+import { FT_MARKET, marketTypeToCheckBoxOptions } from "@/api/code";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useFutuStomp } from "@/stores/futu-stomp";
-import type { PlatesCommand } from "@/types/message";
+import type { PlatesCommand, StockInPlateCommand } from "@/types/message";
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
 import type { TableColumnProps } from "ant-design-vue";
+import type { Plate } from "@/api/futu";
 
 const { queryPlates } = useFutuApi();
 const { plates, platesLoading } = storeToRefs(useFutuApi());
@@ -251,6 +252,26 @@ const formState = reactive({
     bindValue: Object.keys(FT_MARKET)[1]
   }
 });
+
+const requestStockInPlate = (plate: Plate): void => {
+  let { marketCode, code } = plate;
+  let command: StockInPlateCommand = {
+    type: "STOCK_IN_PLATE",
+    all: false,
+    plates: [{
+      market: marketCode,
+      code: code
+    }]
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+};
+const requestStocksInPlates = (): void => {
+  let command: StockInPlateCommand = {
+    type: "STOCK_IN_PLATE",
+    all: true
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -258,7 +279,7 @@ const formState = reactive({
       <a-popover
         title="选择市场"
         trigger="click">
-        <a-button type="primary" size="small">同步板块数据</a-button>
+        <a-button type="primary">同步板块数据</a-button>
         <template #content>
           <a-space>
             <a-checkbox-group style="width: 100px" v-model:value="markets" size="small"
@@ -268,6 +289,14 @@ const formState = reactive({
           </a-space>
         </template>
       </a-popover>
+      <a-popover
+        title="是否全量同步"
+        trigger="click">
+        <a-button type="primary" disabled>全量同步板块下股票(缺陷,建议逐个板块同步 )</a-button>
+        <template #content>
+          <a-button type="primary" disabled @click="requestStocksInPlates()">确定</a-button>
+        </template>
+      </a-popover>
     </a-space>
     <a-divider />
     <AdvancedTable :form="formState" @on-finish="onFinish" :columns="platesColumns" :data-source="plates.data"
@@ -275,27 +304,13 @@ const formState = reactive({
                    @on-change-table="onChangeTable">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
-          <!--                        <span>-->
-          <!--                            <a-dropdown :trigger="['click']">-->
-          <!--                                <a @click.prevent>-->
-          <!--                                    订阅-->
-          <!--                                    <DownOutlined />-->
-          <!--                                </a>-->
-          <!--                                <template #overlay>-->
-          <!--                                    <a-menu style="padding: 10px 10px;">-->
-          <!--                                        <a-checkbox v-model:checked="checkAll" :indeterminate="indeterminate"-->
-          <!--                                                    @change="onCheckAllChange">全选</a-checkbox>-->
-          <!--                                        <br />-->
-          <!--                                        <a-checkbox-group style="width:100px" v-model:value="selectedSubType"-->
-          <!--                                                          :options="subTypes" />-->
-          <!--                                        <br />-->
-          <!--                                        <a-button type="primary" size="small"-->
-          <!--                                                  @click="onClick2Subscribe(record)">确定</a-button>-->
-          <!--                                    </a-menu>-->
-          <!--                                </template>-->
-          <!--                            </a-dropdown>-->
-          <!--                            <a-divider type="vertical" />-->
-          <!--                        </span>-->
+          <a-space>
+            <a-popconfirm
+              title="是否执行?"
+              @confirm="requestStockInPlate(record)">
+              <a href="#">查询板块下股票</a>
+            </a-popconfirm>
+          </a-space>
         </template>
       </template>
     </AdvancedTable>

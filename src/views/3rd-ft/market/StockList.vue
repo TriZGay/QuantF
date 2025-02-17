@@ -3,12 +3,17 @@ import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import type { TableColumnsType } from "ant-design-vue";
-import { DownOutlined } from "@ant-design/icons-vue";
 
 import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
-import { FT_MARKET, FT_SECURITY_TYPE, FT_SUB_TYPE } from "@/api/code";
+import {
+  FT_MARKET,
+  FT_SECURITY_TYPE,
+  FT_SUB_TYPE,
+  marketTypeToCheckBoxOptions,
+  stockTypeToCheckBoxOptions
+} from "@/api/code";
 import type { Stock } from "@/api/futu";
-import type { SubOrUnSubCommand } from "@/types/message";
+import type { StocksCommand, SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
@@ -157,20 +162,38 @@ function onClick2Subscribe(row: Stock) {
   sendFtCommandOnNotifyEndPoint(JSON.stringify(subMessage));
 }
 
-const checkAll = ref(false);
-const indeterminate = ref(false);
+const checkAll = ref<boolean>(false);
+const indeterminate = ref<boolean>(false);
 
 function onCheckAllChange(e: any) {
   indeterminate.value = false;
   selectedSubType.value = e.target.checked ? subTypes.value.map(v => v.value) : [];
 }
 
-const capitalForm = ref({
-  periodType: 1,
-  dateRange: []
-});
+watch(() => selectedSubType, (val) => {
+  indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
+  checkAll.value = val.value.length === subTypes.value.length;
+}, { deep: true });
 
-const isRealTime = computed(() => capitalForm.value.periodType === 1);
+const market = ref<number>();
+const stockType = ref<number>();
+
+const requestStocks = (): void => {
+  let stocksCommand: StocksCommand = {
+    type: "STOCKS",
+    market: market.value,
+    stockType: stockType.value
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(stocksCommand));
+};
+
+// const capitalForm = ref({
+//   periodType: 1,
+//   dateRange: []
+// });
+//
+// const isRealTime = computed(() => capitalForm.value.periodType === 1);
+
 
 // function onSyncCapitalFlow(row) {
 //   let { market, code } = row;
@@ -228,13 +251,26 @@ const isRealTime = computed(() => capitalForm.value.periodType === 1);
 // });
 
 
-watch(() => selectedSubType, (val) => {
-  indeterminate.value = !!val.value.length && val.value.length < subTypes.value.length;
-  checkAll.value = val.value.length === subTypes.value.length;
-}, { deep: true });
 </script>
 <template>
   <div class="stock-list-container">
+    <a-space>
+      <a-popover
+        title="选择市场和标的物类型"
+        trigger="click">
+        <a-button type="primary">同步静态标的物</a-button>
+        <template #content>
+          <a-space>
+            <a-select style="width: 100px" v-model:value="market" size="small"
+                      :options="marketTypeToCheckBoxOptions()" />
+            <a-select style="width: 100px" v-model:value="stockType" size="small"
+                      :options="stockTypeToCheckBoxOptions()"></a-select>
+            <a-button type="primary" size="small" @click="requestStocks()">确定</a-button>
+          </a-space>
+        </template>
+      </a-popover>
+    </a-space>
+    <a-divider />
     <AdvancedTable :form="formState" @on-finish="onFinish" :columns="stocksColumns" :data-source="stocks.data"
                    :loading="stockLoading" :row-key="(record:Stock) => record.id" :pagination="pagination"
                    :scroll="{x:1000}" @on-change-table="onChangeTable">
@@ -261,37 +297,37 @@ watch(() => selectedSubType, (val) => {
                 </a-menu>
               </template>
             </a-dropdown>
-            <a-dropdown :trigger="['click']">
-              <a @click.prevent>
-                查询资金流向
-                <DownOutlined />
-              </a>
-              <template #overlay>
-                <a-menu style="padding: 10px 10px;">
-                  <a-form layout="horizontal" :model="capitalForm">
-                    <a-form-item label="周期类型">
-                      <a-radio-group v-model:value="capitalForm.periodType"
-                                     name="periodTypeName">
-                        <a-radio :value="1">实时</a-radio>
-                        <a-radio :value="2">日</a-radio>
-                        <a-radio :value="3">周</a-radio>
-                        <a-radio :value="4">月</a-radio>
-                      </a-radio-group>
-                    </a-form-item>
-                    <a-form-item label="时间范围">
-                      <a-range-picker v-model:value="capitalForm.dateRange"
-                                      value-format="YYYY-MM-DD"
-                                      :disabled="isRealTime" />
-                    </a-form-item>
-                  </a-form>
-                  <a-button type="primary" size="small"
-                            @click="onSyncCapitalFlow(record)">确定
-                  </a-button>
-                </a-menu>
-              </template>
-            </a-dropdown>
-            <a @click="onSyncCapitalDtb(record)">查询资金分布</a>
-            <a @click="onSyncRehabs(record)">查询复权因子</a>
+            <!--            <a-dropdown :trigger="['click']">-->
+            <!--              <a @click.prevent>-->
+            <!--                查询资金流向-->
+            <!--                <DownOutlined />-->
+            <!--              </a>-->
+            <!--              <template #overlay>-->
+            <!--                <a-menu style="padding: 10px 10px;">-->
+            <!--                  <a-form layout="horizontal" :model="capitalForm">-->
+            <!--                    <a-form-item label="周期类型">-->
+            <!--                      <a-radio-group v-model:value="capitalForm.periodType"-->
+            <!--                                     name="periodTypeName">-->
+            <!--                        <a-radio :value="1">实时</a-radio>-->
+            <!--                        <a-radio :value="2">日</a-radio>-->
+            <!--                        <a-radio :value="3">周</a-radio>-->
+            <!--                        <a-radio :value="4">月</a-radio>-->
+            <!--                      </a-radio-group>-->
+            <!--                    </a-form-item>-->
+            <!--                    <a-form-item label="时间范围">-->
+            <!--                      <a-range-picker v-model:value="capitalForm.dateRange"-->
+            <!--                                      value-format="YYYY-MM-DD"-->
+            <!--                                      :disabled="isRealTime" />-->
+            <!--                    </a-form-item>-->
+            <!--                  </a-form>-->
+            <!--                  <a-button type="primary" size="small"-->
+            <!--                            @click="onSyncCapitalFlow(record)">确定-->
+            <!--                  </a-button>-->
+            <!--                </a-menu>-->
+            <!--              </template>-->
+            <!--            </a-dropdown>-->
+            <!--            <a @click="onSyncCapitalDtb(record)">查询资金分布</a>-->
+            <!--            <a @click="onSyncRehabs(record)">查询复权因子</a>-->
           </a-space>
         </template>
       </template>

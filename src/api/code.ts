@@ -134,6 +134,15 @@ export const MA_TYPE = {
   6: "MA120"
 };
 
+export function stockTypeToCheckBoxOptions(){
+  return Object.keys(FT_SECURITY_TYPE).map(klType => {
+    return {
+      label: FT_SECURITY_TYPE[klType],
+      value: klType
+    };
+  });
+}
+
 export function klTypeToSelectOptions() {
   return Object.keys(FT_KL_TYPE).map(klType => {
     return {

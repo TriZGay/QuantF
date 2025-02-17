@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, onMounted, ref } from "vue";
+import { computed, createVNode, onMounted, ref } from "vue";
 import { klTypeToSelectOptions, parseFTsubType, parseSecurityType } from "@/api/code";
-import type { TableColumnProps } from "ant-design-vue";
+import { Modal, type TableColumnProps } from "ant-design-vue";
 import { useFutuApi } from "@/stores/futu-api";
 import type { Dayjs } from "dayjs";
 import type { SubscribeInfo } from "@/api/futu";
-import type { HistoryKLCommand } from "@/types/message";
+import type { HistoryKLCommand, SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 
 const {
   sendFtCommandOnNotifyEndPoint
@@ -134,29 +135,31 @@ const requestHistoryK = (row: SubscribeInfo): void => {
   sendFtCommandOnNotifyEndPoint(JSON.stringify(historyKLCommand));
 };
 
-// function cancelSubscribe(row) {
-//     let { securityMarket, securityCode, securityName, securityType, subType } = row;
-//     Modal.confirm({
-//         title: "请确认",
-//         icon: createVNode(ExclamationCircleOutlined),
-//         content: "确定取消订阅?",
-//         okText: "是",
-//         okType: "danger",
-//         cancelText: "否",
-//         onOk() {
-//             cancelSubscribeInfo({
-//                 securityList: [{
-//                     market: securityMarket,
-//                     code: securityCode,
-//                     name: securityName,
-//                     type: securityType
-//                 }],
-//                 subTypeList: [subType],
-//                 unsub: true
-//             })
-//         }
-//     })
-// }
+function cancelSubscribe(row:SubscribeInfo) {
+  let { securityMarket, securityCode, securityName, securityType, subType } = row;
+  Modal.confirm({
+    title: "请确认",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "确定取消订阅?",
+    okText: "是",
+    okType: "danger",
+    cancelText: "否",
+    onOk() {
+      let subMessage: SubOrUnSubCommand = {
+        type: "SUBSCRIPTION",
+        securityList: [{
+          market: securityMarket,
+          code: securityCode,
+          name: securityName,
+          type: securityType
+        }],
+        subTypeList: [subType],
+        unsub: true
+      };
+      sendFtCommandOnNotifyEndPoint(JSON.stringify(subMessage));
+    }
+  });
+}
 
 </script>
 <template>
