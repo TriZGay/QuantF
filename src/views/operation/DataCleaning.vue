@@ -2,7 +2,7 @@
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useTaskStore } from "@/stores/task";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import dayjs, { Dayjs } from "dayjs";
 import { type FormInstance, message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
@@ -129,10 +129,6 @@ const metaTableColumns = ref<ColumnProps[]>([
     dataIndex: "rehabType",
     key: "rehabType"
   }]);
-
-fetchDbInfos();
-fetchTables();
-fetchTasks();
 
 const refreshDbInfo = (): void => {
   fetchDbInfos();
@@ -299,10 +295,6 @@ const handleKLineRepeatOk = (): void => {
   });
 };
 
-fetchDataQa({
-  start: dayjs().startOf("month").format("YYYY-MM-DD"),
-  end: dayjs().endOf("month").format("YYYY-MM-DD")
-});
 
 const showDetailsModal = ref<boolean>(false);
 const dataQaRepeatDetails = ref<ColumnProps[]>([
@@ -427,6 +419,15 @@ const handleKArc2MacdOk = (): void => {
     message.error(err.response.data.toString());
   });
 };
+onMounted(() => {
+  fetchDbInfos();
+  fetchTables();
+  fetchTasks();
+  fetchDataQa({
+    start: dayjs().startOf("month").format("YYYY-MM-DD"),
+    end: dayjs().endOf("month").format("YYYY-MM-DD")
+  });
+});
 </script>
 
 <template>

@@ -1,7 +1,12 @@
 export declare interface Message {
   type: "CONNECT" | "MARKET_STATE" | "KL_HISTORY_DETAIL"
     | "REFRESH_SUB" | "SUBSCRIPTION" | "TRADE_DATE" | "KL_HISTORY"
-    | "PLATES" | "STOCK_IN_PLATE" | "STOCKS";
+    | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
+    | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION";
+}
+
+export interface StockOwnerPlatesCommand extends Message {
+  securities: Array<PlateItem>;
 }
 
 export interface StocksCommand extends Message {

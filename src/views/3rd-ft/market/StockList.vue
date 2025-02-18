@@ -9,12 +9,14 @@ import {
   FT_MARKET,
   FT_SECURITY_TYPE,
   FT_SUB_TYPE,
+  klTypeToSelectOptions,
   marketTypeToCheckBoxOptions,
   stockTypeToCheckBoxOptions
 } from "@/api/code";
 import type { Stock } from "@/api/futu";
-import type { StocksCommand, SubOrUnSubCommand } from "@/types/message";
+import type { HistoryKLCommand, StockOwnerPlatesCommand, StocksCommand, SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
+import type { Dayjs } from "dayjs";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
 
@@ -187,6 +189,32 @@ const requestStocks = (): void => {
   sendFtCommandOnNotifyEndPoint(JSON.stringify(stocksCommand));
 };
 
+const klType = ref<string>("1");
+const beginDate = ref<Dayjs>();
+const endDate = ref<Dayjs>();
+
+const requestHistoryK = (row: Stock): void => {
+  let historyKLCommand: HistoryKLCommand = {
+    type: "KL_HISTORY",
+    market: row.marketCode,
+    code: row.code,
+    klType: parseInt(klType.value),
+    beginDate: beginDate.value.format("YYYY-MM-DD"),
+    endDate: endDate.value.format("YYYY-MM-DD")
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(historyKLCommand));
+};
+const requestStockOwnerPlates = (row: Stock): void => {
+  let stockOwnerPlatesCommand: StockOwnerPlatesCommand = {
+    type: "STOCK_OWNER_PLATE",
+    securities: [{
+      market: row.marketCode,
+      code: row.code
+    }]
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(stockOwnerPlatesCommand));
+};
+
 // const capitalForm = ref({
 //   periodType: 1,
 //   dateRange: []
@@ -277,12 +305,26 @@ const requestStocks = (): void => {
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-space>
-            <a-dropdown :trigger="['click']">
-              <a @click.prevent>
-                订阅
-                <DownOutlined />
-              </a>
-              <template #overlay>
+            <a-popover
+              title="选择时间段"
+              trigger="click">
+              <a-button type="link" size="small">请求历史K</a-button>
+              <template #content>
+                <a-space>
+                  <a-select style="width: 100px" v-model:value="klType" size="small"
+                            :options="klTypeToSelectOptions()">
+                  </a-select>
+                  <a-date-picker size="small" v-model:value="beginDate" />
+                  <a-date-picker size="small" v-model:value="endDate" />
+                  <a-button type="primary" size="small" @click="requestHistoryK(record)">确定</a-button>
+                </a-space>
+              </template>
+            </a-popover>
+            <a-popover
+              title="选择订阅类型"
+              trigger="click">
+              <a-button type="link" size="small">订阅</a-button>
+              <template #content>
                 <a-menu style="padding: 10px 10px;">
                   <a-checkbox v-model:checked="checkAll" :indeterminate="indeterminate"
                               @change="onCheckAllChange">全选
@@ -296,7 +338,13 @@ const requestStocks = (): void => {
                   </a-button>
                 </a-menu>
               </template>
-            </a-dropdown>
+            </a-popover>
+            <a-popover title="确定请求" trigger="click">
+              <a-button type="link" size="small">请求板块数据</a-button>
+              <template #content>
+                <a-button type="primary" size="small" @click="requestStockOwnerPlates(record)">确定</a-button>
+              </template>
+            </a-popover>
             <!--            <a-dropdown :trigger="['click']">-->
             <!--              <a @click.prevent>-->
             <!--                查询资金流向-->

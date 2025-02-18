@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { computed, createVNode, onMounted, ref } from "vue";
-import { klTypeToSelectOptions, parseFTsubType, parseSecurityType } from "@/api/code";
+import { parseFTsubType, parseSecurityType } from "@/api/code";
 import { Modal, type TableColumnProps } from "ant-design-vue";
 import { useFutuApi } from "@/stores/futu-api";
-import type { Dayjs } from "dayjs";
 import type { SubscribeInfo } from "@/api/futu";
-import type { HistoryKLCommand, SubOrUnSubCommand } from "@/types/message";
+import type { SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 
@@ -119,22 +118,6 @@ const paginationDetails = computed<Object>(() => {
   };
 });
 
-const klType = ref<string>("1");
-const beginDate = ref<Dayjs>();
-const endDate = ref<Dayjs>();
-
-const requestHistoryK = (row: SubscribeInfo): void => {
-  let historyKLCommand: HistoryKLCommand = {
-    type: "KL_HISTORY",
-    market: row.securityMarket,
-    code: row.securityCode,
-    klType: parseInt(klType.value),
-    beginDate: beginDate.value.format("YYYY-MM-DD"),
-    endDate: endDate.value.format("YYYY-MM-DD")
-  };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(historyKLCommand));
-};
-
 function cancelSubscribe(row:SubscribeInfo) {
   let { securityMarket, securityCode, securityName, securityType, subType } = row;
   Modal.confirm({
@@ -175,21 +158,6 @@ function cancelSubscribe(row:SubscribeInfo) {
             </template>
             <template v-if="column.key === 'action'">
               <a-space>
-                <a-popover
-                  title="选择时间段"
-                  trigger="click">
-                  <a-button type="link" size="small">请求历史K</a-button>
-                  <template #content>
-                    <a-space>
-                      <a-select style="width: 100px" v-model:value="klType" size="small"
-                                :options="klTypeToSelectOptions()">
-                      </a-select>
-                      <a-date-picker size="small" v-model:value="beginDate" />
-                      <a-date-picker size="small" v-model:value="endDate" />
-                      <a-button type="primary" size="small" @click="requestHistoryK(record)">确定</a-button>
-                    </a-space>
-                  </template>
-                </a-popover>
               </a-space>
             </template>
           </template>

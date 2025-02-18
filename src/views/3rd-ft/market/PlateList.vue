@@ -308,7 +308,7 @@ const requestStocksInPlates = (): void => {
             <a-popconfirm
               title="是否执行?"
               @confirm="requestStockInPlate(record)">
-              <a href="#">查询板块下股票</a>
+              <a-button type="link" size="small" disabled>查询板块下股票</a-button>
             </a-popconfirm>
           </a-space>
         </template>
