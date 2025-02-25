@@ -14,7 +14,14 @@ import {
   stockTypeToCheckBoxOptions
 } from "@/api/code";
 import type { Stock } from "@/api/futu";
-import type { HistoryKLCommand, StockOwnerPlatesCommand, StocksCommand, SubOrUnSubCommand } from "@/types/message";
+import type {
+  CapitalDistributionCommand,
+  HistoryKLCommand,
+  RehabsCommand, SnapshotCommand,
+  StockOwnerPlatesCommand,
+  StocksCommand,
+  SubOrUnSubCommand
+} from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import type { Dayjs } from "dayjs";
 
@@ -215,70 +222,36 @@ const requestStockOwnerPlates = (row: Stock): void => {
   sendFtCommandOnNotifyEndPoint(JSON.stringify(stockOwnerPlatesCommand));
 };
 
-// const capitalForm = ref({
-//   periodType: 1,
-//   dateRange: []
-// });
-//
-// const isRealTime = computed(() => capitalForm.value.periodType === 1);
-
-
-// function onSyncCapitalFlow(row) {
-//   let { market, code } = row;
-//   let periodType = capitalForm.value.periodType;
-//   syncCapitalFlow({
-//     periodType: periodType,
-//     market: market,
-//     code: code,
-//     beginDate: capitalForm.value.dateRange[0],
-//     endDate: capitalForm.value.dateRange[1]
-//   }).then(res => {
-//     message.success(res.data);
-//   }).catch(err => {
-//     message.error(err.response.data);
-//   });
-//
-// }
-
-// function onSyncCapitalDtb(row) {
-//   let { market, code } = row;
-//   syncCapitalDistribution({
-//     market: market,
-//     code: code
-//   }).then(res => {
-//     message.success(res.data);
-//   }).catch(err => {
-//     message.error(err.response.data);
-//   });
-// }
-
-// function onSyncRehabs(row) {
-//   let { market, code } = row;
-//   syncRehabs({
-//     market: market,
-//     code: code
-//   }).then(res => {
-//     message.success(res.data);
-//   }).catch(err => {
-//     message.error(err.response.data);
-//   });
-// }
-
-// const kTypes = computed(() => {
-//   let arr = [];
-//   Object.keys(FT_KL_TYPE)
-//     .filter(key => {
-//       return parseInt(key) !== 0;
-//     }).forEach(key => {
-//     arr.push({
-//       value: key,
-//       label: FT_KL_TYPE[key]
-//     });
-//   });
-//   return arr;
-// });
-
-
+const requestCapitalDistribution = (row: Stock): void => {
+  let capitalDistributionCommand: CapitalDistributionCommand = {
+    type: "CAPITAL_DISTRIBUTION",
+    security: {
+      market: row.marketCode,
+      code: row.code
+    }
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(capitalDistributionCommand));
+};
+const requestRehabs = (row: Stock): void => {
+  let rehabsCommand: RehabsCommand = {
+    type: "REHABS",
+    security: {
+      market: row.marketCode,
+      code: row.code
+    }
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(rehabsCommand));
+};
+const requestSnapshot = (row: Stock): void => {
+  let snapshotCommand: SnapshotCommand = {
+    type: "SNAPSHOT",
+    securities: [{
+      market: row.marketCode,
+      code: row.code
+    }]
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(snapshotCommand));
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -308,7 +281,7 @@ const requestStockOwnerPlates = (row: Stock): void => {
             <a-popover
               title="选择时间段"
               trigger="click">
-              <a-button type="link" size="small">请求历史K</a-button>
+              <a-button type="link" size="small">历史K</a-button>
               <template #content>
                 <a-space>
                   <a-select style="width: 100px" v-model:value="klType" size="small"
@@ -339,43 +312,30 @@ const requestStockOwnerPlates = (row: Stock): void => {
                 </a-menu>
               </template>
             </a-popover>
-            <a-popover title="确定请求" trigger="click">
-              <a-button type="link" size="small">请求板块数据</a-button>
+            <a-popover title="确定" trigger="click">
+              <a-button type="link" size="small">板块数据</a-button>
               <template #content>
                 <a-button type="primary" size="small" @click="requestStockOwnerPlates(record)">确定</a-button>
               </template>
             </a-popover>
-            <!--            <a-dropdown :trigger="['click']">-->
-            <!--              <a @click.prevent>-->
-            <!--                查询资金流向-->
-            <!--                <DownOutlined />-->
-            <!--              </a>-->
-            <!--              <template #overlay>-->
-            <!--                <a-menu style="padding: 10px 10px;">-->
-            <!--                  <a-form layout="horizontal" :model="capitalForm">-->
-            <!--                    <a-form-item label="周期类型">-->
-            <!--                      <a-radio-group v-model:value="capitalForm.periodType"-->
-            <!--                                     name="periodTypeName">-->
-            <!--                        <a-radio :value="1">实时</a-radio>-->
-            <!--                        <a-radio :value="2">日</a-radio>-->
-            <!--                        <a-radio :value="3">周</a-radio>-->
-            <!--                        <a-radio :value="4">月</a-radio>-->
-            <!--                      </a-radio-group>-->
-            <!--                    </a-form-item>-->
-            <!--                    <a-form-item label="时间范围">-->
-            <!--                      <a-range-picker v-model:value="capitalForm.dateRange"-->
-            <!--                                      value-format="YYYY-MM-DD"-->
-            <!--                                      :disabled="isRealTime" />-->
-            <!--                    </a-form-item>-->
-            <!--                  </a-form>-->
-            <!--                  <a-button type="primary" size="small"-->
-            <!--                            @click="onSyncCapitalFlow(record)">确定-->
-            <!--                  </a-button>-->
-            <!--                </a-menu>-->
-            <!--              </template>-->
-            <!--            </a-dropdown>-->
-            <!--            <a @click="onSyncCapitalDtb(record)">查询资金分布</a>-->
-            <!--            <a @click="onSyncRehabs(record)">查询复权因子</a>-->
+            <a-popover title="确定" trigger="click">
+              <a-button type="link" size="small">快照数据</a-button>
+              <template #content>
+                <a-button type="primary" size="small" @click="requestSnapshot(record)">确定</a-button>
+              </template>
+            </a-popover>
+            <a-popover title="确定" trigger="click">
+              <a-button type="link" size="small">资金分布</a-button>
+              <template #content>
+                <a-button type="primary" size="small" @click="requestCapitalDistribution(record)">确定</a-button>
+              </template>
+            </a-popover>
+            <a-popover title="确定" trigger="click">
+              <a-button type="link" size="small">复权因子</a-button>
+              <template #content>
+                <a-button type="primary" size="small" @click="requestRehabs(record)">确定</a-button>
+              </template>
+            </a-popover>
           </a-space>
         </template>
       </template>

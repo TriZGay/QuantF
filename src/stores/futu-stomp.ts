@@ -2,13 +2,24 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import Stomp, { Client } from "stompjs";
 import { notification } from "ant-design-vue";
-import type { FutuHistoryKQuota, FutuMarketState } from "@/types/message";
+import type {
+  AccountsCommand,
+  CapitalDistributionCommand,
+  CapitalFlowCommand,
+  FutuHistoryKQuota,
+  FutuMarketState,
+  RehabsCommand
+} from "@/types/message";
 
 export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuStompNotifyClient = ref<Client>();
   const futuStompNotifyClientStatus = ref<boolean>(false);
   const futuHistoryKQuota = ref<FutuHistoryKQuota>();
   const futuMarketState = ref<FutuMarketState>();
+  const futuCapitalDistribution = ref<CapitalDistributionCommand>();
+  const futuCapitalFlow = ref<CapitalFlowCommand>();
+  const futuRehabs = ref<RehabsCommand>();
+  const futuAccounts = ref<AccountsCommand>();
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
@@ -29,6 +40,22 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         //订阅市场状态查询
         futuStompNotifyClient.value?.subscribe("/quantx/topic/market_state", msg => {
           futuMarketState.value = JSON.parse(msg.body);
+        });
+        //订阅资金分布查询
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/capital_distr", msg => {
+          futuCapitalDistribution.value = JSON.parse(msg.body);
+        });
+        //订阅资金流向查询
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/capital_flow", msg => {
+          futuCapitalFlow.value = JSON.parse(msg.body);
+        });
+        //订阅复权因为查询
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/rehabs", msg => {
+          futuRehabs.value = JSON.parse(msg.body);
+        });
+        //订阅交易账户查询
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/accounts", msg => {
+          futuAccounts.value = JSON.parse(msg.body);
         });
       }
     }, err => {
@@ -62,6 +89,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     closeFtStompNotifyConn,
     futuHistoryKQuota,
     futuStompNotifyClientStatus,
-    futuMarketState
+    futuMarketState,
+    futuCapitalDistribution,
+    futuCapitalFlow,
+    futuRehabs,
+    futuAccounts
   };
 });

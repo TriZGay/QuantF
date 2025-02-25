@@ -1,31 +1,32 @@
 <script setup lang="ts">
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
-import { watch } from "vue";
+import { onMounted } from "vue";
 import type { Message } from "@/types/message";
-import { ReloadOutlined } from "@ant-design/icons-vue";
+import { useTimeoutFn } from "@vueuse/core";
 
 const {
   sendFtCommandOnNotifyEndPoint
 } = useFutuStomp();
 const {
   futuMarketState,
-  futuHistoryKQuota,
-  futuStompNotifyClientStatus
+  futuHistoryKQuota
 } = storeToRefs(useFutuStomp());
 
-watch(futuStompNotifyClientStatus, (newVal) => {
-  if (newVal) {
-    const command: Message = {
-      type: "MARKET_STATE"
-    };
-    sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
-    const command2: Message = {
-      type: "KL_HISTORY_DETAIL"
-    };
-    sendFtCommandOnNotifyEndPoint(JSON.stringify(command2));
-  }
+const { start: requestOvrContent } = useTimeoutFn(() => {
+  const command: Message = {
+    type: "MARKET_STATE"
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  const command2: Message = {
+    type: "KL_HISTORY_DETAIL"
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(command2));
+}, 1000);
+onMounted(() => {
+  requestOvrContent();
 });
+
 const refreshMaretState = (): void => {
   let command: Message = {
     type: "MARKET_STATE"

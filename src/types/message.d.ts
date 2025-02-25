@@ -2,7 +2,99 @@ export declare interface Message {
   type: "CONNECT" | "MARKET_STATE" | "KL_HISTORY_DETAIL"
     | "REFRESH_SUB" | "SUBSCRIPTION" | "TRADE_DATE" | "KL_HISTORY"
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
-    | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION";
+    | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
+    | "ACCOUNTS";
+}
+
+export interface AccountItem {
+  trdEnv: number;
+  trdEnvStr: string;
+  accID: string;
+  trdMarketAuthList: Array<Number>;
+  accType: number;
+  accTypeStr: string;
+  cardNum: string;
+  securityFirm: number;
+  securityFirmStr: string;
+  simAccType: number;
+  simAccTypeStr: string;
+  uniCardNum: string;
+  accStatus: number;
+  accStatusStr: string;
+}
+
+export interface AccountsCommand extends Message {
+  accounts?: Array<AccountItem>;
+}
+
+export interface SnapshotCommand extends Message {
+  securities: Array<PlateItem>;
+}
+
+export interface RehabsContent {
+  time: string,
+  companyActFlag: number,
+  fwdFactorA: number,
+  fwdFactorB: number,
+  bwdFactorA: number,
+  bwdFactorB: number,
+  splitBase: number,
+  splitErt: number,
+  joinBase: number,
+  joinErt: number,
+  bonusBase: number,
+  bonusErt: number,
+  transferBase: number,
+  transferErt: number,
+  allotBase: number,
+  allotErt: number,
+  allotPrice: number,
+  addBase: number,
+  addErt: number,
+  addPrice: number,
+  dividend: number,
+  spDividend: number,
+}
+
+export interface RehabsCommand extends Message {
+  security: PlateItem,
+  rehabs?: Array<RehabsContent>
+}
+
+export interface CapitalFlowContend {
+  inFlow: number,
+  mainInFlow: number,
+  superInFlow: number,
+  bigInFlow: number,
+  midInFlow: number
+  smlInFlow: number
+  time: string
+}
+
+export interface CapitalFlowCommand extends Message {
+  security: PlateItem,
+  periodType?: number,
+  beginTime?: string,
+  endTime?: string,
+  lastValidTime?: string,
+  contentList?: Array<CapitalFlowContend>
+}
+
+export interface CapitalDistributionContent {
+  capitalInSuper: number,
+  capitalInBig: number,
+  capitalInMid: number,
+  capitalInSmall: number,
+  capitalOutSuper: number,
+  capitalOutBig: number,
+  capitalOutMid: number,
+  capitalOutSmall: number,
+  updateTime: string
+}
+
+export interface CapitalDistributionCommand extends Message {
+  security: PlateItem,
+  content?: CapitalDistributionContent
 }
 
 export interface StockOwnerPlatesCommand extends Message {
