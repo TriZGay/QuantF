@@ -3,7 +3,49 @@ export declare interface Message {
     | "REFRESH_SUB" | "SUBSCRIPTION" | "TRADE_DATE" | "KL_HISTORY"
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
-    | "ACCOUNTS";
+    | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION";
+}
+
+export interface PositionMessageContent {
+  positionID: string,
+  positionSide: number,
+  code: string
+  name: string,
+  qty: number,
+  canSellQty: number,
+  price: number,
+  costPrice: number,
+  val: number,
+  plVal: number,
+  plRatio: number,
+  secMarket: number,
+  td_plVal: number,
+  td_trdVal: number,
+  td_buyVal: number,
+  td_buyQty: number,
+  td_sellVal: number,
+  td_sellQty: number,
+  unrealizedPL: number,
+  realizedPL: number,
+  currency: number,
+  trdMarket: number,
+}
+
+export interface AccPositionCommand extends Message {
+  accId: string,
+  tradeEnv: number,
+  tradeMarket: number
+  positions?: Array<PositionMessageContent>
+}
+
+export interface AccSubItem {
+  accId: string;
+  cardNum: string;
+  uniCardNum: string;
+}
+
+export interface AccSubCommand extends Message {
+  accSubscribeItems: Array<AccSubItem>;
 }
 
 export interface AccountItem {
@@ -11,6 +53,7 @@ export interface AccountItem {
   trdEnvStr: string;
   accID: string;
   trdMarketAuthList: Array<Number>;
+  trdMarketAuthStrList: Array<string>;
   accType: number;
   accTypeStr: string;
   cardNum: string;

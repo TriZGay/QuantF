@@ -4,6 +4,7 @@ import Stomp, { Client } from "stompjs";
 import { notification } from "ant-design-vue";
 import type {
   AccountsCommand,
+  AccPositionCommand,
   CapitalDistributionCommand,
   CapitalFlowCommand,
   FutuHistoryKQuota,
@@ -20,6 +21,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuCapitalFlow = ref<CapitalFlowCommand>();
   const futuRehabs = ref<RehabsCommand>();
   const futuAccounts = ref<AccountsCommand>();
+  const futuAccPositions = ref<AccPositionCommand>();
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
@@ -57,6 +59,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         futuStompNotifyClient.value?.subscribe("/quantx/topic/accounts", msg => {
           futuAccounts.value = JSON.parse(msg.body);
         });
+        //查询账户持仓
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/positions", msg => {
+          futuAccPositions.value = JSON.parse(msg.body);
+        });
       }
     }, err => {
       futuStompNotifyClientStatus.value = false;
@@ -93,6 +99,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuCapitalDistribution,
     futuCapitalFlow,
     futuRehabs,
-    futuAccounts
+    futuAccounts,
+    futuAccPositions
   };
 });
