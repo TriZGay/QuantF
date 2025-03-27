@@ -2,7 +2,7 @@
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
-import type { Message } from "@/types/message";
+import type { ConnectCommand, Message } from "@/types/message";
 import { useTimeoutFn } from "@vueuse/core";
 
 const {
@@ -39,7 +39,20 @@ const refreshHistoryKQuote = (): void => {
   };
   sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
 };
-
+const connectFutuD = (): void => {
+  let command: ConnectCommand = {
+    type: "CONNECT",
+    isConnect: true
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+};
+const disconnectFutuD = (): void => {
+  let command: ConnectCommand = {
+    type: "CONNECT",
+    isConnect: false
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+};
 </script>
 
 <template>
@@ -91,6 +104,18 @@ const refreshHistoryKQuote = (): void => {
           </a-button>
           <a-button type="primary" @click="refreshHistoryKQuote">
             刷新历史K额度
+            <template #icon>
+              <ReloadOutlined />
+            </template>
+          </a-button>
+          <a-button type="primary" @click="connectFutuD">
+            连接FutuD
+            <template #icon>
+              <ReloadOutlined />
+            </template>
+          </a-button>
+          <a-button type="primary" @click="disconnectFutuD">
+            断开FutuD
             <template #icon>
               <ReloadOutlined />
             </template>

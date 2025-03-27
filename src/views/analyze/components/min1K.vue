@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import SearchArea from "@/components/SearchArea/SearchArea.vue";
 import { storeToRefs } from "pinia";
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
@@ -479,8 +479,10 @@ function onFinish(values: any) {
   });
 }
 
-fetchCodes({
-  granularity: 1
+onMounted(() => {
+  fetchCodes({
+    granularity: 1
+  });
 });
 </script>
 <template>

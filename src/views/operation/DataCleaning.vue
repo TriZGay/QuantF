@@ -726,7 +726,7 @@ onMounted(() => {
       <template #icon>
         <PlusOutlined />
       </template>
-      K线->MACD[k_arc->macd_arc]
+      EMA线->MACD[ema_arc->macd_arc]
     </a-button>
     <a-modal v-model:visible="showModalTransMacd" title="新建定时任务" @ok="handleKArc2MacdOk">
       <a-form :ref="taskMacdForm" :model="k2MacdTaskModel" layout="vertical" name="taskFormInModal">
