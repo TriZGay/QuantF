@@ -170,6 +170,18 @@ export interface MacdResponse {
   updateTime: string
 }
 
+export interface BackTestRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface BackTestResponse {
+
+}
+
 //查询macd数据
 export function fetchMacdData(macdReq: MacdRequest) {
   return request.post<MacdResponse[]>("/ana/macd/macd12269", macdReq);
@@ -228,5 +240,10 @@ export function fetchKLineData(kLineRequest: KLineRequest) {
 //查询不同粒度的ma线数据
 export function fetchMaData(maRequest: MaRequest) {
   return request.post<MaData[]>("/ana/ma/n", maRequest);
+}
+
+//回测
+export function fetchBackTest(backTestRequest: BackTestRequest) {
+  return request.post<BackTestResponse>("/ana/backtest/add", backTestRequest);
 }
 

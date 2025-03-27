@@ -47,12 +47,7 @@ function onFinish(values: any) {
         <a-col v-show="expand || index <= 6" :span="8">
           <a-form-item :name="key" :label="value.name">
             <template v-if="value.type === 'select'">
-              <a-select v-model:value="value.bindValue">
-                <a-select-option v-for="(option, index) in Object.keys(value.kv) " :value="option"
-                                 :key="index">
-                  {{ value.kv[option] }}
-                </a-select-option>
-              </a-select>
+              <a-select v-model:value="value.bindValue" :options="value.selectOptions"/>
             </template>
             <template v-if="value.type === 'input'">
               <a-input v-model:value="value.bindValue" placeholder="请输入名称" allow-clear/>

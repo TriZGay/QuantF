@@ -13,6 +13,7 @@ import { useAnalyzeBoll } from "@/stores/ana-boll";
 import { useAnalyzeEma } from "@/stores/ana-ema";
 import type { AxiosResponse } from "axios";
 import { useAnalyzeMacd } from "@/stores/ana-macd";
+import type { SelectProps } from "ant-design-vue";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -35,19 +36,22 @@ const fetchEmaData = analyzeEmaStores.requestEma;
 const analyzeMacdStores = useAnalyzeMacd();
 const fetchMacdData = analyzeMacdStores.requestMacdData;
 
-const metaCodeMap = computed(() => {
-  let map = {};
+const metaCodeSelectOptions = computed(() => {
+  let options: Array<SelectProps["options"]> = [];
   metaCodes.value.forEach((item) => {
-    map[item.code] = item.market + "+" + item.code;
+    options.push({
+      label: item.market + "+" + item.code,
+      value: item.code
+    });
   });
-  return map;
+  return options;
 });
 
 const formState = reactive({
   code: {
     name: "标的物代码",
     type: "select",
-    kv: metaCodeMap,
+    selectOptions: metaCodeSelectOptions,
     bindValue: ""
   },
   rehabType: {
