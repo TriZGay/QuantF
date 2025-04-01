@@ -174,12 +174,30 @@ export interface BackTestRequest {
   code: string,
   rehabType: number,
   granularity: number,
+  initialCapital: number,
+  commission: number,
   start: string,
   end: string
 }
 
 export interface BackTestResponse {
+  prices: Array<KLine>,
+  tradeSignals: Array<BackTestTradeSignal>;
+  backTestOvr: BackTestOvr;
+}
 
+export interface BackTestTradeSignal {
+  datetime: string;
+  action: "BUY" | "SELL" | "NONE";
+  price: number;
+  quantity: number;
+}
+
+export interface BackTestOvr {
+  finalValue: number;
+  totalProfit: number;
+  initialCapital: number;
+  commission: number;
 }
 
 //查询macd数据

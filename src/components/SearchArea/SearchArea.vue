@@ -47,10 +47,10 @@ function onFinish(values: any) {
         <a-col v-show="expand || index <= 6" :span="8">
           <a-form-item :name="key" :label="value.name">
             <template v-if="value.type === 'select'">
-              <a-select v-model:value="value.bindValue" :options="value.selectOptions"/>
+              <a-select v-model:value="value.bindValue" :options="value.selectOptions" />
             </template>
             <template v-if="value.type === 'input'">
-              <a-input v-model:value="value.bindValue" placeholder="请输入名称" allow-clear/>
+              <a-input v-model:value="value.bindValue" placeholder="请输入名称" allow-clear />
             </template>
             <template v-if="value.type === 'datetime-range'">
               <a-range-picker v-model:value="value.bindValue"
@@ -62,6 +62,12 @@ function onFinish(values: any) {
             </template>
             <template v-if="value.type==='checkbox-group'">
               <a-checkbox-group v-model:value="value.bindValue" :options="value.checkboxOptions" />
+            </template>
+            <template v-if="value.type==='input-number'">
+              <a-input-number v-model:value="value.bindValue"
+                              :step="value.step"
+                              :precision="value.precision"
+                              :formatter="value.formatter" />
             </template>
           </a-form-item>
         </a-col>

@@ -4,12 +4,14 @@ import { fetchBackTest } from "@/api/analyze";
 
 export const useAnalyzeStrategy = defineStore("ana-strategy", () => {
   const {
-    run: addBackTest
+    loading: backTestLoading,
+    runAsync: addBackTest
   } = useRequest(fetchBackTest, {
     manual: true
   });
 
   return {
+    backTestLoading,
     addBackTest
   };
 });
