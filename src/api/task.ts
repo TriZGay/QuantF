@@ -3,7 +3,8 @@ import request from "@/utils/request";
 export interface TaskRequest {
   jobName: string,
   jobType: "KLINE_RAW_TO_ARC" | "KLINE_REPEAT_CHECK" | "KLINE_ARC_TO_MA"
-    | "KLINE_ARC_TO_BOLL" | "KLINE_ARC_TO_EMA" | "KLINE_ARC_TO_MACD",
+    | "KLINE_ARC_TO_BOLL" | "KLINE_ARC_TO_EMA" | "KLINE_ARC_TO_MACD"
+    | "KLINE_ARC_TO_RSI",
   jobGroup?: string,
   triggerName?: string,
   triggerGroup?: string,
@@ -60,6 +61,13 @@ export interface AddKLineTransToEmaTaskRequest extends TaskRequest {
 }
 
 export interface AddKLineTransToMacdTaskRequest extends TaskRequest {
+  toTableName: string,
+  fromTableName: string,
+  startDateTime: string,
+  endDateTime: string,
+}
+
+export interface AddKLineTransToRsiTaskRequest extends TaskRequest {
   toTableName: string,
   fromTableName: string,
   startDateTime: string,

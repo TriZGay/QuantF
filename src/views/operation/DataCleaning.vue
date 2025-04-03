@@ -9,8 +9,12 @@ import type { ColumnProps } from "ant-design-vue/es/table";
 import Cron from "@/components/CronPicker/Cron.vue";
 import type {
   AddKLineRaw2ArcTaskRequest,
-  AddKLineRepeatCheckTaskRequest, AddKLineTransToBollTaskRequest,
-  AddKLineTransToMaTaskRequest, AddKLineTransToEmaTaskRequest, AddKLineTransToMacdTaskRequest
+  AddKLineRepeatCheckTaskRequest,
+  AddKLineTransToBollTaskRequest,
+  AddKLineTransToMaTaskRequest,
+  AddKLineTransToEmaTaskRequest,
+  AddKLineTransToMacdTaskRequest,
+  AddKLineTransToRsiTaskRequest
 } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
 
@@ -168,6 +172,17 @@ const kLineArcTablesOptions = computed(() => {
 const macdTablesOptions = computed(() => {
   return metaTables.value.filter((tableName: string) => {
     return tableName.includes("macd") && tableName.includes("arc");
+  }).map((filter: string) => {
+    return {
+      label: filter,
+      value: filter
+    };
+  });
+});
+
+const rsiTablesOptions = computed(() => {
+  return metaTables.value.filter((tableName: string) => {
+    return tableName.includes("rsi");
   }).map((filter: string) => {
     return {
       label: filter,
@@ -419,6 +434,29 @@ const handleKArc2MacdOk = (): void => {
     message.error(err.response.data.toString());
   });
 };
+
+const showModalTransRsi = ref<boolean>(false);
+const taskRsiForm = ref<FormInstance>();
+const k2RsiTaskModel = ref<AddKLineTransToRsiTaskRequest>({
+  jobName: "",
+  jobType: "KLINE_ARC_TO_RSI",
+  fromTableName: "",
+  toTableName: "",
+  startDateTime: "",
+  endDateTime: ""
+});
+const handleKArc2RsiOk = (): void => {
+  fetchAddTask(k2RsiTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+
 onMounted(() => {
   fetchDbInfos();
   fetchTables();
@@ -477,12 +515,7 @@ onMounted(() => {
       <a-typography-title :level="5">重复数据</a-typography-title>
       <a-table :data-source="dataQaDetails.repeatDetails" :columns="dataQaRepeatDetails" size="small" />
     </a-modal>
-    <a-button type="primary" shape="round" size="small" @click="showModal=true">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      K线[raw->arc]
-    </a-button>
+    <!--    modal-->
     <a-modal v-model:visible="showModal" title="新建定时任务" @ok="handleKLineRaw2ArcOk">
       <a-form :ref="taskForm" :model="kLineRaw2ArcTaskModel" layout="vertical" name="taskFormInModal">
         <a-form-item name="jobName" label="任务名称">
@@ -527,12 +560,6 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-button type="primary" shape="round" size="small" @click="showModalRepeat=true">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      K线重复数据检查[arc]
-    </a-button>
     <a-modal v-model:visible="showModalRepeat" title="新建定时任务" @ok="handleKLineRepeatOk">
       <a-form :ref="taskKLineRepeatForm" :model="kLineRepeatTaskModel" layout="vertical" name="taskFormInModal">
         <a-form-item name="jobName" label="任务名称">
@@ -572,12 +599,6 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-button type="primary" shape="round" size="small" @click="showModalTransMa=true">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      K线->MA[arc->ma_arc]
-    </a-button>
     <a-modal v-model:visible="showModalTransMa" title="新建定时任务" @ok="handleKLineArc2MaOk">
       <a-form :ref="taskMaForm" :model="kLine2MaTaskModel" layout="vertical" name="taskFormInModal">
         <a-form-item name="jobName" label="任务名称">
@@ -622,12 +643,6 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-button type="primary" shape="round" size="small" @click="showModalTransBoll=true">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      K线->BOLL[arc->boll_arc]
-    </a-button>
     <a-modal v-model:visible="showModalTransBoll" title="新建定时任务" @ok="handleKLineArc2BollOk">
       <a-form :ref="taskBollForm" :model="kLine2BollTaskModel" layout="vertical" name="taskFormInModal">
         <a-form-item name="jobName" label="任务名称">
@@ -672,12 +687,6 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-button type="primary" shape="round" size="small" @click="showModalTransEMA=true">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      K线->EMA[k_arc->ema_arc]
-    </a-button>
     <a-modal v-model:visible="showModalTransEMA" title="新建定时任务" @ok="handleKArc2EmaOk">
       <a-form :ref="taskEMAForm" :model="k2EMATaskModel" layout="vertical" name="taskFormInModal">
         <a-form-item name="jobName" label="任务名称">
@@ -722,12 +731,6 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-button type="primary" shape="round" size="small" @click="showModalTransMacd=true">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      EMA线->MACD[ema_arc->macd_arc]
-    </a-button>
     <a-modal v-model:visible="showModalTransMacd" title="新建定时任务" @ok="handleKArc2MacdOk">
       <a-form :ref="taskMacdForm" :model="k2MacdTaskModel" layout="vertical" name="taskFormInModal">
         <a-form-item name="jobName" label="任务名称">
@@ -772,6 +775,98 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
+    <a-modal v-model:visible="showModalTransRsi" title="新建定时任务" @ok="handleKArc2RsiOk">
+      <a-form :ref="taskRsiForm" :model="k2RsiTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="k2RsiTaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="fromTable" label="源表">
+          <a-select v-model:value="k2RsiTaskModel.fromTableName" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="toTable" label="目的表">
+          <a-select v-model:value="k2RsiTaskModel.toTableName" :options="rsiTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker :show-time="{defaultValue:dayjs('09:30:00','HH:mm:ss')}"
+                         v-model:value="k2RsiTaskModel.startDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+          -
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
+                         v-model:value="k2RsiTaskModel.endDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="k2RsiTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="k2RsiTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <!--    -->
+    <!--    button-->
+    <a-space wrap style="margin-bottom: 8px">
+      <a-button type="primary" shape="round" size="small" @click="showModal=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线[raw->arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalRepeat=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线重复数据检查[arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransMa=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线->MA[arc->ma_arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransBoll=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线->BOLL[arc->boll_arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransEMA=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线->EMA[k_arc->ema_arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransMacd=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        EMA线->MACD[ema_arc->macd_arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransRsi=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线->RSI[k_arc->rsi_arc]
+      </a-button>
+    </a-space>
+    <!--    -->
+
     <a-table :data-source="tasks" :columns="tasksColumns"
              :loading="taskLoading"
              size="small">
