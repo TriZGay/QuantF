@@ -6,7 +6,7 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
 import dayjs from "dayjs";
-import type { BollResponse, EMaData, KLine, MacdResponse, MaData } from "@/api/analyze";
+import type { BollResponse, EMaData, KLine, MacdResponse, MaData, RsiResponse } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
 import { rehabTypeToRadioOptions } from "@/api/code";
 import { useAnalyzeBoll } from "@/stores/ana-boll";
@@ -14,6 +14,7 @@ import { useAnalyzeEma } from "@/stores/ana-ema";
 import type { AxiosResponse } from "axios";
 import { useAnalyzeMacd } from "@/stores/ana-macd";
 import type { SelectProps } from "ant-design-vue";
+import { useAnalyzeIndies } from "@/stores/ana-indies";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -28,13 +29,16 @@ const analyzeMaStores = useAnalyzeMa();
 const fetchMaLine = analyzeMaStores.requestMaData;
 
 const analyzeBollStores = useAnalyzeBoll();
-const fetchBolls = analyzeBollStores.requestBoll2002;
+const fetchBolls = analyzeBollStores.requestBoll202;
 
 const analyzeEmaStores = useAnalyzeEma();
 const fetchEmaData = analyzeEmaStores.requestEma;
 
 const analyzeMacdStores = useAnalyzeMacd();
 const fetchMacdData = analyzeMacdStores.requestMacdData;
+
+const analyzeIndiesStores = useAnalyzeIndies();
+const fetchRsiData = analyzeIndiesStores.requestRsiData;
 
 const metaCodeSelectOptions = computed(() => {
   let options: Array<SelectProps["options"]> = [];
@@ -76,16 +80,17 @@ const formState = reactive({
     checkboxOptions: [
       { label: "K", value: "k" },
       { label: "MA(5/10/20/30/60/120)", value: "ma" },
-      { label: "BOLL(20,0.2)", value: "boll" },
+      { label: "BOLL(20,2.0)", value: "boll" },
       { label: "EMA(5/10/20/60/120)", value: "ema" },
-      { label: "MACD(12,26,9)", value: "macd" }
+      { label: "MACD(12,26,9)", value: "macd" },
+      { label: "RSI(6,12,24)", value: "rsi" }
     ]
   }
 });
 
 function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
                         bollLines: BollResponse[], emaLines: EMaData[],
-                        macdLines: MacdResponse[]) {
+                        macdLines: MacdResponse[], rsiLines: RsiResponse[]) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
   let volumes: Array = [];
@@ -399,6 +404,27 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
         xAxisIndex: 2,
         yAxisIndex: 2,
         data: macdLines.map(macd => macd.macd)
+      },
+      {
+        name: "RSI6",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: rsiLines.map(rsi => rsi.rsi6)
+      },
+      {
+        name: "RSI12",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: rsiLines.map(rsi => rsi.rsi12)
+      },
+      {
+        name: "RSI24",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: rsiLines.map(rsi => rsi.rsi24)
       }
     ]
   };
@@ -451,6 +477,15 @@ function onFinish(values: any) {
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     }));
   }
+  if (values.indies.includes("rsi")) {
+    fetchMethods.push(fetchRsiData({
+      rehabType: values.rehabType,
+      granularity: 1,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }));
+  }
   Promise.all(fetchMethods).then(allPromises => {
     if (isAll200(allPromises)) {
       let kLines: KLine[] = [];
@@ -464,7 +499,7 @@ function onFinish(values: any) {
         maLines = allPromises[maPromiseIndex].data;
       }
       let bollLines: BollResponse[] = [];
-      let bollPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/boll/boll2002");
+      let bollPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/boll/boll202");
       if (bollPromiseIndex != -1) {
         bollLines = allPromises[bollPromiseIndex].data;
       }
@@ -478,7 +513,12 @@ function onFinish(values: any) {
       if (macdPromiseIndex != -1) {
         macdLines = allPromises[macdPromiseIndex].data;
       }
-      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines);
+      let rsiLines: RsiResponse[] = [];
+      let rsiPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/rsi/rsi61224");
+      if (rsiPromiseIndex != -1) {
+        rsiLines = allPromises[rsiPromiseIndex].data;
+      }
+      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines, rsiLines);
     }
   });
 }

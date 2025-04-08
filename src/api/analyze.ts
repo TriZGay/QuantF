@@ -200,7 +200,30 @@ export interface BackTestOvr {
   commission: number;
 }
 
-//查询macd数据
+export interface RsiRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface RsiResponse {
+  market: number,
+  code: string,
+  rehabType: number,
+  rsi6: number,
+  rsi12: number,
+  rsi24: number,
+  updateTime: string
+}
+
+//查询rsi数据 RSI(6,12,24)
+export function fetchRsiData(rsiReq: RsiRequest) {
+  return request.post<RsiResponse[]>("/ana/rsi/rsi61224", rsiReq);
+}
+
+//查询macd数据 MACD(12,26,9)
 export function fetchMacdData(macdReq: MacdRequest) {
   return request.post<MacdResponse[]>("/ana/macd/macd12269", macdReq);
 }
@@ -210,9 +233,9 @@ export function fetchEMAData(emaReq: EMaRequest) {
   return request.post<EMaData[]>("/ana/ema/n", emaReq);
 }
 
-//查询boll通道
-export function fetchBoll2002(bollReq: BollRequest) {
-  return request.post<BollResponse[]>("/ana/boll/boll2002", bollReq);
+//查询boll通道 BOLL(20,2)
+export function fetchBoll202(bollReq: BollRequest) {
+  return request.post<BollResponse[]>("/ana/boll/boll202", bollReq);
 }
 
 //查询某一日的数据质量细节如是否重复

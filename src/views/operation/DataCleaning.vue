@@ -858,7 +858,7 @@ onMounted(() => {
         </template>
         EMA线->MACD[ema_arc->macd_arc]
       </a-button>
-      <a-button type="primary" shape="round" size="small" @click="showModalTransRsi=true">
+      <a-button type="primary" danger shape="round" size="small" @click="showModalTransRsi=true">
         <template #icon>
           <PlusOutlined />
         </template>

@@ -1,14 +1,14 @@
 import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
-import { fetchBoll2002 } from "@/api/analyze";
+import { fetchBoll202 } from "@/api/analyze";
 
 export const useAnalyzeBoll = defineStore("ana-boll", () => {
   const {
-    runAsync: requestBoll2002
-  } = useRequest(fetchBoll2002, {
+    runAsync: requestBoll202
+  } = useRequest(fetchBoll202, {
     manual: true
   });
   return {
-    requestBoll2002
+    requestBoll202
   };
 });
