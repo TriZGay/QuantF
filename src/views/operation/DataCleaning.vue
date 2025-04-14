@@ -14,7 +14,7 @@ import type {
   AddKLineTransToMaTaskRequest,
   AddKLineTransToEmaTaskRequest,
   AddKLineTransToMacdTaskRequest,
-  AddKLineTransToRsiTaskRequest
+  AddKLineTransToRsiTaskRequest, AddKLineTransToKdjTaskRequest
 } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
 
@@ -168,7 +168,16 @@ const kLineArcTablesOptions = computed(() => {
     };
   });
 });
-
+const kdjTablesOptions = computed(() => {
+  return metaTables.value.filter((tableName: string) => {
+    return tableName.includes("kdj");
+  }).map((filter: string) => {
+    return {
+      label: filter,
+      value: filter
+    };
+  });
+});
 const macdTablesOptions = computed(() => {
   return metaTables.value.filter((tableName: string) => {
     return tableName.includes("macd") && tableName.includes("arc");
@@ -447,6 +456,28 @@ const k2RsiTaskModel = ref<AddKLineTransToRsiTaskRequest>({
 });
 const handleKArc2RsiOk = (): void => {
   fetchAddTask(k2RsiTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+
+const showModalTransKdj = ref<boolean>(false);
+const taskKdjForm = ref<FormInstance>();
+const k2KdjTaskModel = ref<AddKLineTransToKdjTaskRequest>({
+  jobName: "",
+  jobType: "KLINE_ARC_TO_KDJ",
+  fromTableName: "",
+  toTableName: "",
+  startDateTime: "",
+  endDateTime: ""
+});
+const handleKArc2KdjOk = (): void => {
+  fetchAddTask(k2KdjTaskModel.value)
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
@@ -819,6 +850,50 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
+    <a-modal v-model:visible="showModalTransKdj" title="新建定时任务" @ok="handleKArc2KdjOk">
+      <a-form :ref="taskKdjForm" :model="k2KdjTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="k2KdjTaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="fromTable" label="源表">
+          <a-select v-model:value="k2KdjTaskModel.fromTableName" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="toTable" label="目的表">
+          <a-select v-model:value="k2KdjTaskModel.toTableName" :options="kdjTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker :show-time="{defaultValue:dayjs('09:30:00','HH:mm:ss')}"
+                         v-model:value="k2KdjTaskModel.startDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+          -
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
+                         v-model:value="k2KdjTaskModel.endDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="k2KdjTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="k2KdjTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <!--    -->
     <!--    button-->
     <a-space wrap style="margin-bottom: 8px">
@@ -863,6 +938,12 @@ onMounted(() => {
           <PlusOutlined />
         </template>
         K线->RSI[k_arc->rsi_arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransKdj=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线->KDJ[k_arc->kdj_arc]
       </a-button>
     </a-space>
     <!--    -->
