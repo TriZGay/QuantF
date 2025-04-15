@@ -218,6 +218,29 @@ export interface RsiResponse {
   updateTime: string
 }
 
+export interface KdjRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface KdjResponse {
+  market: number,
+  code: string,
+  rehabType: number,
+  k: number,
+  d: number,
+  j: number,
+  updateTime: string
+}
+
+//查询kdj数据 KDJ(9,3,3)
+export function fetchKdjData(kdjReq: KdjRequest) {
+  return request.post<KdjResponse[]>("/ana/kdj/kdj933", kdjReq);
+}
+
 //查询rsi数据 RSI(6,12,24)
 export function fetchRsiData(rsiReq: RsiRequest) {
   return request.post<RsiResponse[]>("/ana/rsi/rsi61224", rsiReq);

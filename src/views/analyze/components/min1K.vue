@@ -6,7 +6,7 @@ import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useAnalyzeMa } from "@/stores/ana-ma";
 import dayjs from "dayjs";
-import type { BollResponse, EMaData, KLine, MacdResponse, MaData, RsiResponse } from "@/api/analyze";
+import type { BollResponse, EMaData, KdjResponse, KLine, MacdResponse, MaData, RsiResponse } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
 import { rehabTypeToRadioOptions } from "@/api/code";
 import { useAnalyzeBoll } from "@/stores/ana-boll";
@@ -39,6 +39,7 @@ const fetchMacdData = analyzeMacdStores.requestMacdData;
 
 const analyzeIndiesStores = useAnalyzeIndies();
 const fetchRsiData = analyzeIndiesStores.requestRsiData;
+const fetchKdjData = analyzeIndiesStores.requestKdjData;
 
 const metaCodeSelectOptions = computed(() => {
   let options: Array<SelectProps["options"]> = [];
@@ -83,14 +84,17 @@ const formState = reactive({
       { label: "BOLL(20,2.0)", value: "boll" },
       { label: "EMA(5/10/20/60/120)", value: "ema" },
       { label: "MACD(12,26,9)", value: "macd" },
-      { label: "RSI(6,12,24)", value: "rsi" }
+      { label: "RSI(6,12,24)", value: "rsi" },
+      { label: "KDJ(9,3,3)", value: "kdj" }
     ]
   }
 });
 
 function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
                         bollLines: BollResponse[], emaLines: EMaData[],
-                        macdLines: MacdResponse[], rsiLines: RsiResponse[]) {
+                        macdLines: MacdResponse[], rsiLines: RsiResponse[],
+                        kdjLines: KdjResponse[]
+) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
   let volumes: Array = [];
@@ -425,6 +429,27 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
         xAxisIndex: 2,
         yAxisIndex: 2,
         data: rsiLines.map(rsi => rsi.rsi24)
+      },
+      {
+        name: "K",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: kdjLines.map(kdj => kdj.k)
+      },
+      {
+        name: "D",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: kdjLines.map(kdj => kdj.d)
+      },
+      {
+        name: "J",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: kdjLines.map(kdj => kdj.j)
       }
     ]
   };
@@ -486,6 +511,15 @@ function onFinish(values: any) {
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     }));
   }
+  if (values.indies.includes("kdj")) {
+    fetchMethods.push(fetchKdjData({
+      rehabType: values.rehabType,
+      granularity: 1,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }));
+  }
   Promise.all(fetchMethods).then(allPromises => {
     if (isAll200(allPromises)) {
       let kLines: KLine[] = [];
@@ -518,7 +552,12 @@ function onFinish(values: any) {
       if (rsiPromiseIndex != -1) {
         rsiLines = allPromises[rsiPromiseIndex].data;
       }
-      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines, rsiLines);
+      let kdjLines: KdjResponse[] = [];
+      let kdjPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/kdj/kdj933");
+      if (kdjPromiseIndex != -1) {
+        kdjLines = allPromises[kdjPromiseIndex].data;
+      }
+      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines, rsiLines, kdjLines);
     }
   });
 }

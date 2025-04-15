@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
-import { fetchBoll202, fetchRsiData } from "@/api/analyze";
+import { fetchBoll202, fetchRsiData, fetchKdjData } from "@/api/analyze";
 
 
 export const useAnalyzeIndies = defineStore("ana-indies", () => {
@@ -9,7 +9,13 @@ export const useAnalyzeIndies = defineStore("ana-indies", () => {
   } = useRequest(fetchRsiData, {
     manual: true
   });
+  const {
+    runAsync: requestKdjData
+  } = useRequest(fetchKdjData, {
+    manual: true
+  });
   return {
-    requestRsiData
+    requestRsiData,
+    requestKdjData
   };
 });
