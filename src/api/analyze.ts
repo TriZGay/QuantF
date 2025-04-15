@@ -257,7 +257,7 @@ export function fetchEMAData(emaReq: EMaRequest) {
 }
 
 //查询boll通道 BOLL(20,2)
-export function fetchBoll202(bollReq: BollRequest) {
+export function fetchBollData(bollReq: BollRequest) {
   return request.post<BollResponse[]>("/ana/boll/boll202", bollReq);
 }
 

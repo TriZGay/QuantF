@@ -1,9 +1,34 @@
 import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
-import { fetchBoll202, fetchRsiData, fetchKdjData } from "@/api/analyze";
-
+import {
+  fetchMaData, fetchEMAData, fetchBollData,
+  fetchRsiData, fetchKdjData, fetchMacdData
+} from "@/api/analyze";
 
 export const useAnalyzeIndies = defineStore("ana-indies", () => {
+  const {
+    runAsync: requestMacdData
+  } = useRequest(fetchMacdData, {
+    manual: true
+  });
+
+  const {
+    runAsync: requestMaData
+  } = useRequest(fetchMaData, {
+    manual: true
+  });
+  const {
+    runAsync: requestEmaData
+  } = useRequest(fetchEMAData, {
+    manual: true
+  });
+
+  const {
+    runAsync: requestBollData
+  } = useRequest(fetchBollData, {
+    manual: true
+  });
+
   const {
     runAsync: requestRsiData
   } = useRequest(fetchRsiData, {
@@ -15,7 +40,11 @@ export const useAnalyzeIndies = defineStore("ana-indies", () => {
     manual: true
   });
   return {
+    requestBollData,
     requestRsiData,
-    requestKdjData
+    requestKdjData,
+    requestEmaData,
+    requestMaData,
+    requestMacdData
   };
 });
