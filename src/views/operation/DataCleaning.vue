@@ -14,7 +14,7 @@ import type {
   AddKLineTransToMaTaskRequest,
   AddKLineTransToEmaTaskRequest,
   AddKLineTransToMacdTaskRequest,
-  AddKLineTransToRsiTaskRequest, AddKLineTransToKdjTaskRequest
+  AddKLineTransToRsiTaskRequest, AddKLineTransToKdjTaskRequest, AddKLineTransToARBRTaskRequest
 } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
 
@@ -181,6 +181,17 @@ const kdjTablesOptions = computed(() => {
 const macdTablesOptions = computed(() => {
   return metaTables.value.filter((tableName: string) => {
     return tableName.includes("macd") && tableName.includes("arc");
+  }).map((filter: string) => {
+    return {
+      label: filter,
+      value: filter
+    };
+  });
+});
+
+const arbrTablesOptions = computed(() => {
+  return metaTables.value.filter((tableName: string) => {
+    return tableName.includes("arbr");
   }).map((filter: string) => {
     return {
       label: filter,
@@ -478,6 +489,28 @@ const k2KdjTaskModel = ref<AddKLineTransToKdjTaskRequest>({
 });
 const handleKArc2KdjOk = (): void => {
   fetchAddTask(k2KdjTaskModel.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+        fetchTasks();
+      }
+    }).catch(err => {
+    message.error(err.response.data.toString());
+  });
+};
+
+const showModalTransArbr = ref<boolean>(false);
+const taskArbrForm = ref<FormInstance>();
+const k2ArbrTaskModel = ref<AddKLineTransToARBRTaskRequest>({
+  jobName: "",
+  jobType: "KLINE_ARC_TO_ARBR",
+  fromTableName: "",
+  toTableName: "",
+  startDateTime: "",
+  endDateTime: ""
+});
+const handleKArc2ArbrOk = (): void => {
+  fetchAddTask(k2ArbrTaskModel.value)
     .then(res => {
       if (res.status === 200) {
         message.success(res.data.toString());
@@ -894,6 +927,50 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
+    <a-modal v-model:visible="showModalTransArbr" title="新建定时任务" @ok="handleKArc2ArbrOk">
+      <a-form :ref="taskArbrForm" :model="k2ArbrTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item name="jobName" label="任务名称">
+          <a-input v-model:value="k2ArbrTaskModel.jobName" />
+        </a-form-item>
+        <a-form-item name="fromTable" label="源表">
+          <a-select v-model:value="k2ArbrTaskModel.fromTableName" :options="kLineArcTablesOptions" />
+        </a-form-item>
+        <a-form-item name="toTable" label="目的表">
+          <a-select v-model:value="k2ArbrTaskModel.toTableName" :options="arbrTablesOptions" />
+        </a-form-item>
+        <a-form-item name="isImmediate" label="是否立即执行">
+          <a-radio-group v-model:value="isImmediate">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item name="updateRange" label="数据时间" v-if="isImmediate===1">
+          <a-date-picker :show-time="{defaultValue:dayjs('09:30:00','HH:mm:ss')}"
+                         v-model:value="k2ArbrTaskModel.startDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+          -
+          <a-date-picker :show-time="{defaultValue:dayjs('16:00:00','HH:mm:ss')}"
+                         v-model:value="k2ArbrTaskModel.endDateTime"
+                         value-format="YYYY-MM-DD HH:mm:ss"
+                         :show-now="false" />
+        </a-form-item>
+        <a-form-item name="cron" label="Cron表达式" v-if="isImmediate===0">
+          <a-input v-model:value="k2ArbrTaskModel.cron">
+            <template #suffix>
+              <a-popover title="表达式生成" trigger="click">
+                <template #content>
+                  <div class="cronWrapper">
+                    <Cron v-model="k2ArbrTaskModel.cron" />
+                  </div>
+                </template>
+                <PlusCircleOutlined style="color: rgba(0, 0, 0, 0.45)" />
+              </a-popover>
+            </template>
+          </a-input>
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <!--    -->
     <!--    button-->
     <a-space wrap style="margin-bottom: 8px">
@@ -944,6 +1021,12 @@ onMounted(() => {
           <PlusOutlined />
         </template>
         K线->KDJ[k_arc->kdj_arc]
+      </a-button>
+      <a-button type="primary" shape="round" size="small" @click="showModalTransArbr=true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        K线->ARBR[k_arc->arbr_arc]
       </a-button>
     </a-space>
     <!--    -->
