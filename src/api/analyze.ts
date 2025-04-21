@@ -236,6 +236,28 @@ export interface KdjResponse {
   updateTime: string
 }
 
+export interface ArbrRequest {
+  code: string,
+  rehabType: number,
+  granularity: number,
+  start: string,
+  end: string
+}
+
+export interface ArbrResponse {
+  market: number,
+  code: string,
+  rehabType: number,
+  ar: number,
+  br: number,
+  updateTime: string
+}
+
+//查询arbr数据 ARBR(26)
+export function fetchArbrData(arbrReq: ArbrRequest) {
+  return request.post<ArbrResponse>("/ana/arbr/arbr26", arbrReq);
+}
+
 //查询kdj数据 KDJ(9,3,3)
 export function fetchKdjData(kdjReq: KdjRequest) {
   return request.post<KdjResponse[]>("/ana/kdj/kdj933", kdjReq);

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
 import {
   fetchMaData, fetchEMAData, fetchBollData,
-  fetchRsiData, fetchKdjData, fetchMacdData
+  fetchRsiData, fetchKdjData, fetchMacdData, fetchArbrData
 } from "@/api/analyze";
 
 export const useAnalyzeIndies = defineStore("ana-indies", () => {
@@ -39,12 +39,20 @@ export const useAnalyzeIndies = defineStore("ana-indies", () => {
   } = useRequest(fetchKdjData, {
     manual: true
   });
+
+  const {
+    runAsync: requestArbrData
+  } = useRequest(fetchArbrData, {
+    manual: true
+  });
+
   return {
     requestBollData,
     requestRsiData,
     requestKdjData,
     requestEmaData,
     requestMaData,
-    requestMacdData
+    requestMacdData,
+    requestArbrData
   };
 });

@@ -5,7 +5,16 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import dayjs from "dayjs";
-import type { BollResponse, EMaData, KdjResponse, KLine, MacdResponse, MaData, RsiResponse } from "@/api/analyze";
+import type {
+  ArbrResponse,
+  BollResponse,
+  EMaData,
+  KdjResponse,
+  KLine,
+  MacdResponse,
+  MaData,
+  RsiResponse
+} from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
 import { klTypeToSelectOptions, rehabTypeToRadioOptions } from "@/api/code";
 import type { AxiosResponse } from "axios";
@@ -28,6 +37,7 @@ const fetchBolls = analyzeIndiesStores.requestBollData;
 const fetchEmaData = analyzeIndiesStores.requestEmaData;
 const fetchMaLine = analyzeIndiesStores.requestMaData;
 const fetchMacdData = analyzeIndiesStores.requestMacdData;
+const fetchArbrData = analyzeIndiesStores.requestArbrData;
 
 const metaCodeSelectOptions = computed(() => {
   let options: Array<SelectProps["options"]> = [];
@@ -79,7 +89,8 @@ const formState = reactive({
       { label: "EMA(5/10/20/60/120)", value: "ema" },
       { label: "MACD(12,26,9)", value: "macd" },
       { label: "RSI(6,12,24)", value: "rsi" },
-      { label: "KDJ(9,3,3)", value: "kdj" }
+      { label: "KDJ(9,3,3)", value: "kdj" },
+      { label: "ARBR(26)", value: "arbr" }
     ]
   }
 });
@@ -87,7 +98,7 @@ const formState = reactive({
 function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
                         bollLines: BollResponse[], emaLines: EMaData[],
                         macdLines: MacdResponse[], rsiLines: RsiResponse[],
-                        kdjLines: KdjResponse[]
+                        kdjLines: KdjResponse[], arbrLines: ArbrResponse[]
 ) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
@@ -444,6 +455,20 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
         xAxisIndex: 2,
         yAxisIndex: 2,
         data: kdjLines.map(kdj => kdj.j)
+      },
+      {
+        name: "AR",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: arbrLines.map(arbr => arbr.ar)
+      },
+      {
+        name: "BR",
+        type: "line",
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        data: arbrLines.map(arbr => arbr.br)
       }
     ]
   };
@@ -514,6 +539,15 @@ function onFinish(values: any) {
       end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
     }));
   }
+  if (values.indies.includes("arbr")) {
+    fetchMethods.push(fetchArbrData({
+      rehabType: values.rehabType,
+      granularity: values.granularity,
+      code: values.code,
+      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
+    }));
+  }
   Promise.all(fetchMethods).then(allPromises => {
     if (isAll200(allPromises)) {
       let kLines: KLine[] = [];
@@ -551,7 +585,12 @@ function onFinish(values: any) {
       if (kdjPromiseIndex != -1) {
         kdjLines = allPromises[kdjPromiseIndex].data;
       }
-      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines, rsiLines, kdjLines);
+      let arbrLines: ArbrResponse[] = [];
+      let arbrPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/arbr/arbr26");
+      if (arbrPromiseIndex != -1) {
+        arbrLines = allPromises[arbrPromiseIndex].data;
+      }
+      drawAnalyzePic(kLines, maLines, bollLines, emaLines, macdLines, rsiLines, kdjLines, arbrLines);
     }
   });
 }
