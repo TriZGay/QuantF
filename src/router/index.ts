@@ -213,14 +213,6 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/Layout.vue"),
     children: [
       {
-        path: "/operation/sync",
-        name: "SyncCenter",
-        meta: {
-          title: "数据同步",
-          icon: "tool-outlined"
-        },
-        component: () => import("@/views/operation/SyncCenter.vue")
-      }, {
         path: "/operation/cleaning",
         name: "DataClean",
         meta: {

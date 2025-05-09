@@ -19,7 +19,7 @@ import { isAll200 } from "@/utils/web";
 import { klTypeToSelectOptions, rehabTypeToRadioOptions } from "@/api/code";
 import type { AxiosResponse } from "axios";
 import type { SelectProps } from "ant-design-vue";
-import { useAnalyzeIndies } from "@/stores/ana-indies";
+import { useAnalyzeIndies } from "@/stores/ana-indicator";
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
