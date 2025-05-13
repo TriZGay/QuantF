@@ -1,9 +1,25 @@
 import { defineStore } from "pinia";
-import { usePagination } from "vue-request";
-import { fetchPlates, fetchStocks, fetchSubscribeDetails, fetchSubscribeInfos } from "@/api/futu";
+import { usePagination, useRequest } from "vue-request";
+import {
+  fetchPlates,
+  fetchStockFilterCodes,
+  fetchStocks,
+  fetchSubscribeDetails,
+  fetchSubscribeInfos
+} from "@/api/futu";
 import { computed } from "vue";
 
 export const useFutuApi = defineStore("futu-api", () => {
+  const {
+    data: stockFilterCodes,
+    run: queryStockFilterCodes
+  } = useRequest(fetchStockFilterCodes, {
+    manual: true
+  });
+  const computedStockFilterCodes = computed(() => {
+    return stockFilterCodes.value?.data || {};
+  });
+
   const {
     loading: subscribeInfoLoading,
     data: subscribeInfo,
@@ -117,7 +133,10 @@ export const useFutuApi = defineStore("futu-api", () => {
     //
     platesLoading,
     queryPlates,
-    plates
+    plates,
+    //
+    computedStockFilterCodes,
+    queryStockFilterCodes
   };
 
 });

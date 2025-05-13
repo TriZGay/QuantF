@@ -82,6 +82,27 @@ export interface PlateQueryRequest extends PaginationRequest {
   type?: number
 }
 
+export interface StockFilterCodes {
+  sortDirs: AntDesignSelectOptions[],
+  klTypes: AntDesignSelectOptions[],
+  relativePositions: AntDesignSelectOptions[],
+  baseFiltersFields: AntDesignSelectOptions[],
+  financialFiltersFields: AntDesignSelectOptions[],
+  financialQuarters: AntDesignSelectOptions[],
+  accumulateFiltersFields: AntDesignSelectOptions[],
+  indicatorFiltersFields: AntDesignSelectOptions[],
+  patternFiltersFields: AntDesignSelectOptions[],
+}
+
+export interface AntDesignSelectOptions {
+  label: string,
+  value: number
+}
+
+export function fetchStockFilterCodes() {
+  return request.get<StockFilterCodes>("/api/base/stockFiltersMeta");
+}
+
 export function fetchSubscribeDetails(data: QuerySubscribeInfo) {
   return request.post<SubscribeDetailsResult>("/api/sub/details", data);
 }

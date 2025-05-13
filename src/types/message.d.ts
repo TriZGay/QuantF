@@ -3,7 +3,7 @@ export declare interface Message {
     | "REFRESH_SUB" | "SUBSCRIPTION" | "TRADE_DATE" | "KL_HISTORY"
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
-    | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION";
+    | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER";
 }
 
 export interface PositionMessageContent {
@@ -46,6 +46,62 @@ export interface AccSubItem {
 
 export interface AccSubCommand extends Message {
   accSubscribeItems: Array<AccSubItem>;
+}
+
+export interface StockFilterCommand extends Message {
+  begin: number;
+  num: number;
+  market: number;
+  plate?: PlateItem;
+  baseFilterList?: Array<BasicFilter>;
+  accumulateFilterList?: Array<AccumulateFilter>;
+  financialFilterList?: Array<FinancialFilter>;
+  patternFilterList?: Array<PatternFilter>;
+  customIndicatorFilterList?: Array<CustomIndicatorFilter>;
+  stockFilterContent?: StockFilterContent;
+}
+
+export interface StockFilterContent {
+  lastPage: boolean;
+  allCount: number;
+  dataList: Array;
+}
+
+export interface CustomIndicatorFilter {
+  //todo 自定义指标
+}
+
+export interface PatternFilter {
+  fieldName: number;
+  klType: number;
+  isNoFilter?: boolean;
+  consecutivePeriod?: number;
+}
+
+export interface FinancialFilter {
+  fieldName: number;
+  filterMin?: number;
+  filterMax?: number;
+  isNoFilter?: boolean;
+  sortDir?: number;
+  quarter: number; //财报累积时间
+}
+
+export interface AccumulateFilter {
+  fieldName: number;
+  filterMin?: number;
+  filterMax?: number;
+  isNoFilter?: boolean;
+  sortDir?: number;
+  days: number; //近几日 累积时间
+}
+
+export interface BasicFilter {
+  fieldName: number;
+  filterMin?: number;
+  filterMax?: number;
+  isNoFilter?: boolean;
+  sortDir?: number;
 }
 
 export interface AccountItem {

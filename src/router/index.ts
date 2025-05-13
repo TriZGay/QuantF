@@ -70,6 +70,15 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/3rd-ft/SubscribePage.vue")
       },
       {
+        path: "/thirdFutu/filter",
+        name: "StockFilterPage",
+        meta: {
+          title: "自选器",
+          icon: "filter-outlined"
+        },
+        component: () => import("@/views/3rd-ft/MyFilter.vue")
+      },
+      {
         path: "/thirdFutu/market",
         name: "MartetPage",
         redirect: "/thirdFutu/market/stockList",
