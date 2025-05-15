@@ -134,7 +134,16 @@ export const MA_TYPE = {
   6: "MA120"
 };
 
-export function stockTypeToCheckBoxOptions(){
+export function stockTypeToSelectOptions() {
+  return Object.keys(FT_SECURITY_TYPE).map(stockType => {
+    return {
+      label: FT_SECURITY_TYPE[stockType],
+      value: stockType
+    };
+  });
+}
+
+export function stockTypeToCheckBoxOptions() {
   return Object.keys(FT_SECURITY_TYPE).map(klType => {
     return {
       label: FT_SECURITY_TYPE[klType],
@@ -157,6 +166,15 @@ export function maTypeToCheckBoxOptions() {
     return {
       label: MA_TYPE[rehabType],
       value: rehabType
+    };
+  });
+}
+
+export function marketTypeToSelectOptions() {
+  return Object.keys(FT_MARKET).map(marketType => {
+    return {
+      label: FT_MARKET[marketType],
+      value: marketType
     };
   });
 }

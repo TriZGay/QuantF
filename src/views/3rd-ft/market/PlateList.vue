@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
-import { FT_MARKET, marketTypeToCheckBoxOptions } from "@/api/code";
+import { marketTypeToCheckBoxOptions, marketTypeToSelectOptions } from "@/api/code";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import type { PlatesCommand, StockInPlateCommand } from "@/types/message";
@@ -87,10 +87,10 @@ const formState = reactive({
     bindValue: ""
   },
   market: {
-    name: "行情市场",
+    name: "市场",
     type: "select",
-    kv: FT_MARKET,
-    bindValue: Object.keys(FT_MARKET)[1]
+    selectOptions: marketTypeToSelectOptions(),
+    bindValue: "1"
   }
 });
 

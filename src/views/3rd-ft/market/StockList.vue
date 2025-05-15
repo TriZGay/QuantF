@@ -6,18 +6,19 @@ import type { TableColumnsType } from "ant-design-vue";
 
 import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
 import {
-  FT_MARKET,
-  FT_SECURITY_TYPE,
   FT_SUB_TYPE,
   klTypeToSelectOptions,
   marketTypeToCheckBoxOptions,
-  stockTypeToCheckBoxOptions
+  marketTypeToSelectOptions,
+  stockTypeToCheckBoxOptions,
+  stockTypeToSelectOptions
 } from "@/api/code";
 import type { Stock } from "@/api/futu";
 import type {
   CapitalDistributionCommand,
   HistoryKLCommand,
-  RehabsCommand, SnapshotCommand,
+  RehabsCommand,
+  SnapshotCommand,
   StockOwnerPlatesCommand,
   StocksCommand,
   SubOrUnSubCommand
@@ -111,24 +112,23 @@ const formState = reactive({
     bindValue: ""
   },
   market: {
-    name: "行情市场",
+    name: "市场",
     type: "select",
-    kv: FT_MARKET,
-    bindValue: Object.keys(FT_MARKET)[1]
+    selectOptions: marketTypeToSelectOptions(),
+    bindValue: "1"
   },
   stockType: {
     name: "标的物类型",
     type: "select",
-    kv: FT_SECURITY_TYPE,
-    bindValue: Object.keys(FT_SECURITY_TYPE)[3]
+    selectOptions: stockTypeToSelectOptions(),
+    bindValue: "3"
   },
   delisting: {
     name: "是否退市",
     type: "select",
-    kv: {
-      1: "是",
-      0: "否"
-    },
+    selectOptions: [
+      { label: "否", value: "0" },
+      { label: "是", value: "1" }],
     bindValue: "0"
   }
 });
