@@ -16,6 +16,7 @@ const { queryStockFilterCodes } = useFutuApi();
 const { computedStockFilterCodes } = storeToRefs(useFutuApi());
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
 const { futuStockFilters } = storeToRefs(useFutuStomp());
+
 onMounted(() => {
   queryStockFilterCodes();
 });
@@ -35,16 +36,20 @@ const columns = ref<TableColumnProps[]>([
     dataIndex: "market"
   },
   {
-    title: "简单属性结果"
+    title: "简单属性结果",
+    dataIndex: "basicResult"
   },
   {
-    title: "累积属性结果"
+    title: "累积属性结果",
+    dataIndex: "accResult"
   },
   {
-    title: "财务属性结果"
+    title: "财务属性结果",
+    dataIndex: "finResult"
   },
   {
-    title: "形态技术指标属性结果"
+    title: "自定义技术指标属性结果",
+    dataIndex: "customIndiesResult"
   },
   {
     title: "操作",
@@ -408,7 +413,7 @@ const sendFilterCommand = () => {
       </a-col>
     </a-row>
     <a-button type="primary" @click="sendFilterCommand">
-      提交(共:{{ futuStockFilters?.stockFilterContent.allCount || 0 }}条)
+      查询(共:{{ futuStockFilters?.stockFilterContent.allCount || 0 }}条)
     </a-button>
     <a-table :data-source="futuStockFilters?.stockFilterContent.dataList"
              :columns="columns"
@@ -418,8 +423,29 @@ const sendFilterCommand = () => {
           {{ record.security.code }}
         </template>
         <template v-if="column.dataIndex === 'market'">
-          {{ record.security.market }}
+          {{ record.security.marketStr }}
         </template>
+        <template v-if="column.dataIndex === 'basicResult'">
+          <template v-for="idx in record.baseDataList">
+            <a-tag v-if="idx.value <=0" color="green">{{ idx.fieldNameStr }} {{ idx.value }}</a-tag>
+            <a-tag v-if="idx.value >0" color="red">{{ idx.fieldNameStr }} {{ idx.value }}</a-tag>
+          </template>
+        </template>
+        <template v-if="column.dataIndex === 'accResult'">
+          <template v-for="idx in record.accumulateDataList">
+            <a-tag v-if="idx.value <=0" color="green">{{ idx.fieldNameStr }} {{ idx.value }} 累积:{{idx.days}}天</a-tag>
+            <a-tag v-if="idx.value >0" color="red">{{ idx.fieldNameStr }} {{ idx.value }} 累积:{{ idx.days}}天</a-tag>
+          </template>
+        </template>
+        <template v-if="column.dataIndex === 'finResult'">
+          <template v-for="idx in record.financialDataList">
+            <a-tag v-if="idx.value <=0" color="green">{{ idx.fieldNameStr }} {{ idx.value }} {{idx.quarterStr}}</a-tag>
+            <a-tag v-if="idx.value >0" color="red">{{ idx.fieldNameStr }} {{ idx.value }} {{ idx.quarterStr}}</a-tag>
+          </template>
+        </template>
+        <!--        <template v-if="column.dataIndex === 'customIndiesResult'">-->
+        <!--          {{ record.security.market }}-->
+        <!--        </template>-->
       </template>
     </a-table>
   </div>
