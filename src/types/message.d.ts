@@ -3,7 +3,65 @@ export declare interface Message {
     | "REFRESH_SUB" | "SUBSCRIPTION" | "TRADE_DATE" | "KL_HISTORY"
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
-    | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER";
+    | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
+    | "ACC_FUNDS";
+}
+
+export interface AccFundsCommand extends Message {
+  accId: string,
+  tradeEnv: number,
+  tradeMarket: number
+  accFundsContent?: AccFundsContent
+}
+
+export interface AccFundsContent {
+  power: number;
+  totalAssets: number;
+  cash: number;
+  marketVal: number;
+  frozenCash: number;
+  debtCash: number;
+  avlWithdrawalCash: number;
+  currency: number;
+  availableFunds: number;
+  unrealizedPL: number;
+  realizedPL: number;
+  riskLevel: number;
+  initialMargin: number;
+  maintenanceMargin: number;
+
+  cashInfoList: Array<AccFundsCashInfo>;
+  maxPowerShort: number;
+  netCashPower: number;
+  longMv: number;
+  shortMv: number;
+  pendingAsset: number;
+  maxWithdrawal: number;
+  riskStatus: number;
+  marginCallMargin: number;
+
+  isPdt: boolean;
+  pdtSeq: string;
+  beginningDTBP: number;
+  remainingDTBP: number;
+  dtCallAmount: number;
+  dtStatus: number;
+  securitiesAssets: number;
+  fundAssets: number;
+  bondAssets: number;
+  marketInfoList: Array<AccFundsMarketInfo>;
+}
+
+export interface AccFundsMarketInfo {
+  trdMarket: number;
+  assets: number;
+}
+
+export interface AccFundsCashInfo {
+  currency: number;
+  cash: number;
+  availableBalance: number;
+  netCashPower: number;
 }
 
 export interface PositionMessageContent {
