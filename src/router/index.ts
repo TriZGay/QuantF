@@ -119,19 +119,19 @@ const routes: RouteRecordRaw[] = [
             path: "/thirdFutu/trade/account",
             name: "AccountPage",
             meta: {
-              title: "账户管理",
+              title: "账户",
               icon: "credit-card-outlined"
             },
             component: () => import("@/views/3rd-ft/trade/AccountPage.vue")
           },
           {
-            path: "/thirdFutu/trade/position",
-            name: "PositionPage",
+            path: "/thirdFutu/trade/order",
+            name: "OrderPage",
             meta: {
-              title: "持仓管理",
+              title: "订单",
               icon: "table-outlined"
             },
-            component: () => import("@/views/3rd-ft/trade/PositionPage.vue")
+            component: () => import("@/views/3rd-ft/trade/OrderList.vue")
           }
         ]
       },

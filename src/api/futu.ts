@@ -71,9 +71,10 @@ export interface PlateResult {
 export interface StockQueryRequest extends PaginationRequest {
   exchangeType?: number,
   delisting?: number,
-  stockType?: number,
+  stockType?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10,
   market?: number,
   name?: string,
+  code?: string
 }
 
 export interface PlateQueryRequest extends PaginationRequest {
@@ -97,6 +98,27 @@ export interface StockFilterCodes {
 export interface AntDesignSelectOptions {
   label: string,
   value: number
+}
+
+export interface TradeMetaCodes {
+  tradeSides: Array<AntDesignSelectOptions>;
+  trailTypes: Array<AntDesignSelectOptions>;
+  timeInForces: Array<AntDesignSelectOptions>;
+  tradeSecMarkets: Array<AntDesignSelectOptions>;
+  orderTypes: Array<AntDesignSelectOptions>;
+  marketTypes: Array<AntDesignSelectOptions>;
+}
+
+export function fetchStockByCode(code: string) {
+  return request.get<Stock>(`/api/base/getStock/${code}`);
+}
+
+export function fetchAllStocks(data: StockQueryRequest) {
+  return request.post<Array<Stock>>("/api/base/allStocks", data);
+}
+
+export function fetchTradeCodes() {
+  return request.get<TradeMetaCodes>("/api/base/tradeMeta");
 }
 
 export function fetchStockFilterCodes() {

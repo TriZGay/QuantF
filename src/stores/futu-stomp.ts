@@ -9,7 +9,7 @@ import type {
   CapitalDistributionCommand,
   CapitalFlowCommand,
   FutuHistoryKQuota,
-  FutuMarketState,
+  FutuMarketState, PlaceOrderCommand,
   RehabsCommand, StockFilterCommand
 } from "@/types/message";
 
@@ -74,6 +74,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         futuStompNotifyClient.value?.subscribe("/quantx/topic/acc_funds", msg => {
           futuAccFunds.value = JSON.parse(msg.body);
         });
+
       }
     }, err => {
       futuStompNotifyClientStatus.value = false;

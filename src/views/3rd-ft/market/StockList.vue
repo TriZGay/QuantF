@@ -106,6 +106,11 @@ function onChangeTable(tableProps: Object) {
 }
 
 const formState = reactive({
+  code: {
+    name: "代码",
+    type: "input",
+    bindValue: ""
+  },
   name: {
     name: "名称",
     type: "input",

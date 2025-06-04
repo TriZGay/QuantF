@@ -4,7 +4,29 @@ export declare interface Message {
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
     | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
-    | "ACC_FUNDS";
+    | "ACC_FUNDS" | "PLACE_ORDER";
+}
+
+export interface PlaceOrderCommand extends Message {
+  accId: string;
+  tradeEnv: number;
+  tradeMarket: number;
+  tradeSide: number;
+  orderType: number;
+  code: string;
+  qty: number;
+
+  price?: number;
+  adjustPrice?: boolean;
+  adjustSideAndLimit?: number;
+  secMarket?: number;
+  remark?: string;
+  timeInForce?: number;
+  fillOutsideRTH?: boolean;
+  auxPrice?: number;
+  trailType?: number;
+  trailValue?: number;
+  trailSpread?: number;
 }
 
 export interface AccFundsCommand extends Message {
@@ -166,7 +188,7 @@ export interface AccountItem {
   trdEnv: number;
   trdEnvStr: string;
   accID: string;
-  trdMarketAuthList: Array<Number>;
+  trdMarketAuthList: Array<number>;
   trdMarketAuthStrList: Array<string>;
   accType: number;
   accTypeStr: string;

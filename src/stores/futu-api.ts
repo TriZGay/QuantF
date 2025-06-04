@@ -1,15 +1,52 @@
 import { defineStore } from "pinia";
 import { usePagination, useRequest } from "vue-request";
 import {
+  fetchAllStocks,
   fetchPlates,
+  fetchStockByCode,
   fetchStockFilterCodes,
   fetchStocks,
   fetchSubscribeDetails,
-  fetchSubscribeInfos
+  fetchSubscribeInfos,
+  fetchTradeCodes
 } from "@/api/futu";
 import { computed } from "vue";
 
 export const useFutuApi = defineStore("futu-api", () => {
+
+  const {
+    data: oneStock,
+    run: queryStockByCode
+  } = useRequest(fetchStockByCode, {
+    manual: true
+  });
+
+  const computedOneStock = computed(() => {
+    return oneStock.value?.data || {};
+  });
+
+  const {
+    data: allStocks,
+    run: queryAllStocks
+  } = useRequest(fetchAllStocks, {
+    manual: true
+  });
+
+  const computedAllStocks = computed(() => {
+    return allStocks.value?.data || [];
+  });
+
+  const {
+    data: tradeCodes,
+    run: queryTradeCodes
+  } = useRequest(fetchTradeCodes, {
+    manual: true
+  });
+
+  const computedTradeCodes = computed(() => {
+    return tradeCodes.value?.data || {};
+  });
+
   const {
     data: stockFilterCodes,
     run: queryStockFilterCodes
@@ -136,7 +173,16 @@ export const useFutuApi = defineStore("futu-api", () => {
     plates,
     //
     computedStockFilterCodes,
-    queryStockFilterCodes
+    queryStockFilterCodes,
+    //
+    computedTradeCodes,
+    queryTradeCodes,
+    //
+    computedOneStock,
+    queryStockByCode,
+    //
+    computedAllStocks,
+    queryAllStocks
   };
 
 });

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useFutuStomp } from "@/stores/futu-stomp";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import type { AccFundsCommand, AccountItem, AccountsCommand, AccPositionCommand, AccSubCommand } from "@/types/message";
-import { useTimeoutFn } from "@vueuse/core";
 import type { TableColumnsType } from "ant-design-vue";
+import { useTimeoutFn } from "@vueuse/core";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
 const {
@@ -27,13 +27,6 @@ onMounted(() => {
 const simulatorAccounts = computed(() => {
   return futuAccounts.value?.accounts?.filter(acc => {
     return acc.simAccType != null;
-  });
-});
-
-const simulatorAccountsLoading = ref();
-watch(simulatorAccounts, (val) => {
-  simulatorAccountsLoading.value = val?.map(acc => {
-    return { loading: false };
   });
 });
 
@@ -164,7 +157,8 @@ const requestAccFunds = (acc: AccountItem, tradeMarket: number, simAccIdx: numbe
         <a-descriptions-item label="证券市值">{{ futuAccFunds?.accFundsContent.marketVal }}</a-descriptions-item>
         <a-descriptions-item label="冻结资金">{{ futuAccFunds?.accFundsContent.frozenCash }}</a-descriptions-item>
         <a-descriptions-item label="计息金额">{{ futuAccFunds?.accFundsContent.debtCash }}</a-descriptions-item>
-        <a-descriptions-item label="现金可提">{{ futuAccFunds?.accFundsContent.avlWithdrawalCash }}</a-descriptions-item>
+        <a-descriptions-item label="现金可提">{{ futuAccFunds?.accFundsContent.avlWithdrawalCash }}
+        </a-descriptions-item>
         <a-descriptions-item label="币种">{{ futuAccFunds?.accFundsContent.currency }}</a-descriptions-item>
         <a-descriptions-item label="可用资金">{{ futuAccFunds?.accFundsContent.availableFunds }}</a-descriptions-item>
         <a-descriptions-item label="未实现盈亏">{{ futuAccFunds?.accFundsContent.unrealizedPL }}</a-descriptions-item>
@@ -310,9 +304,4 @@ const requestAccFunds = (acc: AccountItem, tradeMarket: number, simAccIdx: numbe
   </div>
 </template>
 <style lang="less" scoped>
-.searchResult {
-  margin-top: 16px;
-  border: 1px dashed #e9e9e9;
-  border-radius: 2px;
-}
 </style>
