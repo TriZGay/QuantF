@@ -9,8 +9,9 @@ import type {
   CapitalDistributionCommand,
   CapitalFlowCommand,
   FutuHistoryKQuota,
-  FutuMarketState, PlaceOrderCommand,
-  RehabsCommand, StockFilterCommand
+  FutuMarketState, HistoryOrderCommand,
+  RehabsCommand,
+  StockFilterCommand
 } from "@/types/message";
 
 export const useFutuStomp = defineStore("futu-stomp", () => {
@@ -25,6 +26,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuAccPositions = ref<AccPositionCommand>();
   const futuStockFilters = ref<StockFilterCommand>();
   const futuAccFunds = ref<AccFundsCommand>();
+  const futuHistoryOrders = ref<HistoryOrderCommand>();
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
@@ -74,7 +76,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         futuStompNotifyClient.value?.subscribe("/quantx/topic/acc_funds", msg => {
           futuAccFunds.value = JSON.parse(msg.body);
         });
-
+        //查询历史订单
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/history_orders", msg => {
+          futuHistoryOrders.value = JSON.parse(msg.body);
+        });
       }
     }, err => {
       futuStompNotifyClientStatus.value = false;
@@ -114,6 +119,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuAccounts,
     futuAccPositions,
     futuStockFilters,
-    futuAccFunds
+    futuAccFunds,
+    futuHistoryOrders
   };
 });

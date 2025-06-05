@@ -2,7 +2,7 @@
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
 import { onMounted, ref, watch } from "vue";
-import type { AccountItem, AccountsCommand, PlaceOrderCommand } from "@/types/message";
+import type { AccountItem, AccountsCommand, HistoryOrderCommand, PlaceOrderCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { useDebounceFn, useTimeoutFn } from "@vueuse/core";
 
@@ -65,6 +65,7 @@ const debounceQueryAllStock = useDebounceFn((val: string) => {
 const onSearchStock = (val: string) => {
   debounceQueryAllStock(val);
 };
+
 const onTrade = () => {
   let account: AccountItem = JSON.parse(placeOrderForm.value.account);
   const submitForm: PlaceOrderCommand = {
@@ -78,6 +79,16 @@ const onTrade = () => {
     qty: placeOrderForm.value.qty,
     //todo secMarket目前固定1
     secMarket: 1
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(submitForm));
+};
+const onHistoryOrder = () => {
+  let account: AccountItem = JSON.parse(placeOrderForm.value.account);
+  const submitForm: HistoryOrderCommand = {
+    type: "HISTORY_ORDER",
+    accId: account.accID,
+    tradeEnv: account.trdEnv,
+    tradeMarket: account.trdMarketAuthList[0]
   };
   sendFtCommandOnNotifyEndPoint(JSON.stringify(submitForm));
 };
@@ -123,7 +134,10 @@ const onTrade = () => {
         <a-input-number v-model:value="placeOrderForm.qty" />
       </a-form-item>
       <a-form-item :wrapper-col="{  span: 12,offset:3  }">
-        <a-button type="primary" @click="onTrade">提交</a-button>
+        <a-space>
+          <a-button type="primary" @click="onTrade">提交</a-button>
+          <a-button type="primary" @click="onHistoryOrder">历史订单</a-button>
+        </a-space>
       </a-form-item>
     </a-form>
   </div>

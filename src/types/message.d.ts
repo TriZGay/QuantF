@@ -4,7 +4,53 @@ export declare interface Message {
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
     | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
-    | "ACC_FUNDS" | "PLACE_ORDER";
+    | "ACC_FUNDS" | "PLACE_ORDER" | "HISTORY_ORDER";
+}
+
+export interface HistoryOrderCommand extends Message {
+  accId: string;
+  tradeEnv: number;
+  tradeMarket: number;
+
+  historyOrderContent?: HistoryOrderContent;
+}
+
+export interface HistoryOrderContent {
+  header: CommonTrdHeader;
+  orderList: Array<OrderContent>;
+}
+
+export interface OrderContent {
+  trdSide: number;
+  orderType: number;
+  orderStatus: number;
+  orderID: string;
+  orderIDEx: string;
+  code: string;
+  name: string;
+  qty: number;
+  price: number;
+  createTime: string;
+  updateTime: string;
+  fillQty: number;
+  fillAvgPrice: number;
+  lastErrMsg: string;
+  secMarket: number;
+  createTimestamp: number;
+  updateTimestamp: number;
+  remark: string;
+  auxPrice: number;
+  trailType: number;
+  trailValue: number;
+  trailSpread: number;
+  currency: number;
+  trdMarket: number;
+}
+
+export interface CommonTrdHeader {
+  trdEnv: number;
+  accID: string;
+  trdMarket: number;
 }
 
 export interface PlaceOrderCommand extends Message {
