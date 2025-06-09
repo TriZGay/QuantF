@@ -246,7 +246,7 @@ const orderColumns = ref<TableColumnProps[]>([
       <a-col :span="12">
         <a-typography-title :level="5">未完成订单</a-typography-title>
         <a-table
-          :scroll="{ x: 2600 }"
+          :scroll="{ x: 2600 ,y:300 }"
           :data-source="futuIncompleteOrders?.incompleteOrderContent.orderList"
           :columns="orderColumns"
           size="small">
@@ -255,7 +255,7 @@ const orderColumns = ref<TableColumnProps[]>([
       <a-col :span="12">
         <a-typography-title :level="5">历史订单</a-typography-title>
         <a-table
-          :scroll="{ x: 2600 }"
+          :scroll="{ x: 2600,y:300 }"
           :data-source="futuHistoryOrders?.historyOrderContent.orderList"
           :columns="orderColumns"
           size="small">
