@@ -4,7 +4,20 @@ export declare interface Message {
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
     | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
-    | "ACC_FUNDS" | "PLACE_ORDER" | "HISTORY_ORDER";
+    | "ACC_FUNDS" | "PLACE_ORDER" | "HISTORY_ORDER" | "INCOMPLETE_ORDER";
+}
+
+export interface IncompleteOrderCommand extends Message {
+  accId: string;
+  tradeEnv: number;
+  tradeMarket: number;
+
+  incompleteOrderContent?: IncompleteOrderContent;
+}
+
+export interface IncompleteOrderContent {
+  header: CommonTrdHeader;
+  orderList: Array<OrderContent>;
 }
 
 export interface HistoryOrderCommand extends Message {

@@ -9,7 +9,9 @@ import type {
   CapitalDistributionCommand,
   CapitalFlowCommand,
   FutuHistoryKQuota,
-  FutuMarketState, HistoryOrderCommand,
+  FutuMarketState,
+  HistoryOrderCommand,
+  IncompleteOrderCommand,
   RehabsCommand,
   StockFilterCommand
 } from "@/types/message";
@@ -27,6 +29,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuStockFilters = ref<StockFilterCommand>();
   const futuAccFunds = ref<AccFundsCommand>();
   const futuHistoryOrders = ref<HistoryOrderCommand>();
+  const futuIncompleteOrders = ref<IncompleteOrderCommand>();
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
@@ -80,6 +83,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         futuStompNotifyClient.value?.subscribe("/quantx/topic/history_orders", msg => {
           futuHistoryOrders.value = JSON.parse(msg.body);
         });
+        //查询未完成订单
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/incomplete_orders", msg => {
+          futuIncompleteOrders.value = JSON.parse(msg.body);
+        });
       }
     }, err => {
       futuStompNotifyClientStatus.value = false;
@@ -120,6 +127,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuAccPositions,
     futuStockFilters,
     futuAccFunds,
-    futuHistoryOrders
+    futuHistoryOrders,
+    futuIncompleteOrders
   };
 });
