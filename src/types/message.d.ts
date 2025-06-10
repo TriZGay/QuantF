@@ -4,7 +4,47 @@ export declare interface Message {
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
     | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
-    | "ACC_FUNDS" | "PLACE_ORDER" | "HISTORY_ORDER" | "INCOMPLETE_ORDER";
+    | "ACC_FUNDS" | "PLACE_ORDER" | "HISTORY_ORDER" | "INCOMPLETE_ORDER"
+    | "USER_GROUP" | "USER_SECURITY";
+}
+
+export interface UserGroupCommand extends Message {
+  groupDataList?: Array<GroupData>;
+}
+
+export interface GroupData {
+  groupName: string;
+  groupType: number;
+}
+
+export interface UserSecurityCommand extends Message {
+  groupName: string;
+  stocks?: Array<StockContent>;
+}
+
+export interface StockContent {
+  basic?: BasicInfo;
+  // warrantExData?:
+  // optionExData?:
+  // futureExData?:
+}
+
+export interface BasicInfo {
+  security: CommonSecurity;
+  id: string;
+  lotSize: number;
+  secType: number;
+  name: string;
+  listTime: string;
+  delisting: boolean;
+  listTimestamp: number;
+  exchType: number;
+}
+
+export interface CommonSecurity {
+  market: number;
+  marketStr: string;
+  code: string;
 }
 
 export interface IncompleteOrderCommand extends Message {

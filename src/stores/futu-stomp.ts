@@ -13,7 +13,7 @@ import type {
   HistoryOrderCommand,
   IncompleteOrderCommand,
   RehabsCommand,
-  StockFilterCommand
+  StockFilterCommand, UserGroupCommand, UserSecurityCommand
 } from "@/types/message";
 
 export const useFutuStomp = defineStore("futu-stomp", () => {
@@ -30,6 +30,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuAccFunds = ref<AccFundsCommand>();
   const futuHistoryOrders = ref<HistoryOrderCommand>();
   const futuIncompleteOrders = ref<IncompleteOrderCommand>();
+  const futuUserGroup = ref<UserGroupCommand>();
+  const futuUserSecurity = ref<UserSecurityCommand>();
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
@@ -87,6 +89,14 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         futuStompNotifyClient.value?.subscribe("/quantx/topic/incomplete_orders", msg => {
           futuIncompleteOrders.value = JSON.parse(msg.body);
         });
+        //查询自选股分组
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/user_group", msg => {
+          futuUserGroup.value = JSON.parse(msg.body);
+        });
+        //查询自选股列表
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/user_security", msg => {
+          futuUserSecurity.value = JSON.parse(msg.body);
+        });
       }
     }, err => {
       futuStompNotifyClientStatus.value = false;
@@ -128,6 +138,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuStockFilters,
     futuAccFunds,
     futuHistoryOrders,
-    futuIncompleteOrders
+    futuIncompleteOrders,
+    futuUserGroup,
+    futuUserSecurity
   };
 });

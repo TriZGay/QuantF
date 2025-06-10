@@ -2,7 +2,7 @@
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
-import type { ConnectCommand, Message } from "@/types/message";
+import type { ConnectCommand, GroupData, Message, UserGroupCommand, UserSecurityCommand } from "@/types/message";
 import { useTimeoutFn } from "@vueuse/core";
 
 const {
@@ -10,7 +10,8 @@ const {
 } = useFutuStomp();
 const {
   futuMarketState,
-  futuHistoryKQuota
+  futuHistoryKQuota,
+  futuUserGroup
 } = storeToRefs(useFutuStomp());
 
 const { start: requestOvrContent } = useTimeoutFn(() => {
@@ -22,6 +23,10 @@ const { start: requestOvrContent } = useTimeoutFn(() => {
     type: "KL_HISTORY_DETAIL"
   };
   sendFtCommandOnNotifyEndPoint(JSON.stringify(command2));
+  const userGroupCommand: Message = {
+    type: "USER_GROUP"
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(userGroupCommand));
 }, 1000);
 onMounted(() => {
   requestOvrContent();
@@ -53,10 +58,31 @@ const disconnectFutuD = (): void => {
   };
   sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
 };
+
+const onUserSecurity = (group: GroupData): void => {
+  let { groupName } = group;
+  let userSecurityCommand: UserSecurityCommand = {
+    type: "USER_SECURITY",
+    groupName: groupName
+  };
+  sendFtCommandOnNotifyEndPoint(JSON.stringify(userSecurityCommand));
+};
 </script>
 
 <template>
   <div>
+    <a-typography>
+      <a-typography-title :level="5">自选股分组</a-typography-title>
+      <a-typography-paragraph>
+        <a-list :grid="{gutter:8,column:8}" :data-source="futuUserGroup?.groupDataList">
+          <template #renderItem="{ item }">
+            <a-list-item>
+              <a-card hoverable @click="onUserSecurity(item)">{{ item.groupName }}</a-card>
+            </a-list-item>
+          </template>
+        </a-list>
+      </a-typography-paragraph>
+    </a-typography>
     <a-typography>
       <a-typography-title :level="5">市场状态</a-typography-title>
       <a-typography-paragraph>
