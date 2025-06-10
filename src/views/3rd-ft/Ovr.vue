@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import type { ConnectCommand, GroupData, Message, UserGroupCommand, UserSecurityCommand } from "@/types/message";
 import { useTimeoutFn } from "@vueuse/core";
 
@@ -11,7 +11,8 @@ const {
 const {
   futuMarketState,
   futuHistoryKQuota,
-  futuUserGroup
+  futuUserGroup,
+  futuUserSecurity
 } = storeToRefs(useFutuStomp());
 
 const { start: requestOvrContent } = useTimeoutFn(() => {
@@ -66,7 +67,10 @@ const onUserSecurity = (group: GroupData): void => {
     groupName: groupName
   };
   sendFtCommandOnNotifyEndPoint(JSON.stringify(userSecurityCommand));
+  userSecurityModal.value = true;
 };
+
+const userSecurityModal = ref<boolean>(false);
 </script>
 
 <template>
@@ -81,6 +85,22 @@ const onUserSecurity = (group: GroupData): void => {
             </a-list-item>
           </template>
         </a-list>
+        <a-modal v-model:visible="userSecurityModal" title="自选股列表">
+          <a-list :data-source="futuUserSecurity?.stocks">
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <template #actions>
+                  <a>edit</a>
+                  <a>more</a>
+                </template>
+                <a-list-item-meta :description="item.basic.security.marketStr" >
+                  <template #title>{{item.basic.security.code}}</template>
+                </a-list-item-meta>
+                <div>{{ item.basic.name}}</div>
+              </a-list-item>
+            </template>
+          </a-list>
+        </a-modal>
       </a-typography-paragraph>
     </a-typography>
     <a-typography>
