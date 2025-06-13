@@ -19,15 +19,15 @@ const { start: requestOvrContent } = useTimeoutFn(() => {
   const command: Message = {
     type: "MARKET_STATE"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
   const command2: Message = {
     type: "KL_HISTORY_DETAIL"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command2));
+  sendFtCommandOnNotifyEndPoint(command2);
   const userGroupCommand: Message = {
     type: "USER_GROUP"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(userGroupCommand));
+  sendFtCommandOnNotifyEndPoint(userGroupCommand);
 }, 1000);
 onMounted(() => {
   requestOvrContent();
@@ -37,27 +37,27 @@ const refreshMaretState = (): void => {
   let command: Message = {
     type: "MARKET_STATE"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 const refreshHistoryKQuote = (): void => {
   let command: Message = {
     type: "KL_HISTORY_DETAIL"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 const connectFutuD = (): void => {
   let command: ConnectCommand = {
     type: "CONNECT",
     isConnect: true
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 const disconnectFutuD = (): void => {
   let command: ConnectCommand = {
     type: "CONNECT",
     isConnect: false
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 
 const onUserSecurity = (group: GroupData): void => {
@@ -66,7 +66,7 @@ const onUserSecurity = (group: GroupData): void => {
     type: "USER_SECURITY",
     groupName: groupName
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(userSecurityCommand));
+  sendFtCommandOnNotifyEndPoint(userSecurityCommand);
   userSecurityModal.value = true;
 };
 
@@ -93,10 +93,10 @@ const userSecurityModal = ref<boolean>(false);
                   <a>edit</a>
                   <a>more</a>
                 </template>
-                <a-list-item-meta :description="item.basic.security.marketStr" >
-                  <template #title>{{item.basic.security.code}}</template>
+                <a-list-item-meta :description="item.basic.security.marketStr">
+                  <template #title>{{ item.basic.security.code }}</template>
                 </a-list-item-meta>
-                <div>{{ item.basic.name}}</div>
+                <div>{{ item.basic.name }}</div>
               </a-list-item>
             </template>
           </a-list>

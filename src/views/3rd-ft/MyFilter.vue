@@ -156,7 +156,7 @@ const sendFilterCommand = () => {
     patternFilterList: patternFilterForm.patternFilters
     // customIndicatorFilterList?: Array<CustomIndicatorFilter>;
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 </script>
 

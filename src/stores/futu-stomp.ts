@@ -12,8 +12,11 @@ import type {
   FutuMarketState,
   HistoryOrderCommand,
   IncompleteOrderCommand,
+  Message,
   RehabsCommand,
-  StockFilterCommand, UserGroupCommand, UserSecurityCommand
+  StockFilterCommand,
+  UserGroupCommand,
+  UserSecurityCommand
 } from "@/types/message";
 
 export const useFutuStomp = defineStore("futu-stomp", () => {
@@ -107,8 +110,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     });
   };
 
-  const sendFtCommandOnNotifyEndPoint = (command: string): void => {
-    futuStompNotifyClient.value?.send("/quantx/ft/notify", {}, command);
+  const sendFtCommandOnNotifyEndPoint = (command: Message): void => {
+    futuStompNotifyClient.value?.send("/quantx/ft/notify", {}, JSON.stringify(command));
   };
 
   const closeFtStompNotifyConn = (): void => {

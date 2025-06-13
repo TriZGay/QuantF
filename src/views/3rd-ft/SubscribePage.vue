@@ -139,7 +139,7 @@ function cancelSubscribe(row:SubscribeInfo) {
         subTypeList: [subType],
         unsub: true
       };
-      sendFtCommandOnNotifyEndPoint(JSON.stringify(subMessage));
+      sendFtCommandOnNotifyEndPoint(subMessage);
     }
   });
 }

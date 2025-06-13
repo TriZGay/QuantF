@@ -27,7 +27,7 @@ const requestPlates = (): void => {
     type: "PLATES",
     markets: markets.value
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 const pagination = computed<Object>(() => {
   return {
@@ -104,14 +104,14 @@ const requestStockInPlate = (plate: Plate): void => {
       code: code
     }]
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 const requestStocksInPlates = (): void => {
   let command: StockInPlateCommand = {
     type: "STOCK_IN_PLATE",
     all: true
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(command));
+  sendFtCommandOnNotifyEndPoint(command);
 };
 </script>
 <template>

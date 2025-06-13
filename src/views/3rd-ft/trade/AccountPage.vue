@@ -5,7 +5,9 @@ import { storeToRefs } from "pinia";
 import type { AccFundsCommand, AccountItem, AccountsCommand, AccPositionCommand, AccSubCommand } from "@/types/message";
 import type { TableColumnsType } from "ant-design-vue";
 import { useTimeoutFn } from "@vueuse/core";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
 const {
   futuAccounts,
@@ -17,7 +19,7 @@ const { start: sendAccountsCommand } = useTimeoutFn(() => {
   let accountsCommand: AccountsCommand = {
     type: "ACCOUNTS"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(accountsCommand));
+  sendFtCommandOnNotifyEndPoint(accountsCommand);
 }, 1000);
 
 onMounted(() => {
@@ -50,7 +52,7 @@ const requestAccSub = (acc: AccountItem): void => {
       uniCardNum: acc.uniCardNum
     }]
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(accSubscribeCommand));
+  sendFtCommandOnNotifyEndPoint(accSubscribeCommand);
 };
 //持仓
 const requestAccPosition = (acc: AccountItem, tradeMarket: number, simAccIdx: number): void => {
@@ -60,7 +62,7 @@ const requestAccPosition = (acc: AccountItem, tradeMarket: number, simAccIdx: nu
     tradeEnv: acc.trdEnv,
     tradeMarket: tradeMarket
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(accPositionCommand));
+  sendFtCommandOnNotifyEndPoint(accPositionCommand);
   positionVisible.value = true;
 };
 const positionVisible = ref<boolean>(false);
@@ -141,10 +143,18 @@ const requestAccFunds = (acc: AccountItem, tradeMarket: number, simAccIdx: numbe
     tradeEnv: acc.trdEnv,
     tradeMarket: tradeMarket
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(accFundsCommand));
+  sendFtCommandOnNotifyEndPoint(accFundsCommand);
   fundsVisible.value = true;
 };
 
+const navigateToPlaceOrder = (simAcc: AccountItem) => {
+  router.push({
+    name: "OrderPage",
+    query: {
+      account: JSON.stringify(simAcc)
+    }
+  });
+};
 
 </script>
 <template>
@@ -209,6 +219,11 @@ const requestAccFunds = (acc: AccountItem, tradeMarket: number, simAccIdx: numbe
           <template v-if="column.dataIndex ==='positionSideStr'">
             <a-tag>{{ record.positionSideStr }}</a-tag>
           </template>
+          <template v-if="column.dataIndex==='plVal'">
+            <a-tag v-if="record.plVal<0" color="green">{{ record.plVal }} ↓</a-tag>
+            <a-tag v-if="record.plVal===0">{{ record.plVal }}</a-tag>
+            <a-tag v-if="record.plVal>0" color="red">{{ record.plVal }} ↑</a-tag>
+          </template>
         </template>
       </a-table>
     </a-modal>
@@ -253,7 +268,7 @@ const requestAccFunds = (acc: AccountItem, tradeMarket: number, simAccIdx: numbe
                                 @confirm="requestAccSub(simAcc)">
                     <a>订阅</a>
                   </a-popconfirm>
-                  <a href="#">交易</a>
+                  <a @click="navigateToPlaceOrder(simAcc)">交易</a>
                 </a-space>
               </template>
             </a-card>

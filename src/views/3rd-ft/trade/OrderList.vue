@@ -6,8 +6,14 @@ import type { AccountItem, AccountsCommand, HistoryOrderCommand, PlaceOrderComma
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { useDebounceFn, useTimeoutFn } from "@vueuse/core";
 import type { TableColumnProps } from "ant-design-vue";
+import { useRoute } from "vue-router";
 
-const { computedTradeCodes, computedAllStocks, computedOneStock } = storeToRefs(useFutuApi());
+const route = useRoute();
+const {
+  computedTradeCodes,
+  computedAllStocks,
+  computedOneStock
+} = storeToRefs(useFutuApi());
 const { queryTradeCodes, queryAllStocks, queryStockByCode } = useFutuApi();
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
 const { futuIncompleteOrders, futuHistoryOrders } = storeToRefs(useFutuStomp());
@@ -19,7 +25,7 @@ const { start: sendAccountsCommand } = useTimeoutFn(() => {
   let accountsCommand: AccountsCommand = {
     type: "ACCOUNTS"
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(accountsCommand));
+  sendFtCommandOnNotifyEndPoint(accountsCommand);
 }, 1000);
 
 onMounted(() => {
@@ -34,16 +40,18 @@ const formItemLayout = {
 
 const onSelectMarket = (value: number) => {
   queryAllStocks({
-    market: value
+    market: value,
+    stockType: 3
   });
 };
 
-const onSelectStock = (id: number) => {
-  queryStockByCode(id);
+const onSelectStock = (code: string) => {
+  queryStockByCode(code);
 };
 
 watch(computedOneStock, (newVal, oldVal) => {
-  placeOrderForm.value.qty = newVal.lotSize;
+  let { lotSize, marketCode, code } = newVal;
+  placeOrderForm.value.qty = lotSize;
 });
 
 const placeOrderForm = ref({
@@ -55,11 +63,12 @@ const placeOrderForm = ref({
 });
 
 const selectedMarket = ref(0);
+const selectedPrice = ref(0);
 
 const debounceQueryAllStock = useDebounceFn((val: string) => {
   queryAllStocks({
     market: selectedMarket.value,
-    stockType: 6,
+    stockType: 3,
     name: val
   });
 }, 1000);
@@ -82,7 +91,7 @@ const onTrade = () => {
     //todo secMarket目前固定1
     secMarket: 1
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(submitForm));
+  sendFtCommandOnNotifyEndPoint(submitForm);
 };
 
 const onHistoryOrderAndIncompleteOrder = () => {
@@ -99,8 +108,8 @@ const onHistoryOrderAndIncompleteOrder = () => {
     tradeEnv: account.trdEnv,
     tradeMarket: account.trdMarketAuthList[0]
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(historySubmitForm));
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(incompleteSubmitForm));
+  sendFtCommandOnNotifyEndPoint(historySubmitForm);
+  sendFtCommandOnNotifyEndPoint(incompleteSubmitForm);
 };
 const orderColumns = ref<TableColumnProps[]>([
   {
@@ -194,6 +203,16 @@ const orderColumns = ref<TableColumnProps[]>([
     dataIndex: "trdMarketStr"
   }
 ]);
+
+watch(
+  () => route.query,
+  (newQuery) => {
+    if (newQuery.hasOwnProperty("account")) {
+      placeOrderForm.value.account = newQuery.account;
+    }
+  },
+  { deep: true, immediate: true }
+);
 </script>
 
 <template>
@@ -234,6 +253,9 @@ const orderColumns = ref<TableColumnProps[]>([
       </a-form-item>
       <a-form-item label="数量">
         <a-input-number v-model:value="placeOrderForm.qty" />
+      </a-form-item>
+      <a-form-item label="价格">
+        <a-input-number v-model:value="selectedPrice" />
       </a-form-item>
       <a-form-item :wrapper-col="{  span: 12,offset:3  }">
         <a-space>

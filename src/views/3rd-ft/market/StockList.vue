@@ -173,7 +173,7 @@ function onClick2Subscribe(row: Stock) {
     subTypeList: selectedSubType.value,
     unsub: false
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(subMessage));
+  sendFtCommandOnNotifyEndPoint(subMessage);
 }
 
 const checkAll = ref<boolean>(false);
@@ -198,7 +198,7 @@ const requestStocks = (): void => {
     market: market.value,
     stockType: stockType.value
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(stocksCommand));
+  sendFtCommandOnNotifyEndPoint(stocksCommand);
 };
 
 const klType = ref<string>("1");
@@ -214,7 +214,7 @@ const requestHistoryK = (row: Stock): void => {
     beginDate: beginDate.value.format("YYYY-MM-DD"),
     endDate: endDate.value.format("YYYY-MM-DD")
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(historyKLCommand));
+  sendFtCommandOnNotifyEndPoint(historyKLCommand);
 };
 const requestStockOwnerPlates = (row: Stock): void => {
   let stockOwnerPlatesCommand: StockOwnerPlatesCommand = {
@@ -224,7 +224,7 @@ const requestStockOwnerPlates = (row: Stock): void => {
       code: row.code
     }]
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(stockOwnerPlatesCommand));
+  sendFtCommandOnNotifyEndPoint(stockOwnerPlatesCommand);
 };
 
 const requestCapitalDistribution = (row: Stock): void => {
@@ -235,7 +235,7 @@ const requestCapitalDistribution = (row: Stock): void => {
       code: row.code
     }
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(capitalDistributionCommand));
+  sendFtCommandOnNotifyEndPoint(capitalDistributionCommand);
 };
 const requestRehabs = (row: Stock): void => {
   let rehabsCommand: RehabsCommand = {
@@ -245,7 +245,7 @@ const requestRehabs = (row: Stock): void => {
       code: row.code
     }
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(rehabsCommand));
+  sendFtCommandOnNotifyEndPoint(rehabsCommand);
 };
 const requestSnapshot = (row: Stock): void => {
   let snapshotCommand: SnapshotCommand = {
@@ -255,7 +255,7 @@ const requestSnapshot = (row: Stock): void => {
       code: row.code
     }]
   };
-  sendFtCommandOnNotifyEndPoint(JSON.stringify(snapshotCommand));
+  sendFtCommandOnNotifyEndPoint(snapshotCommand);
 };
 </script>
 <template>
