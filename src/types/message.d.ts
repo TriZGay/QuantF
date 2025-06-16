@@ -4,8 +4,16 @@ export declare interface Message {
     | "PLATES" | "STOCK_IN_PLATE" | "STOCKS" | "STOCK_OWNER_PLATE"
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
     | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
-    | "ACC_FUNDS" | "PLACE_ORDER" | "HISTORY_ORDER" | "INCOMPLETE_ORDER"
-    | "USER_GROUP" | "USER_SECURITY";
+    | "ACC_FUNDS" | "PLACE_ORDER" | "MODIFY_ORDER" | "HISTORY_ORDER"
+    | "INCOMPLETE_ORDER" | "USER_GROUP" | "USER_SECURITY";
+}
+
+export interface ModifyOrderCommand extends Message {
+  accId: string;
+  tradeEnv: number;
+  tradeMarket: number;
+  orderId: string;
+  modifyOp: number;
 }
 
 export interface UserGroupCommand extends Message {

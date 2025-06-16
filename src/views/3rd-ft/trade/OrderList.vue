@@ -2,7 +2,13 @@
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
 import { onMounted, ref, watch } from "vue";
-import type { AccountItem, AccountsCommand, HistoryOrderCommand, PlaceOrderCommand } from "@/types/message";
+import type {
+  AccountItem,
+  AccountsCommand,
+  HistoryOrderCommand, ModifyOrderCommand,
+  OrderContent,
+  PlaceOrderCommand
+} from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { useDebounceFn, useTimeoutFn } from "@vueuse/core";
 import type { TableColumnProps } from "ant-design-vue";
@@ -111,7 +117,8 @@ const onHistoryOrderAndIncompleteOrder = () => {
   sendFtCommandOnNotifyEndPoint(historySubmitForm);
   sendFtCommandOnNotifyEndPoint(incompleteSubmitForm);
 };
-const orderColumns = ref<TableColumnProps[]>([
+
+const historyOrderColumns = ref<TableColumnProps[]>([
   {
     title: "订单ID",
     dataIndex: "orderID",
@@ -201,6 +208,108 @@ const orderColumns = ref<TableColumnProps[]>([
   {
     title: "交易市场",
     dataIndex: "trdMarketStr"
+  },
+  {
+    title: "操作",
+    key: "action",
+    fixed: "right"
+  }
+]);
+const incompleteOrderColumns = ref<TableColumnProps[]>([
+  {
+    title: "订单ID",
+    dataIndex: "orderID",
+    fixed: "left"
+  },
+  {
+    title: "订单ID-ex",
+    dataIndex: "orderIDEx",
+    fixed: "left"
+  },
+  {
+    title: "代码",
+    dataIndex: "code"
+  },
+  {
+    title: "名称",
+    dataIndex: "name"
+  },
+  {
+    title: "交易方向",
+    dataIndex: "trdSideStr"
+  },
+  {
+    title: "订单类型",
+    dataIndex: "orderTypeStr"
+  },
+  {
+    title: "订单状态",
+    dataIndex: "orderStatusStr"
+  },
+  {
+    title: "订单数量",
+    dataIndex: "qty"
+  },
+  {
+    title: "订单价格",
+    dataIndex: "price"
+  },
+  {
+    title: "创建时间",
+    dataIndex: "createTime"
+  },
+  {
+    title: "最后更新时间",
+    dataIndex: "updateTime"
+  },
+  {
+    title: "成交数量",
+    dataIndex: "fillQty"
+  },
+  {
+    title: "成交均价",
+    dataIndex: "fillAvgPrice"
+  },
+  {
+    title: "最后的错误描述",
+    dataIndex: "lastErrMsg"
+  },
+  {
+    title: "证券所属市场",
+    dataIndex: "secMarketStr"
+  },
+  {
+    title: "用户备注字符串",
+    dataIndex: "remark"
+  },
+  {
+    title: "触发价格",
+    dataIndex: "auxPrice"
+  },
+  {
+    title: "跟踪类型",
+    dataIndex: "trailTypeStr"
+  },
+  {
+    title: "跟踪金额/百分比",
+    dataIndex: "trailValue"
+  },
+  {
+    title: "指定价差",
+    dataIndex: "trailSpread"
+  },
+  {
+    title: "货币类型",
+    dataIndex: "currencyStr"
+  },
+  {
+    title: "交易市场",
+    dataIndex: "trdMarketStr"
+  },
+  {
+    title: "操作",
+    key: "action",
+    fixed: "right"
   }
 ]);
 
@@ -213,6 +322,25 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+const modifyForm = ref({
+  modifyOp: 2
+});
+
+const onModify = (order: OrderContent) => {
+  let { orderID } = order;
+  let account: AccountItem = JSON.parse(placeOrderForm.value.account);
+  let { modifyOp } = modifyForm.value;
+  let modifyCommand: ModifyOrderCommand = {
+    type: "MODIFY_ORDER",
+    modifyOp: modifyOp,
+    orderId: orderID,
+    accId: account.accID,
+    tradeEnv: account.trdEnv,
+    tradeMarket: account.trdMarketAuthList[0]
+  };
+  sendFtCommandOnNotifyEndPoint(modifyCommand);
+};
 </script>
 
 <template>
@@ -264,26 +392,52 @@ watch(
         </a-space>
       </a-form-item>
     </a-form>
-    <a-row :gutter="8" justify="center">
-      <a-col :span="12">
-        <a-typography-title :level="5">未完成订单</a-typography-title>
-        <a-table
-          :scroll="{ x: 2600 ,y:300 }"
-          :data-source="futuIncompleteOrders?.incompleteOrderContent.orderList"
-          :columns="orderColumns"
-          size="small">
-        </a-table>
-      </a-col>
-      <a-col :span="12">
-        <a-typography-title :level="5">历史订单</a-typography-title>
-        <a-table
-          :scroll="{ x: 2600,y:300 }"
-          :data-source="futuHistoryOrders?.historyOrderContent.orderList"
-          :columns="orderColumns"
-          size="small">
-        </a-table>
-      </a-col>
-    </a-row>
+    <a-typography>
+      <a-typography-title :level="5">未完成订单</a-typography-title>
+      <a-table
+        :scroll="{ x: 2700 ,y:300 }"
+        :data-source="futuIncompleteOrders?.incompleteOrderContent.orderList"
+        :columns="incompleteOrderColumns"
+        size="small">
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'action'">
+            <a-space>
+              <a-popover
+                title="改撤单"
+                trigger="click">
+                <a-button type="link" size="small">改单/撤单</a-button>
+                <template #content>
+                  <a-form>
+                    <a-form-item label="操作类型">
+                      <a-select v-model:value="modifyForm.modifyOp" :options="computedTradeCodes.modifyOrderOps" />
+                    </a-form-item>
+                    <a-form-item>
+                      <a-button type="primary" size="small" @click="onModify(record)">提交</a-button>
+                    </a-form-item>
+                  </a-form>
+                </template>
+              </a-popover>
+            </a-space>
+          </template>
+        </template>
+      </a-table>
+    </a-typography>
+    <a-typography>
+      <a-typography-title :level="5">历史订单</a-typography-title>
+      <a-table
+        :scroll="{ x: 2700,y:300 }"
+        :data-source="futuHistoryOrders?.historyOrderContent.orderList"
+        :columns="historyOrderColumns"
+        size="small">
+        <template #bodyCell="{column,record}">
+          <template v-if="column.key=='action'">
+            <a-space>
+
+            </a-space>
+          </template>
+        </template>
+      </a-table>
+    </a-typography>
   </div>
 </template>
 

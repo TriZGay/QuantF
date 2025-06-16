@@ -107,6 +107,7 @@ export interface TradeMetaCodes {
   tradeSecMarkets: Array<AntDesignSelectOptions>;
   orderTypes: Array<AntDesignSelectOptions>;
   marketTypes: Array<AntDesignSelectOptions>;
+  modifyOrderOps: Array<AntDesignSelectOptions>;
 }
 
 export function fetchStockByCode(code: string) {
