@@ -212,6 +212,27 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/thirdItick",
+    name: "ThirdItickPage",
+    redirect: "/thirdFutu/products",
+    meta: {
+      title: "第三方-Itick",
+      icon: "account-book-filled"
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: [
+      {
+        path: "/thirdFutu/products",
+        name: "ProductList",
+        meta: {
+          title: "标的清单",
+          icon: "container-filled"
+        },
+        component: () => import("@/views/3rd-itick/ProductList.vue")
+      }
+    ]
+  },
+  {
     path: "/operation",
     name: "OperationPage",
     redirect: "/operation/sync",
