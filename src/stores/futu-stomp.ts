@@ -9,7 +9,7 @@ import type {
   CapitalDistributionCommand,
   CapitalFlowCommand,
   FutuHistoryKQuota,
-  FutuMarketState,
+  FutuMarketState, GetPriceReminderCommand,
   HistoryOrderCommand,
   IncompleteOrderCommand,
   Message,
@@ -35,6 +35,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuIncompleteOrders = ref<IncompleteOrderCommand>();
   const futuUserGroup = ref<UserGroupCommand>();
   const futuUserSecurity = ref<UserSecurityCommand>();
+  const futuGetPriceReminder = ref<GetPriceReminderCommand>();
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
@@ -100,6 +101,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
         futuStompNotifyClient.value?.subscribe("/quantx/topic/user_security", msg => {
           futuUserSecurity.value = JSON.parse(msg.body);
         });
+        //查询到价提醒列表
+        futuStompNotifyClient.value?.subscribe("/quantx/topic/get_price_reminders", msg => {
+          futuGetPriceReminder.value = JSON.parse(msg.body);
+        });
       }
     }, err => {
       futuStompNotifyClientStatus.value = false;
@@ -143,6 +148,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuHistoryOrders,
     futuIncompleteOrders,
     futuUserGroup,
-    futuUserSecurity
+    futuUserSecurity,
+    futuGetPriceReminder
   };
 });

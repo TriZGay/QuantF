@@ -5,7 +5,41 @@ export declare interface Message {
     | "CAPITAL_FLOW" | "CAPITAL_DISTRIBUTION" | "REHABS" | "SNAPSHOT"
     | "ACCOUNTS" | "ACC_SUBSCRIBE" | "ACC_POSITION" | "STOCK_FILTER"
     | "ACC_FUNDS" | "PLACE_ORDER" | "MODIFY_ORDER" | "HISTORY_ORDER"
-    | "INCOMPLETE_ORDER" | "USER_GROUP" | "USER_SECURITY";
+    | "INCOMPLETE_ORDER" | "USER_GROUP" | "USER_SECURITY" | "SET_PRICE_REMINDER"
+    | "GET_PRICE_REMINDER";
+}
+
+export interface GetPriceReminderCommand extends Message {
+  secMarket?: number;//股票所属市场
+  code?: string;
+  market?: number;//整个市场
+  priceReminderList?: Array<PriceReminder>;
+}
+
+export interface PriceReminder {
+  security: CommonSecurity;
+  name: string;
+  itemList: Array<PriceReminderItem>;
+}
+
+export interface PriceReminderItem {
+  key: number;
+  type: number;
+  value: number;
+  note: string;
+  freq: number;
+  isEnable: boolean;
+}
+
+export interface SetPriceReminderCommand extends Message {
+  market: number;
+  code: string;
+  op?: number;
+  key?: number;
+  remindType?: number;
+  remindFreq?: number;
+  value?: number;
+  note?: string;
 }
 
 export interface ModifyOrderCommand extends Message {

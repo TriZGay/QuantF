@@ -18,6 +18,7 @@ import type {
   CapitalDistributionCommand,
   HistoryKLCommand,
   RehabsCommand,
+  SetPriceReminderCommand,
   SnapshotCommand,
   StockOwnerPlatesCommand,
   StocksCommand,
@@ -28,8 +29,8 @@ import type { Dayjs } from "dayjs";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
 
-const { queryStocks } = useFutuApi();
-const { stockLoading, stocks } = storeToRefs(useFutuApi());
+const { queryStocks, queryTradeCodes } = useFutuApi();
+const { stockLoading, stocks, computedTradeCodes } = storeToRefs(useFutuApi());
 
 const stocksColumns = ref<TableColumnsType>([
   {
@@ -72,7 +73,7 @@ const stocksColumns = ref<TableColumnsType>([
   {
     title: "操作",
     key: "action",
-    width: 400,
+    width: 420,
     fixed: "right"
   }
 ]);
@@ -93,6 +94,7 @@ onMounted(() => {
     size: 10,
     current: 1
   });
+  queryTradeCodes();
 });
 
 function onChangeTable(tableProps: Object) {
@@ -257,6 +259,28 @@ const requestSnapshot = (row: Stock): void => {
   };
   sendFtCommandOnNotifyEndPoint(snapshotCommand);
 };
+
+const setPriceReminderForm = ref({
+  op: 1,
+  remindType: 1,
+  remindFreq: 1,
+  value: 0,
+  note: ""
+});
+
+const requestSetPriceReminder = (row: Stock): void => {
+  let setPriceReminderCommand: SetPriceReminderCommand = {
+    type: "SET_PRICE_REMINDER",
+    market: row.marketCode,
+    code: row.code,
+    op: setPriceReminderForm.value?.op,
+    remindType: setPriceReminderForm.value?.remindType,
+    remindFreq: setPriceReminderForm.value?.remindFreq,
+    value: setPriceReminderForm.value?.value,
+    note: setPriceReminderForm.value?.note
+  };
+  sendFtCommandOnNotifyEndPoint(setPriceReminderCommand);
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -339,6 +363,32 @@ const requestSnapshot = (row: Stock): void => {
               <a-button type="link" size="small">复权因子</a-button>
               <template #content>
                 <a-button type="primary" size="small" @click="requestRehabs(record)">确定</a-button>
+              </template>
+            </a-popover>
+            <a-popover title="确定" trigger="click">
+              <a-button type="link" size="small">设置到价提醒</a-button>
+              <template #content>
+                <a-form>
+                  <a-form-item label="价格">
+                    <a-input-number v-model:value="setPriceReminderForm.value" />
+                  </a-form-item>
+                  <a-form-item label="操作类型">
+                    <a-select v-model:value="setPriceReminderForm.op"
+                              :options="computedTradeCodes?.setPriceReminderOps" />
+                  </a-form-item>
+                  <a-form-item label="提醒类型">
+                    <a-select v-model:value="setPriceReminderForm.remindType"
+                              :options="computedTradeCodes?.setPriceReminderTypes" />
+                  </a-form-item>
+                  <a-form-item label="提醒频率">
+                    <a-select v-model:value="setPriceReminderForm.remindFreq"
+                              :options="computedTradeCodes?.setPriceReminderFreqs" />
+                  </a-form-item>
+                  <a-form-item label="备注">
+                    <a-input v-model:value="setPriceReminderForm.note" />
+                  </a-form-item>
+                </a-form>
+                <a-button type="primary" size="small" @click="requestSetPriceReminder(record)">确定</a-button>
               </template>
             </a-popover>
           </a-space>

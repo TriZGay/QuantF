@@ -2,8 +2,16 @@
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
-import type { ConnectCommand, GroupData, Message, UserGroupCommand, UserSecurityCommand } from "@/types/message";
+import type {
+  ConnectCommand,
+  GetPriceReminderCommand,
+  GroupData,
+  Message,
+  UserGroupCommand,
+  UserSecurityCommand
+} from "@/types/message";
 import { useTimeoutFn } from "@vueuse/core";
+import type { TableColumnProps } from "ant-design-vue";
 
 const {
   sendFtCommandOnNotifyEndPoint
@@ -12,7 +20,8 @@ const {
   futuMarketState,
   futuHistoryKQuota,
   futuUserGroup,
-  futuUserSecurity
+  futuUserSecurity,
+  futuGetPriceReminder
 } = storeToRefs(useFutuStomp());
 
 const { start: requestOvrContent } = useTimeoutFn(() => {
@@ -24,10 +33,15 @@ const { start: requestOvrContent } = useTimeoutFn(() => {
     type: "KL_HISTORY_DETAIL"
   };
   sendFtCommandOnNotifyEndPoint(command2);
-  const userGroupCommand: Message = {
+  const userGroupCommand: UserGroupCommand = {
     type: "USER_GROUP"
   };
   sendFtCommandOnNotifyEndPoint(userGroupCommand);
+  const getPriceReminderCommand: GetPriceReminderCommand = {
+    type: "GET_PRICE_REMINDER",
+    market: 1
+  };
+  sendFtCommandOnNotifyEndPoint(getPriceReminderCommand);
 }, 1000);
 onMounted(() => {
   requestOvrContent();
@@ -71,10 +85,67 @@ const onUserSecurity = (group: GroupData): void => {
 };
 
 const userSecurityModal = ref<boolean>(false);
+
+const getPriceReminderColumns = ref<TableColumnProps[]>([
+  {
+    title: "代码",
+    dataIndex: ["security", "code"],
+    fixed: "left"
+  },
+  {
+    title: "名称",
+    dataIndex: "name"
+  },
+  {
+    title: "市场",
+    dataIndex: ["security", "marketStr"]
+  }
+]);
+
+const reminderInnerColumns = ref<TableColumnProps[]>([
+  {
+    title: "Key",
+    dataIndex: "key"
+  },
+  {
+    title: "类型"
+  },
+  {
+    title: "价格",
+    dataIndex: "value"
+  },
+  {
+    title: "频率"
+
+  },
+  {
+    title: "是否可用"
+  },
+  {
+    title: "备注"
+  }
+]);
+
 </script>
 
 <template>
   <div>
+    <a-typography>
+      <a-typography-title :level="5">到价提醒</a-typography-title>
+      <a-typography-paragraph>
+        <a-table size="small" :columns="getPriceReminderColumns"
+                 :data-source="futuGetPriceReminder?.priceReminderList">
+          <template #expandedRowRender>
+            <a-table v-for="eachReminder in futuGetPriceReminder?.priceReminderList"
+                     :columns="reminderInnerColumns"
+                     size="small"
+                     :data-source="eachReminder.itemList" :pagination="false">
+
+            </a-table>
+          </template>
+        </a-table>
+      </a-typography-paragraph>
+    </a-typography>
     <a-typography>
       <a-typography-title :level="5">自选股分组</a-typography-title>
       <a-typography-paragraph>
