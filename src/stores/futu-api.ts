@@ -8,7 +8,7 @@ import {
   fetchStocks,
   fetchSubscribeDetails,
   fetchSubscribeInfos,
-  fetchTradeCodes, type Stock
+  fetchTradeCodes
 } from "@/api/futu";
 import { computed } from "vue";
 

@@ -212,6 +212,25 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/thirdAks",
+    name: "ThirdAksharesPage",
+    redirect: "/thirdAks/stocks",
+    meta: {
+      title: "第三方-AkShares",
+      icon: "account-book-filled"
+    },
+    component: () => import("@/layouts/Layout.vue"),
+    children: [{
+      path: "/thirdAks/stocks",
+      name: "AksStocksPage",
+      meta: {
+        title: "股票",
+        icon: "container-filled"
+      },
+      component: () => import("@/views/3rd-akshares/StocksPage.vue")
+    }]
+  },
+  {
     path: "/operation",
     name: "OperationPage",
     redirect: "/operation/sync",

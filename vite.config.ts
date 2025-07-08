@@ -18,10 +18,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ana/, "")
       },
-      "/itick": {
+      "/akshres": {
         target: "http://localhost:9093",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/itick/, "")
+        rewrite: (path) => path.replace(/^\/akshres/, "")
       }
     }
   },
