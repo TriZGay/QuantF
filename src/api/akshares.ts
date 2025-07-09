@@ -20,6 +20,19 @@ export interface SZSummary {
   circularMarketVal: number;
 }
 
+export interface BigAStockIndividualResp {
+  stockItems: Array<StockItem>;
+}
+
+export interface StockItem {
+  item: string,
+  value: string
+}
+
 export function fetchBigAStockTodaySummary() {
   return request.get<SHSZTodaySummary>("/akshres/stocks/today-summary");
+}
+
+export function fetchBigAStockIndividual(code: string) {
+  return request.get<BigAStockIndividualResp>(`/akshres/stocks/bigA-individual/${code}`);
 }

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
-import { fetchBigAStockTodaySummary } from "@/api/akshares";
+import { fetchBigAStockIndividual, fetchBigAStockTodaySummary } from "@/api/akshares";
 import { computed } from "vue";
 
 export const useAkSharesApi = defineStore("akshares-api", () => {
@@ -15,10 +15,24 @@ export const useAkSharesApi = defineStore("akshares-api", () => {
     return bigASummaries.value?.data || {};
   });
 
+  const {
+    data: bigAStockIndividual,
+    run: requestBigAStockIndividual
+  } = useRequest(fetchBigAStockIndividual, {
+    manual: true
+  });
+
+  const computedBigAStockIndividual = computed(() => {
+    return bigAStockIndividual.value?.data || {};
+  });
+
   return {
     //
     requestBigAStockTodaySummary,
-    computedBigASummaries
+    computedBigASummaries,
     //
+    requestBigAStockIndividual,
+    computedBigAStockIndividual
+
   };
 });
