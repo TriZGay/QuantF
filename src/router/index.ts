@@ -227,7 +227,31 @@ const routes: RouteRecordRaw[] = [
         title: "股票",
         icon: "container-filled"
       },
-      component: () => import("@/views/3rd-akshares/StocksPage.vue")
+      children: [{
+        path: "/thirdAks/stocks/zh",
+        name: "AksStocksZhPage",
+        meta: {
+          title: "大A",
+          icon: "container-filled"
+        },
+        component: () => import("@/views/3rd-akshares/stocks/StocksZhPage.vue")
+      }, {
+        path: "/thirdAks/stocks/us",
+        name: "AksStocksUsPage",
+        meta: {
+          title: "美股",
+          icon: "container-filled"
+        },
+        component: () => import("@/views/3rd-akshares/stocks/StocksUsPage.vue")
+      }]
+    }, {
+      path: "/thirdAks/indies",
+      name: "AksIndiesPage",
+      meta: {
+        title: "指数",
+        icon: "container-filled"
+      },
+      component: () => import("@/views/3rd-akshares/stocks/StocksZhPage.vue")
     }]
   },
   {
