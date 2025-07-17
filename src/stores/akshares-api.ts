@@ -63,13 +63,10 @@ export const useAkSharesApi = defineStore("akshares-api", () => {
   });
 
   const {
-    data: bigAHistoryData,
-    run: requestBigAHistory
+    runAsync: requestBigAHistory,
+    loading: bigAHistoryLoading
   } = useRequest(fetchBigAHistory, {
     manual: true
-  });
-  const computedBigAHistory = computed(() => {
-    return bigAHistoryData.value?.data || {};
   });
 
   return {
@@ -91,7 +88,7 @@ export const useAkSharesApi = defineStore("akshares-api", () => {
     bigARealTimeLoading,
     //
     requestBigAHistory,
-    computedBigAHistory
+    bigAHistoryLoading
 
   };
 });

@@ -77,10 +77,10 @@ export interface StockRTPrice {
 
 export interface StockZhHistoryRequest {
   symbol: string;
-  period: string;
+  period: "daily" | "weekly" | "monthly";
   startDate: string;
   endDate: string;
-  adjust: string;
+  adjust: "qfq" | "hfq";
 }
 
 export interface StockZhHistoryResponse {
