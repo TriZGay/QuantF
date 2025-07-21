@@ -9,7 +9,6 @@ const {
   computedBigASummaries,
   bigARealTimeLoading,
   computedBigARealTime,
-  computedBigAHistory,
   bigAHistoryLoading,
   computedBigAStockIndividual
 } = storeToRefs(useAkSharesApi());

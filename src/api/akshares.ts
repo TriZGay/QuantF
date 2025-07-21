@@ -102,6 +102,29 @@ export interface StockZhHistory {
   turnoverRatio: number;
 }
 
+export interface StockUsRtResponse {
+  stockUsRtPrices: Array<StockUsRtPrice>;
+}
+
+export interface StockUsRtPrice {
+  id: number;
+  code: string;
+  name: string;
+  price: number;
+  ratio: number;
+  ratioVal: number;
+  turnover: number;
+  volume: number;
+  amplitude: number;
+  high: number;
+  low: number;
+  open: number;
+  close: number;
+  turnoverRatio: number;
+  marketCap: number;
+  peRatio: number;
+}
+
 export function fetchBigAStockTodaySummary() {
   return request.get<SHSZTodaySummary>("/akshres/stocks/today-summary");
 }
@@ -124,4 +147,8 @@ export function fetchBigARealTime(type: BigARealTimeType) {
 
 export function fetchBigAHistory(req: StockZhHistoryRequest) {
   return request.post<StockZhHistoryResponse>("/akshres/stocks/bigA-history", req);
+}
+
+export function fetchUsRealTime() {
+  return request.get<StockUsRtResponse>("/akshres/stocks/us-rt");
 }

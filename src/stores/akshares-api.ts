@@ -4,7 +4,7 @@ import {
   fetchBigABidAsk, fetchBigAHistory, fetchBigARealTime,
   fetchBigAStockIndividual,
   fetchBigAStockIndividualInfo,
-  fetchBigAStockTodaySummary
+  fetchBigAStockTodaySummary, fetchUsRealTime
 } from "@/api/akshares";
 import { computed } from "vue";
 
@@ -69,6 +69,17 @@ export const useAkSharesApi = defineStore("akshares-api", () => {
     manual: true
   });
 
+  const {
+    data: usRealTimeData,
+    run: requestUsRealTime,
+    loading: usRealTimeLoading
+  } = useRequest(fetchUsRealTime, {
+    manual: true
+  });
+  const computedUsRealTime = computed(() => {
+    return usRealTimeData.value?.data || {};
+  });
+
   return {
     //
     requestBigAStockTodaySummary,
@@ -88,7 +99,11 @@ export const useAkSharesApi = defineStore("akshares-api", () => {
     bigARealTimeLoading,
     //
     requestBigAHistory,
-    bigAHistoryLoading
+    bigAHistoryLoading,
+    //
+    requestUsRealTime,
+    computedUsRealTime,
+    usRealTimeLoading
 
   };
 });
