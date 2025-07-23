@@ -156,7 +156,7 @@ export function klTypeToSelectOptions() {
   return Object.keys(FT_KL_TYPE).map(klType => {
     return {
       label: FT_KL_TYPE[klType],
-      value: klType
+      value: parseInt(klType)
     };
   });
 }

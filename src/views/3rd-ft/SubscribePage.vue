@@ -8,6 +8,7 @@ import type { SubscribeInfo } from "@/api/futu";
 import type { SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import HistoryKLineButton from "@/components/HistoryKLineButton/index.vue";
 
 const {
   sendFtCommandOnNotifyEndPoint
@@ -118,7 +119,7 @@ const paginationDetails = computed<Object>(() => {
   };
 });
 
-function cancelSubscribe(row:SubscribeInfo) {
+function cancelSubscribe(row: SubscribeInfo) {
   let { securityMarket, securityCode, securityName, securityType, subType } = row;
   Modal.confirm({
     title: "请确认",
@@ -144,6 +145,13 @@ function cancelSubscribe(row:SubscribeInfo) {
   });
 }
 
+const computeKlType = (subType: number) => {
+  if (subType === 11) {
+    return 1;
+  }
+};
+
+
 </script>
 <template>
   <div class="subscribe-info-container">
@@ -167,8 +175,11 @@ function cancelSubscribe(row:SubscribeInfo) {
     <a-typography>
       <a-typography-title :level="5">订阅细节</a-typography-title>
       <a-typography-paragraph>
-        <a-table :columns="subscribeDetailsColumns" :data-source="subscribeDetails.data"
-                 :loading="subscribeDetailsLoading" :pagination="paginationDetails" @change="onChangeDetailsTable">
+        <a-table :columns="subscribeDetailsColumns"
+                 :data-source="subscribeDetails.data"
+                 :loading="subscribeDetailsLoading"
+                 :pagination="paginationDetails"
+                 @change="onChangeDetailsTable">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'securityType'">
               {{ parseSecurityType(record.securityType) }}
@@ -180,6 +191,9 @@ function cancelSubscribe(row:SubscribeInfo) {
                     <span>
                         <a-button type="link" size="small" @click="cancelSubscribe(record)">取消订阅</a-button>
                         <a-divider type="vertical" />
+                        <HistoryKLineButton :kl-type="computeKlType(record.subType)"
+                                            :market="record.securityMarket"
+                                            :code="record.securityCode" />
                     </span>
             </template>
           </template>
