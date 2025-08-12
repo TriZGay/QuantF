@@ -3,7 +3,7 @@
 import { watch, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useWsKLine } from '@/stores/rt-k';
-import { useDrawKLine } from '@/views/trade/k/components/drawKLine';
+import { useDrawKLine } from '@/views/3rd-ft/trade/k/components/drawKLine';
 import KLineTabs from './components/KLineTabs.vue'
 
 const rtWsKlineStore = useWsKLine();
