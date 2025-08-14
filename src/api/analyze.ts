@@ -333,3 +333,7 @@ export function fetchBackTest(backTestRequest: BackTestRequest) {
   return request.post<BackTestResponse>("/ana/backtest/add", backTestRequest);
 }
 
+//初始化kdj933指标数据
+export function fetchKdj933Init(granularity: number) {
+  return request.get<string>(`/ana/kdj/initKdj933/${granularity}`);
+}

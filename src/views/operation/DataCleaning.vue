@@ -7,6 +7,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { type FormInstance, message } from "ant-design-vue";
 import type { ColumnProps } from "ant-design-vue/es/table";
 import Cron from "@/components/CronPicker/Cron.vue";
+import { useAnalyzeIndies } from "@/stores/ana-indicator";
 import type {
   AddKLineRaw2ArcTaskRequest,
   AddKLineRepeatCheckTaskRequest,
@@ -17,6 +18,9 @@ import type {
   AddKLineTransToRsiTaskRequest, AddKLineTransToKdjTaskRequest, AddKLineTransToARBRTaskRequest
 } from "@/api/task";
 import { FT_REHABTYPE } from "@/api/code";
+
+const analyzeIndiesStores = useAnalyzeIndies();
+const fetchKdj933Init = analyzeIndiesStores.requestKdj933Init;
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchTables = analyzeMetaStores.requestTables;
@@ -521,6 +525,16 @@ const handleKArc2ArbrOk = (): void => {
   });
 };
 
+const initKdj933Granularity = ref<number>(1);
+const toInitKdj933 = (): void => {
+  fetchKdj933Init(initKdj933Granularity.value)
+    .then(res => {
+      if (res.status === 200) {
+        message.success(res.data.toString());
+      }
+    });
+};
+
 onMounted(() => {
   fetchDbInfos();
   fetchTables();
@@ -885,6 +899,12 @@ onMounted(() => {
     </a-modal>
     <a-modal v-model:visible="showModalTransKdj" title="新建定时任务" @ok="handleKArc2KdjOk">
       <a-form :ref="taskKdjForm" :model="k2KdjTaskModel" layout="vertical" name="taskFormInModal">
+        <a-form-item label="初始化数据(2025-01-02)">
+          <a-select v-model:value="initKdj933Granularity" :options="[{label:'1分钟',value:1}]" />
+        </a-form-item>
+        <a-form-item>
+          <a-button danger size="small" @click="toInitKdj933">确定</a-button>
+        </a-form-item>
         <a-form-item name="jobName" label="任务名称">
           <a-input v-model:value="k2KdjTaskModel.jobName" />
         </a-form-item>

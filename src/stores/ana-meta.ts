@@ -1,8 +1,11 @@
 import {
-  fetchMetaData, fetchMetaDbInfo,
-  fetchMetaTables, fetchTableInfo,
-  fetchTruncateTable, fetchDataQaPerDay,
-  fetchDataQaDetails, type DataQaDetailsResponse
+  fetchDataQaDetails,
+  fetchDataQaPerDay,
+  fetchMetaData,
+  fetchMetaDbInfo,
+  fetchMetaTables,
+  fetchTableInfo,
+  fetchTruncateTable
 } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
