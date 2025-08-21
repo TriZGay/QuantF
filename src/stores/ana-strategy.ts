@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useRequest } from "vue-request";
-import { fetchBackTest } from "@/api/analyze";
+import { fetchBackTest, fetchStrategyTypes } from "@/api/analyze";
+import { computed } from "vue";
 
 export const useAnalyzeStrategy = defineStore("ana-strategy", () => {
   const {
@@ -10,8 +11,19 @@ export const useAnalyzeStrategy = defineStore("ana-strategy", () => {
     manual: true
   });
 
+  const {
+    run: requestStrategyTypes,
+    data: strategyTypesData
+  } = useRequest(fetchStrategyTypes, {
+    manual: true
+  });
+  const strategyTypes = computed(() => {
+    return strategyTypesData.value?.data || [];
+  });
   return {
     backTestLoading,
-    addBackTest
+    addBackTest,
+    requestStrategyTypes,
+    strategyTypes
   };
 });

@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import type { AntDesignSelectOptions } from "@/api/futu";
 
 export interface BasicQuoteRequest {
   code: string,
@@ -174,6 +175,7 @@ export interface BackTestRequest {
   code: string,
   rehabType: number,
   granularity: number,
+  strategyType: number,
   initialCapital: number,
   commission: number,
   start: string,
@@ -188,9 +190,15 @@ export interface BackTestResponse {
 
 export interface BackTestTradeSignal {
   datetime: string;
-  action: "BUY" | "SELL" | "NONE";
+  action: "BUY" | "SELL" | "HOLD";
   price: number;
   quantity: number;
+
+  openPrice: number;
+  closePrice: number;
+  highPrice: number;
+  lowPrice: number;
+  volume: number;
 }
 
 export interface BackTestOvr {
@@ -336,4 +344,8 @@ export function fetchBackTest(backTestRequest: BackTestRequest) {
 //初始化kdj933指标数据
 export function fetchKdj933Init(granularity: number) {
   return request.get<string>(`/ana/kdj/initKdj933/${granularity}`);
+}
+
+export function fetchStrategyTypes() {
+  return request.get<AntDesignSelectOptions[]>("/ana/meta/strategyTypes");
 }

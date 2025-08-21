@@ -14,8 +14,9 @@ const fetchCodes = analyzeMetaStores.requestMetaData;
 const { metaCodes } = storeToRefs(analyzeMetaStores);
 
 const analyzeStrategyStores = useAnalyzeStrategy();
-const { backTestLoading } = storeToRefs(analyzeStrategyStores);
+const { backTestLoading, strategyTypes } = storeToRefs(analyzeStrategyStores);
 const fetchBackTest = analyzeStrategyStores.addBackTest;
+const fetchStrategyTypes = analyzeStrategyStores.requestStrategyTypes;
 
 const backTestOptions = ref({});
 
@@ -41,7 +42,13 @@ const formState = reactive({
     name: "K线类型",
     type: "select",
     selectOptions: klTypeToSelectOptions(),
-    bindValue: "1"
+    bindValue: 1
+  },
+  strategyType: {
+    name: "策略",
+    type: "select",
+    selectOptions: strategyTypes,
+    bindValue: 1
   },
   rehabType: {
     name: "复权类型",
@@ -73,10 +80,10 @@ const formState = reactive({
   }
 });
 
-function drawBackTestPic(prices: KLine[], tradeSignals: BackTestTradeSignal[]) {
+function drawBackTestPic( tradeSignals: BackTestTradeSignal[]) {
   let xAxisTime: Array<string> = [];
   let candelstickArray: Array = [];
-  prices.forEach((k, index) => {
+  tradeSignals.forEach((k, index) => {
     xAxisTime.push(k.datetime);
     candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice]);
   });
@@ -205,7 +212,6 @@ function drawBackTestPic(prices: KLine[], tradeSignals: BackTestTradeSignal[]) {
         name: formState.code.bindValue,
         type: "line",
         data: tradeSignals.map(signal => {
-          console.log(signal.datetime, signal.price);
           return signal.price;
         }),
         smooth: true,
@@ -245,6 +251,7 @@ function onFinish(values: any) {
   fetchBackTest({
     rehabType: values.rehabType,
     granularity: values.granularity,
+    strategyType: values.strategyType,
     code: values.code,
     initialCapital: values.initialCapital,
     commission: values.commission,
@@ -252,8 +259,8 @@ function onFinish(values: any) {
     end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
   }).then(res => {
     if (res.status === 200) {
-      let { backTestOvr, prices, tradeSignals } = res.data;
-      drawBackTestPic(prices, tradeSignals);
+      let { backTestOvr, tradeSignals } = res.data;
+      drawBackTestPic( tradeSignals);
     }
   });
 }
@@ -262,6 +269,7 @@ onMounted(() => {
   fetchCodes({
     granularity: 1
   });
+  fetchStrategyTypes();
 });
 </script>
 

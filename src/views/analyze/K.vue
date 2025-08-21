@@ -61,13 +61,13 @@ const formState = reactive({
     name: "K线类型",
     type: "select",
     selectOptions: klTypeToSelectOptions(),
-    bindValue: "1"
+    bindValue: 1
   },
   rehabType: {
     name: "复权类型",
     type: "radio-group",
     radioOptions: rehabTypeToRadioOptions(),
-    bindValue: "1"
+    bindValue: '1'
   },
   range: {
     name: "时间范围",
