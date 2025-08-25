@@ -1,153 +1,175 @@
-<script setup lang="ts">
-//@ts-nocheck
-// import { UseNow } from '@vueuse/components'
-// import { ref, watch, onMounted } from 'vue';
-// import { storeToRefs } from 'pinia';
-// import { useMarketState } from '@/stores/market';
-// import * as dayjs from 'dayjs';
-// import { parseMarket } from '@/api/code'
-//
-// const marketState = useMarketState();
-// const refreshMartketState = marketState.run;
-// const refreshHistoryKDetail = marketState.requestHistoryKDetail;
-// const { loading, rtMarketState, nowHistoryKDetail } = storeToRefs(marketState)
-//
-// const globalMarketState = ref({
-//   time: "",
-//   marketHK: "",
-//   marketHKFuture: "",
-//   marketSH: "",
-//   marketSZ: "",
-//   marketUS: "",
-//   marketUSFuture: "",
-//   marketSGFuture: "",
-//   marketJPFuture: ""
-// })
-//
-// const historyKDetailRef = ref({
-//   usedQuota: 0,
-//   remainQuota: 0,
-//   itemList: []
-// })
-//
-// watch(() => nowHistoryKDetail, (message) => {
-//   historyKDetailRef.value = message.value
-// }, { deep: true })
-//
-// watch(() => rtMarketState, (message) => {
-//   globalMarketState.value = message.value
-// }, { deep: true })
-//
-// onMounted(() => {
-//   refreshMartketState();
-//   refreshHistoryKDetail();
-// })
-//
-// function refreshInfo() {
-//   refreshMartketState();
-//   refreshHistoryKDetail();
-// }
-//
-// function parseNow(now: Object) {
-//   return dayjs(now).format("DD-MM-YYYY HH:mm:ss")
-// }
-//
-// const showHistoryKDetail = ref<boolean>(false)
-//
-// function showHistoryKDetailDrawer() {
-//   showHistoryKDetail.value = true
-// }
+<script setup>
+// This starter template is using Vue 3 <script setup> SFCs
+// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
+import { ref } from "vue";
+
+/*
+ * There are example components in both API styles: Options API, and Composition API
+ *
+ * Select your preferred style from the imports below:
+ */
+import FinanceChart from "@/components/FinanceChart/index.vue";
+
+/**
+ * Generates sample data for the Lightweight Charts™ example
+ * @param  {Boolean} ohlc Whether generated dat should include open, high, low, and close values
+ * @returns {Array} sample data
+ */
+function generateSampleData(ohlc) {
+  const randomFactor = 25 + Math.random() * 25;
+
+  function samplePoint(i) {
+    return (
+      i *
+      (0.5 +
+        Math.sin(i / 10) * 0.2 +
+        Math.sin(i / 20) * 0.4 +
+        Math.sin(i / randomFactor) * 0.8 +
+        Math.sin(i / 500) * 0.5) +
+      200
+    );
+  }
+
+  const res = [];
+  let date = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+  const numberOfPoints = ohlc ? 100 : 500;
+  for (var i = 0; i < numberOfPoints; ++i) {
+    const time = date.getTime() / 1000;
+    const value = samplePoint(i);
+    if (ohlc) {
+      const randomRanges = [
+        -1 * Math.random(),
+        Math.random(),
+        Math.random()
+      ].map(i => i * 10);
+      const sign = Math.sin(Math.random() - 0.5);
+      res.push({
+        time,
+        low: value + randomRanges[0],
+        high: value + randomRanges[1],
+        open: value + sign * randomRanges[2],
+        close: samplePoint(i + 1)
+      });
+    } else {
+      res.push({
+        time,
+        value
+      });
+    }
+
+    date.setUTCDate(date.getUTCDate() + 1);
+  }
+
+  return res;
+}
+
+const chartOptions = ref({});
+const data = ref(generateSampleData(false));
+const seriesOptions = ref({
+  color: "rgb(45, 77, 205)"
+});
+const chartType = ref("line");
+const lwChart = ref();
+
+function randomShade() {
+  return Math.round(Math.random() * 255);
+}
+
+const randomColor = (alpha = 1) => {
+  return `rgba(${randomShade()}, ${randomShade()}, ${randomShade()}, ${alpha})`;
+};
+
+const colorsTypeMap = {
+  area: [
+    ["topColor", 0.4],
+    ["bottomColor", 0],
+    ["lineColor", 1]
+  ],
+  bar: [
+    ["upColor", 1],
+    ["downColor", 1]
+  ],
+  baseline: [
+    ["topFillColor1", 0.28],
+    ["topFillColor2", 0.05],
+    ["topLineColor", 1],
+    ["bottomFillColor1", 0.28],
+    ["bottomFillColor2", 0.05],
+    ["bottomLineColor", 1]
+  ],
+  candlestick: [
+    ["upColor", 1],
+    ["downColor", 1],
+    ["borderUpColor", 1],
+    ["borderDownColor", 1],
+    ["wickUpColor", 1],
+    ["wickDownColor", 1]
+  ],
+  histogram: [["color", 1]],
+  line: [["color", 1]]
+};
+
+// Set a random colour for the series as an example of how
+// to apply new options to series. A similar appraoch will work on the
+// option properties.
+const changeColors = () => {
+  const options = {};
+  const colorsToSet = colorsTypeMap[chartType.value];
+  colorsToSet.forEach(c => {
+    options[c[0]] = randomColor(c[1]);
+  });
+  seriesOptions.value = options;
+};
+
+const changeData = () => {
+  const candlestickTypeData = ["candlestick", "bar"].includes(chartType.value);
+  const newData = generateSampleData(candlestickTypeData);
+  data.value = newData;
+  if (chartType.value === "baseline") {
+    const average =
+      newData.reduce((s, c) => {
+        return s + c.value;
+      }, 0) / newData.length;
+    seriesOptions.value = { baseValue: { type: "price", price: average } };
+  }
+};
+
+const changeType = () => {
+  const types = [
+    "line",
+    "area",
+    "baseline",
+    "histogram",
+    "candlestick",
+    "bar"
+  ].filter(t => t !== chartType.value);
+  const randIndex = Math.round(Math.random() * (types.length - 1));
+  chartType.value = types[randIndex];
+  changeData();
+
+  // call a method on the component.
+  lwChart.value.fitContent();
+};
 </script>
 <template>
-  <div>首页</div>
-  <!--  <div>-->
-  <!--    <a-button size="small" @click="refreshInfo" style="margin-bottom: 8px;">-->
-  <!--      刷新-->
-  <!--      <template #icon>-->
-  <!--        <reload-outlined />-->
-  <!--      </template>-->
-  <!--    </a-button>-->
-  <!--    <a-button size="small" @click="showHistoryKDetailDrawer" style="margin-bottom: 8px">-->
-  <!--      历史K线额度明细-->
-  <!--    </a-button>-->
-  <!--    <a-drawer v-model:visible="showHistoryKDetail" title="历史K线额度明细">-->
-  <!--      <a-row>-->
-  <!--        <a-col :span="12">-->
-  <!--          <a-statistic title="已用额度" :value="historyKDetailRef.usedQuota" />-->
-  <!--        </a-col>-->
-  <!--        <a-col :span="12">-->
-  <!--          <a-statistic title="剩余额度" :value="historyKDetailRef.remainQuota" />-->
-  <!--        </a-col>-->
-  <!--      </a-row>-->
-  <!--      <a-list item-layout="horizontal" :data-source="historyKDetailRef.itemList">-->
-  <!--        <template #renderItem="{ item }">-->
-  <!--          <a-list-item>-->
-  <!--            <a-list-item-meta :description="'代码:' + item.code + '市场:' + parseMarket(item.market)">-->
-  <!--              <template #title>-->
-  <!--                {{ item.name }}-->
-  <!--              </template>-->
-  <!--            </a-list-item-meta>-->
-  <!--            <a-list-item>-->
-  <!--              {{ item.requestTime }}-->
-  <!--            </a-list-item>-->
-  <!--          </a-list-item>-->
-  <!--        </template>-->
-  <!--      </a-list>-->
-  <!--    </a-drawer>-->
-  <!--    <a-row style="margin-bottom: 8px;">-->
-  <!--      <a-col :span="24">-->
-  <!--        <a-card title="时间" size="small" :loading="loading">-->
-  <!--          <UseNow v-slot="{ now, pause, resume }">-->
-  <!--            本机客户端时间:<span style="font-weight: bolder;">{{ parseNow(now) }}</span>-->
-  <!--          </UseNow>-->
-  <!--          <div>-->
-  <!--            服务器时间:<span style="font-weight: bolder;">{{ globalMarketState.time }}</span>-->
-  <!--          </div>-->
-  <!--        </a-card>-->
-  <!--      </a-col>-->
-  <!--    </a-row>-->
-  <!--    <a-row :gutter="8">-->
-  <!--      <a-col :span="6">-->
-  <!--        <a-card title="香港市场" size="small" :loading="loading">-->
-  <!--          <div>-->
-  <!--            香港股市:<span style="font-weight: bolder;">{{ globalMarketState.marketHK }}</span>-->
-  <!--          </div>-->
-  <!--          <div>-->
-  <!--            香港期货:<span style="font-weight: bolder;">{{ globalMarketState.marketHKFuture }}</span>-->
-  <!--          </div>-->
-  <!--        </a-card>-->
-  <!--      </a-col>-->
-  <!--      <a-col :span="6">-->
-  <!--        <a-card title="大A" size="small" :loading="loading">-->
-  <!--          <div>-->
-  <!--            上海:<span style="font-weight: bolder;">{{ globalMarketState.marketSH }}</span>-->
-  <!--          </div>-->
-  <!--          <div>-->
-  <!--            深圳:<span style="font-weight: bolder;">{{ globalMarketState.marketSZ }}</span>-->
-  <!--          </div>-->
-  <!--        </a-card>-->
-  <!--      </a-col>-->
-  <!--      <a-col :span="6">-->
-  <!--        <a-card title="美国市场" size="small" :loading="loading">-->
-  <!--          <div>-->
-  <!--            美国股市:<span style="font-weight: bolder;">{{ globalMarketState.marketUS }}</span>-->
-  <!--          </div>-->
-  <!--          <div>-->
-  <!--            美国期货:<span style="font-weight: bolder;">{{ globalMarketState.marketUSFuture }}</span>-->
-  <!--          </div>-->
-  <!--        </a-card>-->
-  <!--      </a-col>-->
-  <!--      <a-col :span="6">-->
-  <!--        <a-card title="其他" size="small" :loading="loading">-->
-  <!--          <div>-->
-  <!--            新加坡期货:<span style="font-weight: bolder;">{{ globalMarketState.marketSGFuture }}</span>-->
-  <!--          </div>-->
-  <!--          <div>-->
-  <!--            日本期货: <span style="font-weight: bolder;">{{ globalMarketState.marketJPFuture }}</span>-->
-  <!--          </div>-->
-  <!--        </a-card>-->
-  <!--      </a-col>-->
-  <!--    </a-row>-->
-  <!--  </div>-->
+  <div>首页
+<!--    <div class="chart-container">-->
+<!--      <FinanceChart-->
+<!--        :type="chartType"-->
+<!--        :data="data"-->
+<!--        :autosize="true"-->
+<!--        :chart-options="chartOptions"-->
+<!--        :series-options="seriesOptions"-->
+<!--        ref="lwChart"-->
+<!--      />-->
+<!--    </div>-->
+<!--    <button type="button" @click="changeColors">Set Random Colors</button>-->
+<!--    <button type="button" @click="changeType">Change Chart Type</button>-->
+<!--    <button type="button" @click="changeData">Change Data</button>-->
+  </div>
 </template>
-<style scoped></style>
+<style scoped>
+.chart-container {
+  height: 1200px
+}
+</style>

@@ -67,7 +67,7 @@ const formState = reactive({
     name: "复权类型",
     type: "radio-group",
     radioOptions: rehabTypeToRadioOptions(),
-    bindValue: '1'
+    bindValue: "1"
   },
   range: {
     name: "时间范围",
@@ -603,6 +603,10 @@ onMounted(() => {
 </script>
 <template>
   <SearchArea :form="formState" @onFinish="onFinish" />
-  <v-chart style="height: 500px;" :loading="kLoading" :autoresize="true" :option="kLineOptions"></v-chart>
+  <v-chart class="chart" :loading="kLoading" :autoresize="true" :option="kLineOptions"></v-chart>
 </template>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.chart {
+  height: 500px;
+}
+</style>
