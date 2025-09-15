@@ -2,7 +2,7 @@
 import { use, time } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { UniversalTransition } from "echarts/features";
-import { LineChart, BarChart } from "echarts/charts";
+import { LineChart, BarChart, CandlestickChart } from "echarts/charts";
 import {
   MatrixComponent,
   GridComponent,
@@ -22,35 +22,32 @@ use([
   GridComponent,
   UniversalTransition,
   LineChart,
-  BarChart
+  BarChart,
+  CandlestickChart
 ]);
 
 provide(THEME_KEY, "dark");
-/**
- * Use a matrix coordinate system to layout multiple charts and components,
- * following the similar idea of CSS grid layout, and provide responsiveness
- * by media queries.
- */
+
 let _idBase = 1;
 const _mediaDefinitionList = [
-  {
-    // When the canvas width is less than 500px,
-    query: { maxWidth: 500 },
-    matrix: {
-      // Define column and rows
-      x: { data: Array(1).fill(null) },
-      y: { data: Array(10).fill(null) }
-    },
-    // Place sections into the matrix cell determined by the coords.
-    // key: sectionId, value: coord.
-    sectionCoordMap: {
-      section_title_1: [0, 0],
-      section_header_1: [0, [1, 2]],
-      section_sidebar_1: [0, [3, 4]],
-      section_main_content_area_1: [0, [5, 7]],
-      section_footer_1: [0, [8, 9]]
-    }
-  },
+  // {
+  //   // When the canvas width is less than 500px,
+  //   query: { maxWidth: 500 },
+  //   matrix: {
+  //     // Define column and rows
+  //     x: { data: Array(1).fill(null) },
+  //     y: { data: Array(10).fill(null) }
+  //   },
+  //   // Place sections into the matrix cell determined by the coords.
+  //   // key: sectionId, value: coord.
+  //   sectionCoordMap: {
+  //     section_title_1: [0, 0],
+  //     section_header_1: [0, [1, 2]],
+  //     section_sidebar_1: [0, [3, 4]],
+  //     section_main_content_area_1: [0, [5, 7]],
+  //     section_footer_1: [0, [8, 9]]
+  //   }
+  // },
   {
     // The default (with no `query`)
     matrix: {
@@ -59,90 +56,26 @@ const _mediaDefinitionList = [
       y: { data: Array(10).fill(null) }
     },
     sectionCoordMap: {
-      section_title_1: [[0, 3], 0],
-      section_header_1: [
-        [0, 3],
-        [1, 2]
+      order_book_area: [3, [0, 4]],
+      depth_area: [3, [5, 9]],
+      k_area: [
+        [0, 2],
+        [0, 5]
       ],
-      section_sidebar_1: [0, [3, 9]],
-      section_main_content_area_1: [
-        [1, 3],
-        [3, 7]
+      indies_area: [
+        [0, 2],
+        [6, 7]
       ],
-      section_footer_1: [
-        [1, 3],
+      volume: [
+        [0, 2],
         [8, 9]
       ]
     }
   }
 ];
 
-/**
- * Each section contains some charts and components.
- */
 const _sectionDefinitionMap = {
-  section_title_1: {
-    option: {
-      title: [
-        {
-          coordinateSystem: "matrix",
-          text: "Resize the Canvas to Check the Responsiveness",
-          left: "center",
-          top: 10
-        }
-      ]
-    }
-  },
-  section_header_1: {
-    option: {
-      title: [
-        {
-          coordinateSystem: "matrix",
-          text: "Header Section",
-          textStyle: { fontSize: 14 },
-          left: "center",
-          top: 5
-        }
-      ],
-      xAxis: {
-        type: "time",
-        id: "header_1",
-        gridId: "header_1"
-      },
-      yAxis: {
-        id: "header_1",
-        gridId: "header_1",
-        splitNumber: 2,
-        splitLine: { show: false }
-      },
-      grid: {
-        id: "header_1",
-        coordinateSystem: "matrix",
-        tooltip: {
-          trigger: "axis"
-        },
-        top: 30,
-        bottom: 10,
-        left: 10,
-        right: 10,
-        outerBounds: {
-          top: 30,
-          left: 20,
-          bottom: 20,
-          right: 20
-        }
-      },
-      series: {
-        type: "line",
-        id: "header_1",
-        xAxisId: "header_1",
-        yAxisId: "header_1",
-        symbol: "none",
-        data: generateSingleSeriesData(100, false)
-      }
-    }
-  },
-  section_sidebar_1: {
+  order_book_area: {
     option: {
       title: {
         coordinateSystem: "matrix",
@@ -193,15 +126,59 @@ const _sectionDefinitionMap = {
       }
     }
   },
-  section_main_content_area_1: {
+  depth_area: {
     option: {
       title: {
-        text: "Main Content Area",
         coordinateSystem: "matrix",
+        text: "Sidebar Section",
         textStyle: { fontSize: 14 },
         left: "center",
         top: 15
       },
+      xAxis: {
+        id: "sidebar_2",
+        gridId: "sidebar_2",
+        splitLine: { show: false },
+        axisLabel: {
+          hideOverlap: true
+        }
+      },
+      yAxis: {
+        type: "time",
+        id: "sidebar_2",
+        gridId: "sidebar_2",
+        axisLabel: {
+          hideOverlap: true
+        }
+      },
+      grid: {
+        id: "sidebar_2",
+        coordinateSystem: "matrix",
+        tooltip: {
+          trigger: "axis"
+        },
+        top: 50,
+        bottom: 30,
+        left: 40,
+        right: 30,
+        outerBounds: {
+          top: 30,
+          left: 20,
+          bottom: 20,
+          right: 20
+        }
+      },
+      series: {
+        type: "bar",
+        id: "sidebar_2",
+        xAxisId: "sidebar_2",
+        yAxisId: "sidebar_2",
+        data: generateSingleSeriesData(10, true)
+      }
+    }
+  },
+  k_area: {
+    option: {
       xAxis: {
         type: "time",
         id: "main_content_area_1",
@@ -238,14 +215,51 @@ const _sectionDefinitionMap = {
       }
     }
   },
-  section_footer_1: {
+  indies_area: {
+    option: {
+      xAxis: {
+        type: "time",
+        id: "main_content_area_2",
+        gridId: "main_content_area_2"
+      },
+      yAxis: {
+        id: "main_content_area_2",
+        gridId: "main_content_area_2"
+      },
+      grid: {
+        id: "main_content_area_2",
+        coordinateSystem: "matrix",
+        tooltip: {
+          trigger: "axis"
+        },
+        top: 50,
+        bottom: 10,
+        left: 10,
+        right: 10,
+        outerBounds: {
+          top: 30,
+          left: 20,
+          bottom: 20,
+          right: 20
+        }
+      },
+      series: {
+        type: "line",
+        id: "main_content_area_2",
+        xAxisId: "main_content_area_2",
+        yAxisId: "main_content_area_2",
+        symbol: "none",
+        data: generateSingleSeriesData(100, false)
+      }
+    }
+  },
+  volume: {
     option: {
       title: {
         coordinateSystem: "matrix",
-        text: "Footer Section",
-        textStyle: { fontSize: 14 },
-        left: "center",
-        top: 15
+        text: "成交量(Volume)",
+        textStyle: { fontSize: 12 },
+        top: 0
       },
       xAxis: {
         type: "time",
@@ -292,7 +306,7 @@ const option = ref({
     x: { show: false, data: [] },
     y: { show: false, data: [] },
     body: {
-      itemStyle: { borderColor: "none" }
+      itemStyle: { borderColor: "red" }
     },
     backgroundStyle: { borderColor: "none" },
     top: 0,
@@ -359,9 +373,6 @@ function assembleIntoEChartsOption(
   });
 }
 
-/**
- * If no component id, generate one, and immutablely return a new component object.
- */
 function ensureComponentId(component, sectionId, componentMainType) {
   if (component.id != null) {
     return component;
@@ -371,16 +382,10 @@ function ensureComponentId(component, sectionId, componentMainType) {
   return component;
 }
 
-/**
- * `{}` is converted to `[{}]`; null/undefined is converted to `[]`.
- */
 function normalizeToArray(value) {
   return Array.isArray(value) ? value : value != null ? [value] : [];
 }
 
-/**
- * Generate some random data for a single series.
- */
 function generateSingleSeriesData(dayCount, inverseXY) {
   const dayStart = new Date("2025-05-05T00:00:00.000Z"); // Monday
   const timeStart = dayStart.getTime();
@@ -413,14 +418,52 @@ function generateSingleSeriesData(dayCount, inverseXY) {
   return seriesData;
 }
 
+const kdjToggle = ref(false);
+
+function toggleKdj(checked) {
+  if (checked) {
+    option.value.matrix.body.itemStyle = { borderColor: "none" };
+  } else {
+    option.value.matrix.body.itemStyle = { borderColor: "red" };
+  }
+
+  // {
+  //   matrix: {
+  //     x: { show: false, data: [] },
+  //     y: { show: false, data: [] },
+  //     body: {
+  //       itemStyle: { borderColor: "none" }
+  //     },
+  //     backgroundStyle: { borderColor: "none" },
+  //     top: 0,
+  //     bottom: 0,
+  //     left: 0,
+  //     right: 0
+  //   },
+  //   tooltip: {}
+  // };
+}
+
+const props = defineProps({
+  height: {
+    type: Number,
+    default: 600
+  }
+});
+
+
+console.log(option.value);
 </script>
 
 <template>
-  <v-chart :autoresize="true" class="chart" :option="option" />
+  <div>
+    <a-switch v-model:checked="kdjToggle" @change="toggleKdj" size="small" />
+    <v-chart :autoresize="true" class="chart" :style="{height:height+'px'}" :option="option" />
+  </div>
 </template>
 
 <style scoped lang="less">
 .chart {
-  height: 400px;
+  width: 100%;
 }
 </style>
