@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import SearchArea from "@/components/SearchArea/SearchArea.vue";
+import TradingPane from "@/components/TradingPane/index.vue";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
@@ -474,6 +475,8 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
   };
 }
 
+const kData = ref([]);
+
 function onFinish(values: any) {
   let fetchMethods: Array<Promise<AxiosResponse>> = [];
   if (values.indies.includes("k")) {
@@ -553,6 +556,7 @@ function onFinish(values: any) {
       let kLines: KLine[] = [];
       let kPromiseIndex = allPromises.findIndex(promise => promise.config.url === "/ana/k/n");
       if (kPromiseIndex != -1) {
+        kData.value = allPromises[kPromiseIndex].data;
         kLines = allPromises[kPromiseIndex].data;
       }
       let maLines: MaData[] = [];
@@ -603,10 +607,7 @@ onMounted(() => {
 </script>
 <template>
   <SearchArea :form="formState" @onFinish="onFinish" />
-  <v-chart class="chart" :loading="kLoading" :autoresize="true" :option="kLineOptions"></v-chart>
+  <TradingPane :k="kData" :volumes="kData"/>
 </template>
 <style lang="less" scoped>
-.chart {
-  height: 500px;
-}
 </style>
