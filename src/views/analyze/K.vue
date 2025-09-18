@@ -28,8 +28,7 @@ const { metaCodes } = storeToRefs(analyzeMetaStores);
 // k线
 const analyzeKStores = useAnalyzeKline();
 const fetchKLine = analyzeKStores.requestK;
-const { kLoading } = storeToRefs(analyzeKStores);
-const kLineOptions = ref({});
+const { kData } = storeToRefs(analyzeKStores);
 // 指标
 const analyzeIndiesStores = useAnalyzeIndies();
 const fetchRsiData = analyzeIndiesStores.requestRsiData;
@@ -49,51 +48,6 @@ const metaCodeSelectOptions = computed(() => {
     });
   });
   return options;
-});
-
-const formState = reactive({
-  code: {
-    name: "标的物代码",
-    type: "select",
-    selectOptions: metaCodeSelectOptions,
-    bindValue: ""
-  },
-  granularity: {
-    name: "K线类型",
-    type: "select",
-    selectOptions: klTypeToSelectOptions(),
-    bindValue: 1
-  },
-  rehabType: {
-    name: "复权类型",
-    type: "radio-group",
-    radioOptions: rehabTypeToRadioOptions(),
-    bindValue: "1"
-  },
-  range: {
-    name: "时间范围",
-    type: "datetime-range",
-    bindValue: [dayjs(), dayjs().subtract(1, "minute")],
-    ranges: {
-      "大A交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(15).minute(30).second(0)],
-      "港股交易时段": [dayjs().hour(9).minute(30).second(0), dayjs().hour(16).minute(0).second(0)]
-    }
-  },
-  indies: {
-    name: "指标",
-    type: "checkbox-group",
-    bindValue: ["k"],
-    checkboxOptions: [
-      { label: "K", value: "k" },
-      { label: "MA(5/10/20/30/60/120)", value: "ma" },
-      { label: "BOLL(20,2.0)", value: "boll" },
-      { label: "EMA(5/10/20/60/120)", value: "ema" },
-      { label: "MACD(12,26,9)", value: "macd" },
-      { label: "RSI(6,12,24)", value: "rsi" },
-      { label: "KDJ(9,3,3)", value: "kdj" },
-      { label: "ARBR(26)", value: "arbr" }
-    ]
-  }
 });
 
 function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
@@ -475,19 +429,9 @@ function drawAnalyzePic(kLines: KLine[], maLines: MaData[],
   };
 }
 
-const kData = ref([]);
 
 function onFinish(values: any) {
   let fetchMethods: Array<Promise<AxiosResponse>> = [];
-  if (values.indies.includes("k")) {
-    fetchMethods.push(fetchKLine({
-      rehabType: values.rehabType,
-      granularity: values.granularity,
-      code: values.code,
-      start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-      end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss")
-    }));
-  }
   if (values.indies.includes("ma")) {
     fetchMethods.push(fetchMaLine({
       rehabType: values.rehabType,
@@ -599,6 +543,111 @@ function onFinish(values: any) {
   });
 }
 
+const volumes = computed(() => {
+  let xAxisTime: Array<String> = [];
+  let volumes: Array<Array> = [];
+  kData.value.forEach((k, index) => {
+    xAxisTime.push(k.datetime);
+    volumes.push([index, k.volume, k.openPrice > k.closePrice ? 1 : -1]);
+  });
+  return {
+    datetime: xAxisTime,
+    value: volumes
+  };
+});
+
+const kLines = computed(() => {
+  let xAxisTime: Array<String> = [];
+  let candelstickArray: Array<Array> = [];
+  kData.value.forEach((k, index) => {
+    xAxisTime.push(k.datetime);
+    candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice]);
+  });
+  return {
+    datetime: xAxisTime,
+    value: candelstickArray
+  };
+});
+
+const maData = ref<{
+  datetime: Array<String>,
+  ma5: Array<Number>,
+  ma10: Array<Number>,
+  ma20: Array<Number>,
+  ma30: Array<Number>,
+  ma60: Array<Number>,
+  ma120: Array<Number>,
+}>({
+  datetime: [],
+  ma5: [],
+  ma10: [],
+  ma20: [],
+  ma30: [],
+  ma60: [],
+  ma120: []
+});
+
+function queryDataset(values: any) {
+  fetchKLine({
+    rehabType: values.rehabType,
+    granularity: values.granularity,
+    code: values.code,
+    start: dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
+    end: dayjs(values.end).format("YYYY-MM-DD HH:mm:ss")
+  });
+  queryMaData(values);
+}
+
+function queryMaData(values: any) {
+  if (values.indies.includes("ma")) {
+    fetchMaLine({
+      rehabType: values.rehabType,
+      granularity: values.granularity,
+      code: values.code,
+      start: dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
+      end: dayjs(values.end).format("YYYY-MM-DD HH:mm:ss")
+    }).then(res => {
+      if (res.status === 200) {
+        let xAxisTime: Array<String> = [];
+        let ma5Array: Array<Number> = [];
+        let ma10Array: Array<Number> = [];
+        let ma20Array: Array<Number> = [];
+        let ma30Array: Array<Number> = [];
+        let ma60Array: Array<Number> = [];
+        let ma120Array: Array<Number> = [];
+        res.data.forEach((ma, index) => {
+          xAxisTime.push(ma.updateTime);
+          ma5Array.push(ma.ma5Value);
+          ma10Array.push(ma.ma10Value);
+          ma20Array.push(ma.ma20Value);
+          ma30Array.push(ma.ma30Value);
+          ma60Array.push(ma.ma60Value);
+          ma120Array.push(ma.ma120Value);
+        });
+        maData.value.datetime = xAxisTime;
+        maData.value.ma5 = ma5Array;
+        maData.value.ma10 = ma10Array;
+        maData.value.ma20 = ma20Array;
+        maData.value.ma30 = ma30Array;
+        maData.value.ma60 = ma60Array;
+        maData.value.ma120 = ma120Array;
+      }
+    });
+  } else {
+    maData.value.datetime = [];
+    maData.value.ma5 = [];
+    maData.value.ma10 = [];
+    maData.value.ma20 = [];
+    maData.value.ma30 = [];
+    maData.value.ma60 = [];
+    maData.value.ma120 = [];
+  }
+}
+
+function queryIndiesDataset(values: any) {
+  queryMaData(values);
+}
+
 onMounted(() => {
   fetchCodes({
     granularity: 1
@@ -606,8 +655,12 @@ onMounted(() => {
 });
 </script>
 <template>
-  <SearchArea :form="formState" @onFinish="onFinish" />
-  <TradingPane :k="kData" :volumes="kData"/>
+  <TradingPane :codes="metaCodeSelectOptions"
+               :k="kLines"
+               :volumes="volumes"
+               :ma="maData"
+               @on-select-code="queryDataset"
+               @on-select-indies="queryIndiesDataset" />
 </template>
 <style lang="less" scoped>
 </style>
