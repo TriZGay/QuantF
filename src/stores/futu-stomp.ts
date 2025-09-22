@@ -38,7 +38,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   const futuGetPriceReminder = ref<GetPriceReminderCommand>();
 
   const connectToNotifyEndPoint = (): void => {
-    futuStompNotifyClient.value = Stomp.client("ws://localhost:9090/notify");
+    futuStompNotifyClient.value = Stomp.client("/rt/notify");
     futuStompNotifyClient.value.connect({}, frame => {
       if (frame?.command === "CONNECTED") {
         futuStompNotifyClientStatus.value = true;

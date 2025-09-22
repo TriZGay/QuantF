@@ -8,6 +8,12 @@ export default defineConfig({
   server: {
     port: 8888,
     proxy: {
+      "/rt": {
+        target: "ws://localhost:9090",
+        ws: true,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/rt/, "")
+      },
       "/api": {
         target: "http://localhost:9090",
         changeOrigin: true,
