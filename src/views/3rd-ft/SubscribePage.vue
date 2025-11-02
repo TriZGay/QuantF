@@ -144,14 +144,6 @@ function cancelSubscribe(row: SubscribeInfo) {
     }
   });
 }
-
-const computeKlType = (subType: number) => {
-  if (subType === 11) {
-    return 1;
-  }
-};
-
-
 </script>
 <template>
   <div class="subscribe-info-container">
@@ -189,11 +181,12 @@ const computeKlType = (subType: number) => {
             </template>
             <template v-if="column.key === 'action'">
                     <span>
+                      <a-space>
                         <a-button type="link" size="small" @click="cancelSubscribe(record)">取消订阅</a-button>
-                        <a-divider type="vertical" />
-                        <HistoryKLineButton :kl-type="computeKlType(record.subType)"
+                        <HistoryKLineButton :sub-type="record.subType"
                                             :market="record.securityMarket"
                                             :code="record.securityCode" />
+                      </a-space>
                     </span>
             </template>
           </template>
