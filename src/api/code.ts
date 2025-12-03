@@ -6,7 +6,7 @@ export const FT_MARKET = {
   21: "上海市场",
   22: "深圳市场",
   31: "新加坡市场",
-  41: "日本市场"
+  41: "日本市场",
 };
 
 export const FT_EXCHANGE_TYPE = {
@@ -28,31 +28,31 @@ export const FT_EXCHANGE_TYPE = {
   15: "深交所",
   16: "大A科创板",
   17: "新交所",
-  18: "大阪交易所"
+  18: "大阪交易所",
 };
 
 export const FT_TRADE_ENV = {
   0: "模拟环境",
-  1: "真实环境"
+  1: "真实环境",
 };
 
 export const FT_FIRM = {
   0: "未知",
   1: "富途证券（香港）",
   2: "富途证券（美国）",
-  3: "富途证券（新加坡）"
+  3: "富途证券（新加坡）",
 };
 
 export const FT_ACC_TYPE = {
   0: "未知",
   1: "现金账户",
-  2: "保证金账户"
+  2: "保证金账户",
 };
 
 export const FT_SIM_ACC_TYPE = {
   0: "未知",
   1: "股票模拟账户",
-  2: "期权模拟账户"
+  2: "期权模拟账户",
 };
 
 export const FT_TRADE_MARKET_AUTH = {
@@ -61,7 +61,7 @@ export const FT_TRADE_MARKET_AUTH = {
   2: "美国市场（证券、期权）",
   3: "A 股市场（仅用于模拟交易）",
   4: "A 股通市场（股票）",
-  5: "期货市场（环球期货）"
+  5: "期货市场（环球期货）",
 };
 
 export const FT_SUB_TYPE = {
@@ -80,7 +80,7 @@ export const FT_SUB_TYPE = {
   14: "经纪队列",
   15: "季K",
   16: "年K",
-  17: "3分K"
+  17: "3分K",
 };
 export const FT_SECURITY_TYPE = {
   0: "未知",
@@ -93,7 +93,7 @@ export const FT_SECURITY_TYPE = {
   7: "板块",
   8: "期权",
   9: "板块集",
-  10: "期货"
+  10: "期货",
 };
 
 export const FT_POSITION_SIDE = {
@@ -101,13 +101,13 @@ export const FT_POSITION_SIDE = {
   1: "买入",
   2: "卖出",
   3: "卖空",
-  4: "买回"
+  4: "买回",
 };
 
 export const FT_REHABTYPE = {
   0: "不复权",
   1: "前复权",
-  2: "后复权"
+  2: "后复权",
 };
 
 export const FT_KL_TYPE = {
@@ -122,7 +122,7 @@ export const FT_KL_TYPE = {
   8: "30分K",
   9: "60分K",
   10: "3分K",
-  11: "季K"
+  11: "季K",
 };
 
 export const MA_TYPE = {
@@ -131,68 +131,68 @@ export const MA_TYPE = {
   3: "MA20",
   4: "MA30",
   5: "MA60",
-  6: "MA120"
+  6: "MA120",
 };
 
 export function stockTypeToSelectOptions() {
-  return Object.keys(FT_SECURITY_TYPE).map(stockType => {
+  return Object.keys(FT_SECURITY_TYPE).map((stockType) => {
     return {
       label: FT_SECURITY_TYPE[stockType],
-      value: stockType
+      value: stockType,
     };
   });
 }
 
 export function stockTypeToCheckBoxOptions() {
-  return Object.keys(FT_SECURITY_TYPE).map(klType => {
+  return Object.keys(FT_SECURITY_TYPE).map((klType) => {
     return {
       label: FT_SECURITY_TYPE[klType],
-      value: klType
+      value: klType,
     };
   });
 }
 
 export function klTypeToSelectOptions() {
-  return Object.keys(FT_KL_TYPE).map(klType => {
+  return Object.keys(FT_KL_TYPE).map((klType) => {
     return {
       label: FT_KL_TYPE[klType],
-      value: parseInt(klType)
+      value: parseInt(klType),
     };
   });
 }
 
 export function maTypeToCheckBoxOptions() {
-  return Object.keys(MA_TYPE).map(rehabType => {
+  return Object.keys(MA_TYPE).map((rehabType) => {
     return {
       label: MA_TYPE[rehabType],
-      value: rehabType
+      value: rehabType,
     };
   });
 }
 
 export function marketTypeToSelectOptions() {
-  return Object.keys(FT_MARKET).map(marketType => {
+  return Object.keys(FT_MARKET).map((marketType) => {
     return {
       label: FT_MARKET[marketType],
-      value: marketType
+      value: marketType,
     };
   });
 }
 
 export function marketTypeToCheckBoxOptions() {
-  return Object.keys(FT_MARKET).map(marketType => {
+  return Object.keys(FT_MARKET).map((marketType) => {
     return {
       label: FT_MARKET[marketType],
-      value: marketType
+      value: marketType,
     };
   });
 }
 
 export function rehabTypeToRadioOptions() {
-  return Object.keys(FT_REHABTYPE).map(rehabType => {
+  return Object.keys(FT_REHABTYPE).map((rehabType) => {
     return {
       label: FT_REHABTYPE[rehabType],
-      value: rehabType
+      value: rehabType,
     };
   });
 }
