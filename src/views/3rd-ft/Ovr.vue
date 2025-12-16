@@ -62,14 +62,14 @@ const refreshHistoryKQuote = (): void => {
 const connectFutuD = (): void => {
   let command: ConnectCommand = {
     type: "CONNECT",
-    isConnect: true
+    connected: true
   };
   sendFtCommandOnNotifyEndPoint(command);
 };
 const disconnectFutuD = (): void => {
   let command: ConnectCommand = {
     type: "CONNECT",
-    isConnect: false
+    connected: false
   };
   sendFtCommandOnNotifyEndPoint(command);
 };
