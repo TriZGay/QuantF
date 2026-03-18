@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import SearchArea from "@/components/SearchArea/SearchArea.vue";
 import TradingPane from "@/components/TradingPane/index.vue";
 import { storeToRefs } from "pinia";
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
+import { useCapitalDistribution } from "@/components/CapitalDistributionButton/capitalDistribution";
 import dayjs from "dayjs";
 import type {
   ArbrResponse,
@@ -17,14 +17,17 @@ import type {
   RsiResponse,
 } from "@/api/analyze";
 import { isAll200 } from "@/utils/web";
-import { klTypeToSelectOptions, rehabTypeToRadioOptions } from "@/api/code";
 import type { AxiosResponse } from "axios";
-import type { SelectProps } from "ant-design-vue";
 import { useAnalyzeIndies } from "@/stores/ana-indicator";
+import { parseRehabType } from "@/api/code";
+
+const { sendCapitalDistributionCommand, capitalDistribution } =
+  useCapitalDistribution();
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
-const { metaCodes } = storeToRefs(analyzeMetaStores);
+const fetchTbInfoPerCode = analyzeMetaStores.requestTbInfoPerCode;
+const { metaCodes, computedTbInfoPerCode } = storeToRefs(analyzeMetaStores);
 // k线
 const analyzeKStores = useAnalyzeKline();
 const fetchKLine = analyzeKStores.requestK;
@@ -45,7 +48,7 @@ const metaCodeSelectOptions = computed(() => {
     options.push({
       icon: item.market,
       label: item.code,
-      value: item.code,
+      value: item.code + ":" + item.market,
     });
   });
   return options;
@@ -645,14 +648,25 @@ const maData = ref<{
 });
 
 function queryDataset(values: any) {
+  let realCode = values.code.split(":")[0];
+  let market = values.code.split(":")[1];
   fetchKLine({
     rehabType: values.rehabType,
     granularity: values.granularity,
-    code: values.code,
+    code: realCode,
     start: dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
     end: dayjs(values.end).format("YYYY-MM-DD HH:mm:ss"),
   });
-  queryMaData(values);
+  sendCapitalDistributionCommand({
+    marketCode: market,
+    code: realCode,
+  });
+  // queryMaData(values);
+}
+
+function queryTbInfo(values: any) {
+  let realCode = values.code.split(":")[0];
+  fetchTbInfoPerCode(values.granularity, realCode, values.rehabType);
 }
 
 function queryMaData(values: any) {
@@ -718,14 +732,34 @@ onMounted(() => {
 });
 </script>
 <template>
-  <TradingPane
-    :codes="metaCodeSelectOptions"
-    :k="kLines"
-    :volumes="volumes"
-    :ma="maData"
-    @on-select-code="queryDataset"
-    @on-select-indies="queryIndiesDataset"
-    @on-select-granularity="queryCodes"
-  />
+  <div>
+    <a-descriptions title="该标的库内情况" size="small" :column="6">
+      <a-descriptions-item label="标的物">
+        {{ computedTbInfoPerCode?.kInfo?.code }} -
+        {{ computedTbInfoPerCode?.name }}
+      </a-descriptions-item>
+      <a-descriptions-item label="复权">
+        {{ parseRehabType(computedTbInfoPerCode?.kInfo?.rehabType) }}
+      </a-descriptions-item>
+      <a-descriptions-item label="K线表最大时间" span="2">
+        {{ computedTbInfoPerCode?.kInfo?.maxTime }}
+      </a-descriptions-item>
+      <a-descriptions-item label="K线表最小时间" span="2">
+        {{ computedTbInfoPerCode?.kInfo?.minTime }}
+      </a-descriptions-item>
+    </a-descriptions>
+    <a-divider />
+    <TradingPane
+      :codes="metaCodeSelectOptions"
+      :k="kLines"
+      :volumes="volumes"
+      :ma="maData"
+      :capital-distribution="capitalDistribution"
+      @on-select-code="queryTbInfo"
+      @on-select-indies="queryIndiesDataset"
+      @on-select-granularity="queryCodes"
+      @on-select-dataset="queryDataset"
+    />
+  </div>
 </template>
 <style lang="less" scoped></style>

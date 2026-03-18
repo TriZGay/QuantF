@@ -2,72 +2,72 @@ import request from "@/utils/request";
 import type { AntDesignSelectOptions } from "@/api/futu";
 
 export interface BasicQuoteRequest {
-  code: string,
-  start: string,
-  end: string
+  code: string;
+  start: string;
+  end: string;
 }
 
 export interface KLineRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string,
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface BasicQuote {
-  code: string,
-  amplitude: number,
-  curPrice: number,
-  darkStatus: number,
-  highPrice: number,
-  lastClosePrice: number,
-  lowPrice: number,
-  market: number,
-  openPrice: number,
-  priceSpread: number,
-  secStatus: number,
-  trunover: number,
-  trunoverRate: number,
-  updateTime: string,
-  volume: number
+  code: string;
+  amplitude: number;
+  curPrice: number;
+  darkStatus: number;
+  highPrice: number;
+  lastClosePrice: number;
+  lowPrice: number;
+  market: number;
+  openPrice: number;
+  priceSpread: number;
+  secStatus: number;
+  trunover: number;
+  trunoverRate: number;
+  updateTime: string;
+  volume: number;
 }
 
 export interface KLine {
-  market: number,
-  code: string,
-  highPrice: string,
-  openPrice: string,
-  lowPrice: string,
-  closePrice: string,
-  lastClosePrice: number,
-  volume: number,
-  turnover: number,
-  turnoverRate: number,
-  pe: number,
-  changeRate: number,
-  datetime: string
+  market: number;
+  code: string;
+  highPrice: string;
+  openPrice: string;
+  lowPrice: string;
+  closePrice: string;
+  lastClosePrice: number;
+  volume: number;
+  turnover: number;
+  turnoverRate: number;
+  pe: number;
+  changeRate: number;
+  datetime: string;
 }
 
 export interface MaRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface MaData {
-  market: number,
-  code: string,
-  rehabType: number,
-  ma5Value: number,
-  ma10Value: number,
-  ma20Value: number,
-  ma30Value: number,
-  ma60Value: number,
-  ma120Value: number,
-  updateTime: string,
+  market: number;
+  code: string;
+  rehabType: number;
+  ma5Value: number;
+  ma10Value: number;
+  ma20Value: number;
+  ma30Value: number;
+  ma60Value: number;
+  ma120Value: number;
+  updateTime: string;
 }
 
 export interface MetaRequest {
@@ -75,24 +75,24 @@ export interface MetaRequest {
 }
 
 export interface MetaResponse {
-  market: number,
-  code: string
+  market: number;
+  code: string;
 }
 
 export interface TableInfoRequest {
-  tableName: string,
+  tableName: string;
 }
 
 export interface TableInfoResponse {
-  maxTime: string,
-  minTime: string,
-  code: string,
+  maxTime: string;
+  minTime: string;
+  code: string;
   rehabType: number;
 }
 
 export interface DataQaRequest {
-  start: string,
-  end: string,
+  start: string;
+  end: string;
 }
 
 export interface DataQaDetailsRequest {
@@ -104,24 +104,24 @@ export interface DataQaDetailsResponse {
 }
 
 export interface RepeatDetails {
-  checkDate: string,
-  code: string,
-  rehabType: Number,
-  updateTime: string,
-  tableName: string
+  checkDate: string;
+  code: string;
+  rehabType: Number;
+  updateTime: string;
+  tableName: string;
 }
 
 export interface BollRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface BollResponse {
-  market: number,
-  code: String,
+  market: number;
+  code: String;
   rehabType: number;
   ma20Mid: number;
   doubleUpper: number;
@@ -134,56 +134,56 @@ export interface BollResponse {
 }
 
 export interface EMaRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface EMaData {
-  market: number,
-  code: string,
-  rehabType: number,
-  ema5Value: number,
-  ema10Value: number,
-  ema20Value: number,
-  ema60Value: number,
-  ema120Value: number,
-  updateTime: string,
+  market: number;
+  code: string;
+  rehabType: number;
+  ema5Value: number;
+  ema10Value: number;
+  ema20Value: number;
+  ema60Value: number;
+  ema120Value: number;
+  updateTime: string;
 }
 
 export interface MacdRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface MacdResponse {
-  market: number,
-  code: string,
-  rehabType: number,
-  dif: number,
-  dea: number,
-  macd: number,
-  updateTime: string
+  market: number;
+  code: string;
+  rehabType: number;
+  dif: number;
+  dea: number;
+  macd: number;
+  updateTime: string;
 }
 
 export interface BackTestRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  strategyType: number,
-  initialCapital: number,
-  commission: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  strategyType: number;
+  initialCapital: number;
+  commission: number;
+  start: string;
+  end: string;
 }
 
 export interface BackTestResponse {
-  prices: Array<KLine>,
+  prices: Array<KLine>;
   tradeSignals: Array<BackTestTradeSignal>;
   backTestOvr: BackTestOvr;
 }
@@ -209,56 +209,56 @@ export interface BackTestOvr {
 }
 
 export interface RsiRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface RsiResponse {
-  market: number,
-  code: string,
-  rehabType: number,
-  rsi6: number,
-  rsi12: number,
-  rsi24: number,
-  updateTime: string
+  market: number;
+  code: string;
+  rehabType: number;
+  rsi6: number;
+  rsi12: number;
+  rsi24: number;
+  updateTime: string;
 }
 
 export interface KdjRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface KdjResponse {
-  market: number,
-  code: string,
-  rehabType: number,
-  k: number,
-  d: number,
-  j: number,
-  updateTime: string
+  market: number;
+  code: string;
+  rehabType: number;
+  k: number;
+  d: number;
+  j: number;
+  updateTime: string;
 }
 
 export interface ArbrRequest {
-  code: string,
-  rehabType: number,
-  granularity: number,
-  start: string,
-  end: string
+  code: string;
+  rehabType: number;
+  granularity: number;
+  start: string;
+  end: string;
 }
 
 export interface ArbrResponse {
-  market: number,
-  code: string,
-  rehabType: number,
-  ar: number,
-  br: number,
-  updateTime: string
+  market: number;
+  code: string;
+  rehabType: number;
+  ar: number;
+  br: number;
+  updateTime: string;
 }
 
 //查询arbr数据 ARBR(26)
@@ -293,12 +293,18 @@ export function fetchBollData(bollReq: BollRequest) {
 
 //查询某一日的数据质量细节如是否重复
 export function fetchDataQaDetails(detailsReq: DataQaDetailsRequest) {
-  return request.post<DataQaDetailsResponse>("/ana/meta/dataQaDetails", detailsReq);
+  return request.post<DataQaDetailsResponse>(
+    "/ana/meta/dataQaDetails",
+    detailsReq
+  );
 }
 
 //查询每日数据质量
 export function fetchDataQaPerDay(dataQaReq: DataQaRequest) {
-  return request.post<Map<String, boolean>>("/ana/meta/dataQaPerDay", dataQaReq);
+  return request.post<Map<String, boolean>>(
+    "/ana/meta/dataQaPerDay",
+    dataQaReq
+  );
 }
 
 //查询ck的表
@@ -348,4 +354,15 @@ export function fetchKdj933Init(granularity: number) {
 
 export function fetchStrategyTypes() {
   return request.get<AntDesignSelectOptions[]>("/ana/meta/strategyTypes");
+}
+
+//查询表数据边界
+export function fetchTbInfoPerCode(
+  granularity: number,
+  code: string,
+  rehabType: number
+) {
+  return request.get(
+    `/ana/meta/tbInfo/granularity/${granularity}/code/${code}/rehabType/${rehabType}`
+  );
 }

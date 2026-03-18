@@ -5,61 +5,62 @@ import {
   fetchMetaDbInfo,
   fetchMetaTables,
   fetchTableInfo,
-  fetchTruncateTable
+  fetchTbInfoPerCode,
+  fetchTruncateTable,
 } from "@/api/analyze";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useRequest } from "vue-request";
 
 export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
-  const {
-    data,
-    run: requestMetaData
-  } = useRequest(fetchMetaData, {
-    manual: true
+  const { data, run: requestMetaData } = useRequest(fetchMetaData, {
+    manual: true,
   });
 
-  const {
-    data: tables,
-    run: requestTables
-  } = useRequest(fetchMetaTables, {
-    manual: true
+  const { data: tables, run: requestTables } = useRequest(fetchMetaTables, {
+    manual: true,
   });
 
   const {
     data: dbInfos,
     loading: dbInfoLoading,
-    run: requestMetaDbInfo
+    run: requestMetaDbInfo,
   } = useRequest(fetchMetaDbInfo, {
-    manual: true
+    manual: true,
   });
 
   const {
     data: tableInfos,
     loading: tableInfoLoading,
-    runAsync: requestTableInfo
+    runAsync: requestTableInfo,
   } = useRequest(fetchTableInfo, {
-    manual: true
+    manual: true,
   });
 
-  const {
-    runAsync: requestTruncateTable
-  } = useRequest(fetchTruncateTable, {
-    manual: true
+  const { runAsync: requestTruncateTable } = useRequest(fetchTruncateTable, {
+    manual: true,
   });
 
-  const {
-    run: requestDataQa,
-    data: dataQa
-  } = useRequest(fetchDataQaPerDay, {
-    manual: true
+  const { run: requestDataQa, data: dataQa } = useRequest(fetchDataQaPerDay, {
+    manual: true,
   });
 
-  const {
-    run: requestDataQaDetails,
-    data: qaDetails
-  } = useRequest(fetchDataQaDetails, {
-    manual: true
+  const { run: requestDataQaDetails, data: qaDetails } = useRequest(
+    fetchDataQaDetails,
+    {
+      manual: true,
+    }
+  );
+
+  const { run: requestTbInfoPerCode, data: tbInfoPerCode } = useRequest(
+    fetchTbInfoPerCode,
+    {
+      manual: true,
+    }
+  );
+
+  const computedTbInfoPerCode = computed(() => {
+    return tbInfoPerCode.value?.data || {};
   });
 
   const dataQaDetails = computed(() => {
@@ -101,6 +102,8 @@ export const useAnalyzeMeta = defineStore("analyzeMeta", () => {
     dataQaPerDay,
     requestDataQa,
     requestDataQaDetails,
-    dataQaDetails
+    dataQaDetails,
+    requestTbInfoPerCode,
+    computedTbInfoPerCode,
   };
 });

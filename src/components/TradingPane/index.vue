@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { useK } from "./k";
 import { useVolumes } from "./volumes";
 import { useMa } from "./ma";
+import { useCapitalDistribution   } from "@/components/TradingPane/capitalDistribution";
 
 provide(THEME_KEY, "dark");
 
@@ -33,6 +34,20 @@ const props = defineProps({
       value: [],
     },
   },
+  capitalDistribution: {
+    type: Object,
+    default: {
+      capitalInSuper: 0,
+      capitalInBig: 0,
+      capitalInMid: 0,
+      capitalInSmall: 0,
+      capitalOutSuper: 0,
+      capitalOutBig: 0,
+      capitalOutMid: 0,
+      capitalOutSmall: 0,
+      updateTime: "",
+    },
+  },
   ma: {
     type: Object,
     default: {
@@ -50,6 +65,7 @@ const emit = defineEmits([
   "on-select-code",
   "on-select-indies",
   "on-select-granularity",
+  "on-select-dataset",
 ]);
 const query = ref({
   code: "",
@@ -60,8 +76,12 @@ const query = ref({
   indies: [],
 });
 
+const indiesMode = ref(2);
+
 const { kOptions } = useK(props);
 const { volumeOptions } = useVolumes(props);
+const { capitalDistributionOptions } = useCapitalDistribution(props);
+
 useMa(props, kOptions);
 
 const onSelectCode = (value) => {
@@ -74,8 +94,13 @@ const handleIndiesChange = (value) => {
 };
 
 const onSelectGranularity = (value) => {
+  query.value.code = "";
   query.value.granularity = value;
   emit("on-select-granularity", query.value);
+};
+
+const onSearchDataset = () => {
+  emit("on-select-dataset", query.value);
 };
 </script>
 
@@ -133,6 +158,24 @@ const onSelectGranularity = (value) => {
           @change="handleIndiesChange"
         />
       </a-form-item>
+      <a-form-item label="指标计算模式">
+        <a-radio-group>
+          <a-radio-group
+            size="small"
+            v-model:value="indiesMode"
+            :options="[
+              { label: 'wasm', value: 1 },
+              { label: '后端', value: 2 },
+            ]"
+          />
+        </a-radio-group>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" size="small" @click="onSearchDataset">
+          <template #icon><SearchOutlined /></template>
+          查询
+        </a-button>
+      </a-form-item>
     </a-form>
   </div>
   <div :style="{ height: height + 'px' }" class="trading-pane">
@@ -149,7 +192,11 @@ const onSelectGranularity = (value) => {
       group="trading-pane"
       :option="volumeOptions"
     />
-    <v-chart :autoresize="true" class="depth-area" />
+    <v-chart
+      :autoresize="true"
+      class="cap-distr-area"
+      :option="capitalDistributionOptions"
+    />
   </div>
 </template>
 
@@ -163,7 +210,7 @@ const onSelectGranularity = (value) => {
   background-color: #000c17;
 }
 
-.depth-area {
+.cap-distr-area {
   @apply col-start-4 col-end-6 row-start-4 row-end-7;
   background-color: #000c17;
 }

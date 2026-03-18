@@ -53,7 +53,7 @@ export function useVolumes(props) {
     dataZoom: [
       {
         type: "inside",
-        start: 95,
+        start: 0,
         end: 100
       }
     ],

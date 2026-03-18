@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { klTypeToSelectOptions } from "@/api/code";
-import { defineProps, ref, watch } from "vue";
+import { defineProps, ref } from "vue";
 import type { Dayjs } from "dayjs";
 import type { HistoryKLCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
@@ -12,9 +12,9 @@ const endDate = ref<Dayjs>();
 
 const visible = ref<boolean>(false);
 const props = defineProps<{
-  subType: number,
-  market: number,
-  code: string,
+  subType: number;
+  market: number;
+  code: string;
 }>();
 const klType = ref<number>(0);
 const computeKlType = (subType: number) => {
@@ -60,7 +60,7 @@ const requestHistoryK = (): void => {
     code: props.code,
     klType: klType.value,
     beginDate: beginDate.value.format("YYYY-MM-DD"),
-    endDate: endDate.value.format("YYYY-MM-DD")
+    endDate: endDate.value.format("YYYY-MM-DD"),
   };
   sendFtCommandOnNotifyEndPoint(historyKLCommand);
 };
@@ -74,12 +74,19 @@ const openModal = () => {
 <template>
   <div>
     <a-button type="link" size="small" @click="openModal">历史K</a-button>
-    <a-modal v-model:visible="visible" title="选择时间段"
-             @ok="requestHistoryK"
-             @cancel="visible=false">
+    <a-modal
+      v-model:visible="visible"
+      title="选择时间段"
+      @ok="requestHistoryK"
+      @cancel="visible = false"
+    >
       <a-space>
-        <a-select style="width: 100px" v-model:value="klType" size="small"
-                  :options="klTypeToSelectOptions()">
+        <a-select
+          style="width: 100px"
+          v-model:value="klType"
+          size="small"
+          :options="klTypeToSelectOptions()"
+        >
         </a-select>
         <a-date-picker size="small" v-model:value="beginDate" />
         <a-date-picker size="small" v-model:value="endDate" />
@@ -88,6 +95,4 @@ const openModal = () => {
   </div>
 </template>
 
-<style scoped lang="less">
-
-</style>
+<style scoped lang="less"></style>
