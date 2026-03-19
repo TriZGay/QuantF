@@ -49,14 +49,46 @@ export function useCapitalDistribution(props) {
     (newVal) => {
       capitalDistributionOptions.value.title.subtext = newVal.updateTime;
       let pieData = [];
-      pieData.push({ name: "特大单流入", value: newVal.capitalInSuper });
-      pieData.push({ name: "大单流入", value: newVal.capitalInBig });
-      pieData.push({ name: "中单流入", value: newVal.capitalInMid });
-      pieData.push({ name: "小单流入", value: newVal.capitalInSmall });
-      pieData.push({ name: "特大单流出", value: newVal.capitalOutSuper });
-      pieData.push({ name: "大单流出", value: newVal.capitalOutBig });
-      pieData.push({ name: "中单流出", value: newVal.capitalOutMid });
-      pieData.push({ name: "小单流出", value: newVal.capitalOutSmall });
+      pieData.push({
+        name: "特大单流入",
+        value: newVal.capitalInSuper,
+        itemStyle: { color: "#D32F2F" },
+      });
+      pieData.push({
+        name: "大单流入",
+        value: newVal.capitalInBig,
+        itemStyle: { color: "#E53935" },
+      });
+      pieData.push({
+        name: "中单流入",
+        value: newVal.capitalInMid,
+        itemStyle: { color: "#EF5350" },
+      });
+      pieData.push({
+        name: "小单流入",
+        value: newVal.capitalInSmall,
+        itemStyle: { color: "#F48FB1" },
+      });
+      pieData.push({
+        name: "特大单流出",
+        value: newVal.capitalOutSuper,
+        itemStyle: { color: "#2E7D32" },
+      });
+      pieData.push({
+        name: "大单流出",
+        value: newVal.capitalOutBig,
+        itemStyle: { color: "#388E3C" },
+      });
+      pieData.push({
+        name: "中单流出",
+        value: newVal.capitalOutMid,
+        itemStyle: { color: "#4CAF50" },
+      });
+      pieData.push({
+        name: "小单流出",
+        value: newVal.capitalOutSmall,
+        itemStyle: { color: "#81C784" },
+      });
       capitalDistributionOptions.value.series[0].data = pieData;
     }
   );
