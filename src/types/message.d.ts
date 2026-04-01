@@ -414,10 +414,9 @@ export interface CapitalFlowContend {
 
 export interface CapitalFlowCommand extends Message {
   security: PlateItem;
-  periodType?: number;
+  periodType?: number; //1-实时 2-日 3-周 4-月
   beginTime?: string;
   endTime?: string;
-  lastValidTime?: string;
   contentList?: Array<CapitalFlowContend>;
 }
 

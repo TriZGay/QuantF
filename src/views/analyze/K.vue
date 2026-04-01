@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useCapitalDistribution } from "@/components/CapitalDistributionButton/capitalDistribution";
+import { useCapitalFlow } from "@/components/CapitalFlowButton/capiflow";
 import dayjs from "dayjs";
 import type {
   ArbrResponse,
@@ -23,6 +24,7 @@ import { parseRehabType } from "@/api/code";
 
 const { sendCapitalDistributionCommand, capitalDistribution } =
   useCapitalDistribution();
+const { sendCapitalFlowCommand, capitalFlow } = useCapitalFlow();
 
 const analyzeMetaStores = useAnalyzeMeta();
 const fetchCodes = analyzeMetaStores.requestMetaData;
@@ -661,6 +663,16 @@ function queryDataset(values: any) {
     marketCode: market,
     code: realCode,
   });
+  //k线周期 1分K的码表值刚好为1-实时
+  let periodType = values.granularity;
+  sendCapitalFlowCommand(
+    market,
+    realCode,
+    periodType,
+    dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
+    dayjs(values.end).format("YYYY-MM-DD HH:mm:ss")
+  );
+
   // queryMaData(values);
 }
 
@@ -755,6 +767,7 @@ onMounted(() => {
       :volumes="volumes"
       :ma="maData"
       :capital-distribution="capitalDistribution"
+      :capital-flow="capitalFlow"
       @on-select-code="queryTbInfo"
       @on-select-indies="queryIndiesDataset"
       @on-select-granularity="queryCodes"

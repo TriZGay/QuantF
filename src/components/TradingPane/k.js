@@ -57,6 +57,7 @@ export function useK(props) {
     series: [{
       type: "candlestick",
       data: [],
+      //todo no display bug
       markPoint: {
         data: [
           {

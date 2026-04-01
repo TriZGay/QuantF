@@ -7,7 +7,8 @@ import dayjs from "dayjs";
 import { useK } from "./k";
 import { useVolumes } from "./volumes";
 import { useMa } from "./ma";
-import { useCapitalDistribution   } from "@/components/TradingPane/capitalDistribution";
+import { useCapitalDistribution } from "@/components/TradingPane/capitalDistribution";
+import { useCapitalFlow } from "@/components/TradingPane/capitalFlow";
 
 provide(THEME_KEY, "dark");
 
@@ -32,6 +33,13 @@ const props = defineProps({
     default: {
       datetime: [],
       value: [],
+    },
+  },
+  capitalFlow: {
+    type: Object,
+    default: {
+      updateTime: "",
+      contentList: [],
     },
   },
   capitalDistribution: {
@@ -81,6 +89,7 @@ const indiesMode = ref(2);
 const { kOptions } = useK(props);
 const { volumeOptions } = useVolumes(props);
 const { capitalDistributionOptions } = useCapitalDistribution(props);
+const { capitalFlowOptions } = useCapitalFlow(props);
 
 useMa(props, kOptions);
 
@@ -185,7 +194,11 @@ const onSearchDataset = () => {
       group="trading-pane"
       :option="kOptions"
     />
-    <v-chart :autoresize="true" class="order-area" />
+    <v-chart
+      :autoresize="true"
+      class="cap-flow-area"
+      :option="capitalFlowOptions"
+    />
     <v-chart
       :autoresize="true"
       class="volume-area"
@@ -205,7 +218,7 @@ const onSearchDataset = () => {
   @apply grid grid-cols-4 grid-rows-6;
 }
 
-.order-area {
+.cap-flow-area {
   @apply col-span-2 row-span-3;
   background-color: #000c17;
 }
