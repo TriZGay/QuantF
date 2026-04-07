@@ -27,7 +27,73 @@ export declare interface Message {
     | "USER_GROUP"
     | "USER_SECURITY"
     | "SET_PRICE_REMINDER"
-    | "GET_PRICE_REMINDER";
+    | "GET_PRICE_REMINDER"
+    | "IPO";
+}
+
+export interface WinningNumData {
+  winningName: string;
+  winningInfo: string;
+}
+
+export interface BasicIpoData {
+  security: CommonSecurity;
+  name: string;
+  listTime: string;
+  listTimestamp: number;
+}
+
+export interface CNIpoExData {
+  applyCode: string;
+  issueSize: number; // 发行总数
+  onlineIssueSize: number; // 网上发行量
+  applyUpperLimit: number; // 申购上限
+  applyLimitMarketValue: number; // 顶格申购需配市值
+  isEstimateIpoPrice: boolean; // 是否预估发行价
+  ipoPrice: number; // 发行价 预估值会因为募集资金、发行数量、发行费用等数据变动而变动，
+  industryPeRate: number; // 行业市盈率
+  isEstimateWinningRatio: boolean; // 是否预估中签率
+  winningRatio: number; // 中签率 该字段为百分比字段，默认不展示 %，如 20 实际
+  issuePeRate: number; // 发行市盈率
+  applyTime: string; // 申购日期字符串（格式：yyyy-MM-dd）
+  applyTimestamp: number; // 申购日期时间戳
+  winningTime: string; // 公布中签日期字符串（格式：yyyy-MM-dd）
+  winningTimestamp: number; // 公布中签日期时间戳
+  isHasWon: boolean; // 是否已经公布中签号
+  winningNumData: Array<WinningNumData>;
+}
+
+export interface HKIpoExData {
+  ipoPriceMin: number;
+  ipoPriceMax: number;
+  listPrice: number;
+  lotSize: number;
+  entrancePrice: number;
+  isSubscribeStatus: boolean;
+  applyEndTime: string;
+  applyEndTimestamp: number;
+}
+
+export interface USIpoExData {
+  ipoPriceMin: number;
+  ipoPriceMax: number;
+  issueSize: number;
+}
+
+export interface IpoData {
+  basic?: BasicIpoData;
+  cnExData?: CNIpoExData;
+  hkExData?: HKIpoExData;
+  usExData?: USIpoExData;
+}
+
+export interface IpoListResult {
+  hk: GetIpoListCommand;
+  cn: GetIpoListCommand;
+}
+export interface GetIpoListCommand extends Message {
+  market?: number;
+  ipoList?: Array<IpoData>;
 }
 
 export interface GetPriceReminderCommand extends Message {
@@ -402,7 +468,7 @@ export interface RehabsCommand extends Message {
   rehabs?: Array<RehabsContent>;
 }
 
-export interface CapitalFlowContend {
+export interface CapitalFlowContent {
   inFlow: number;
   mainInFlow: number;
   superInFlow: number;
@@ -417,7 +483,7 @@ export interface CapitalFlowCommand extends Message {
   periodType?: number; //1-实时 2-日 3-周 4-月
   beginTime?: string;
   endTime?: string;
-  contentList?: Array<CapitalFlowContend>;
+  contentList?: Array<CapitalFlowContent>;
 }
 
 export interface CapitalDistributionContent {

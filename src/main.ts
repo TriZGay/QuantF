@@ -1,3 +1,4 @@
+//@ts-ignore
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import Antd from "ant-design-vue";
@@ -11,7 +12,6 @@ import * as Icons from "@ant-design/icons-vue";
 const app = createApp(App);
 
 for (const i in Icons) {
-  //@ts-ignore
   app.component(i, Icons[i]);
 }
 app.config.globalProperties.$antIcons = Icons;
