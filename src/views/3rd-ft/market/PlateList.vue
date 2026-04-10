@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
-import { marketTypeToCheckBoxOptions, marketTypeToSelectOptions } from "@/api/code";
+import {
+  marketTypeToCheckBoxOptions,
+  marketTypeToSelectOptions,
+} from "@/api/code";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import type { PlatesCommand, StockInPlateCommand } from "@/types/message";
@@ -13,19 +16,20 @@ const { queryPlates } = useFutuApi();
 const { plates, platesLoading } = storeToRefs(useFutuApi());
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const markets = ref<Array<Number>>([]);
+const { futuStocksInPlate } = storeToRefs(useFutuStomp());
+const markets = ref<Array<number>>([]);
 
 onMounted(() => {
   queryPlates({
     size: 10,
-    current: 1
+    current: 1,
   });
 });
 
 const requestPlates = (): void => {
   let command: PlatesCommand = {
     type: "PLATES",
-    markets: markets.value
+    markets: markets.value,
   };
   sendFtCommandOnNotifyEndPoint(command);
 };
@@ -34,7 +38,8 @@ const pagination = computed<Object>(() => {
     total: plates.value.total,
     current: plates.value.current,
     pageSize: plates.value.pageSize,
-    showTotal: (total: Number, range: Array<any>) => `${range[0]}-${range[1]} of ${total} items`
+    showTotal: (total: Number, range: Array<any>) =>
+      `${range[0]}-${range[1]} of ${total} items`,
   };
 });
 
@@ -44,7 +49,7 @@ function onChangeTable(tableProps: Object) {
   queryPlates({
     ...queryForm,
     size: pageSize,
-    current: current
+    current: current,
   });
 }
 
@@ -52,31 +57,31 @@ const platesColumns = ref<TableColumnProps[]>([
   {
     title: "代码",
     dataIndex: "code",
-    fixed: "left"
+    fixed: "left",
   },
   {
     title: "名称",
-    dataIndex: "name"
+    dataIndex: "name",
   },
   {
     title: "市场",
-    dataIndex: "market"
+    dataIndex: "market",
   },
   {
     title: "板块类型",
-    dataIndex: "plateType"
+    dataIndex: "plateType",
   },
   {
     title: "操作",
-    key: "action"
-  }
+    key: "action",
+  },
 ]);
 
 function onFinish(queryForm: Object) {
   queryPlates({
     ...queryForm,
     size: pagination.value.pageSize,
-    current: 1
+    current: 1,
   });
 }
 
@@ -84,78 +89,106 @@ const formState = reactive({
   name: {
     name: "名称",
     type: "input",
-    bindValue: ""
+    bindValue: "",
   },
   market: {
     name: "市场",
     type: "select",
     selectOptions: marketTypeToSelectOptions(),
-    bindValue: "1"
-  }
+    bindValue: "1",
+  },
 });
 
 const requestStockInPlate = (plate: Plate): void => {
   let { marketCode, code } = plate;
   let command: StockInPlateCommand = {
     type: "STOCK_IN_PLATE",
-    all: false,
-    plates: [{
+    plate: {
       market: marketCode,
-      code: code
-    }]
+      code: code,
+    },
   };
   sendFtCommandOnNotifyEndPoint(command);
+  openStockInPlateModal.value = true;
 };
-const requestStocksInPlates = (): void => {
-  let command: StockInPlateCommand = {
-    type: "STOCK_IN_PLATE",
-    all: true
+const stockInPlateColumns = ref<TableColumnProps[]>([
+  {
+    title: "代码",
+    dataIndex: ["basic", "security", "code"],
+    fixed: "left",
+  },
+  {
+    title: "名称",
+    dataIndex: ["basic", "name"],
+  },
+]);
+const stockInPlatePagination = computed(() => {
+  return {
+    total: futuStocksInPlate.value?.stocks.length,
+    showTotal: (total: Number, range: Array<any>) =>
+      `${range[0]}-${range[1]} of ${total} items`,
   };
-  sendFtCommandOnNotifyEndPoint(command);
-};
+});
+
+const openStockInPlateModal = ref<boolean>(false);
 </script>
 <template>
   <div class="stock-list-container">
     <a-space>
-      <a-popover
-        title="选择市场"
-        trigger="click">
+      <a-popover title="选择市场" trigger="click">
         <a-button type="primary">同步板块数据</a-button>
         <template #content>
           <a-space>
-            <a-checkbox-group style="width: 100px" v-model:value="markets" size="small"
-                              :options="marketTypeToCheckBoxOptions()">
+            <a-checkbox-group
+              style="width: 100px"
+              v-model:value="markets"
+              size="small"
+              :options="marketTypeToCheckBoxOptions()"
+            >
             </a-checkbox-group>
-            <a-button type="primary" size="small" @click="requestPlates()">确定</a-button>
+            <a-button type="primary" size="small" @click="requestPlates()"
+              >确定</a-button
+            >
           </a-space>
-        </template>
-      </a-popover>
-      <a-popover
-        title="是否全量同步"
-        trigger="click">
-        <a-button type="primary" disabled>全量同步板块下股票(缺陷,建议逐个板块同步 )</a-button>
-        <template #content>
-          <a-button type="primary" disabled @click="requestStocksInPlates()">确定</a-button>
         </template>
       </a-popover>
     </a-space>
     <a-divider />
-    <AdvancedTable :form="formState" @on-finish="onFinish" :columns="platesColumns" :data-source="plates.data"
-                   :loading="platesLoading" :pagination="pagination"
-                   @on-change-table="onChangeTable">
+    <AdvancedTable
+      :form="formState"
+      @on-finish="onFinish"
+      :columns="platesColumns"
+      :data-source="plates.data"
+      :loading="platesLoading"
+      :pagination="pagination"
+      @on-change-table="onChangeTable"
+    >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-space>
             <a-popconfirm
               title="是否执行?"
-              @confirm="requestStockInPlate(record)">
-              <a-button type="link" size="small" disabled>查询板块下股票</a-button>
+              @confirm="requestStockInPlate(record)"
+            >
+              <a-button type="link" size="small">查询板块下股票</a-button>
             </a-popconfirm>
           </a-space>
         </template>
       </template>
     </AdvancedTable>
-
+    <a-modal
+      title="成分股"
+      v-model:visible="openStockInPlateModal"
+      width="648px"
+      @ok="openStockInPlateModal = false"
+    >
+      <a-table
+        size="middle"
+        :pagination="stockInPlatePagination"
+        :data-source="futuStocksInPlate?.stocks"
+        :columns="stockInPlateColumns"
+      />
+    </a-modal>
   </div>
 </template>
 <style scoped lang="less"></style>

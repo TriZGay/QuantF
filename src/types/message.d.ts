@@ -1,3 +1,5 @@
+import type { Stock } from "@/api/futu";
+
 export declare interface Message {
   type:
     | "CONNECT"
@@ -518,8 +520,8 @@ interface PlateItem {
 }
 
 export interface StockInPlateCommand extends Message {
-  all: boolean;
-  plates?: Array<PlateItem>;
+  plate: PlateItem;
+  stocks?: Array<StockContent>;
 }
 
 export interface PlatesCommand extends Message {

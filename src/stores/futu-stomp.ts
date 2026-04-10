@@ -18,6 +18,7 @@ import type {
   Message,
   RehabsCommand,
   StockFilterCommand,
+  StockInPlateCommand,
   UserGroupCommand,
   UserSecurityCommand,
 } from "@/types/message";
@@ -48,6 +49,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     hk: {} as GetIpoListCommand,
     cn: {} as GetIpoListCommand,
   });
+  const futuStocksInPlate =
+    ref<StockInPlateCommand>() as Ref<StockInPlateCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -164,6 +167,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuGetPriceReminder.value = JSON.parse(msg.body);
             }
           );
+          //ipo
           futuStompNotifyClient.value?.subscribe("/quantx/topic/ipo", (msg) => {
             let ipoResult = JSON.parse(msg.body);
             if (ipoResult.market === 1) {
@@ -172,6 +176,13 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuGetIpoList.value.cn = ipoResult;
             }
           });
+          //板块下股票
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/stocks_in_plate",
+            (msg) => {
+              futuStocksInPlate.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -224,5 +235,6 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuUserSecurity,
     futuGetPriceReminder,
     futuGetIpoList,
+    futuStocksInPlate,
   };
 });
