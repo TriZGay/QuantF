@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
+import SnapshotButton from "@/components/SnapshotButton/index.vue";
 import {
   marketTypeToCheckBoxOptions,
   marketTypeToSelectOptions,
@@ -172,6 +173,7 @@ const openStockInPlateModal = ref<boolean>(false);
             >
               <a-button type="link" size="small">查询板块下股票</a-button>
             </a-popconfirm>
+            <SnapshotButton :market="record.marketCode" :code="record.code" />
           </a-space>
         </template>
       </template>
