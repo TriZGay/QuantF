@@ -366,3 +366,8 @@ export function fetchTbInfoPerCode(
     `/ana/meta/tbInfo/granularity/${granularity}/code/${code}/rehabType/${rehabType}`
   );
 }
+
+//查询板块热力图
+export function fetchHeatmapByPlates(market: number) {
+  return request.get(`/ana/statistics/heatmapByPlates/${market}`);
+}

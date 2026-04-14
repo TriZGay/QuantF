@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HkIpoCard from "@/views/home/HkIpoCard.vue";
 import CnIpoCard from "@/views/home/CNIpoCard.vue";
+import HeatmapByPlates from "@/views/home/HeatmapByPlates.vue";
 </script>
 <template>
   <div>
@@ -17,6 +18,10 @@ import CnIpoCard from "@/views/home/CNIpoCard.vue";
         </a-row>
       </a-typography-paragraph>
     </a-typography>
+    <a-typography-title :level="5">热力图</a-typography-title>
+    <a-typography-paragraph>
+      <HeatmapByPlates :market="1" />
+    </a-typography-paragraph>
   </div>
 </template>
 <style scoped></style>
