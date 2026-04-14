@@ -61,7 +61,6 @@ onMounted(() => {
 
 <template>
   <div>
-    {{ heatmapByPlates }}
     <v-chart
       :autoresize="true"
       class="heatmapChart"

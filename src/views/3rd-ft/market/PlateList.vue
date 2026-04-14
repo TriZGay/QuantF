@@ -7,7 +7,11 @@ import {
 } from "@/api/code";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useFutuStomp } from "@/stores/futu-stomp";
-import type { PlatesCommand, StockInPlateCommand } from "@/types/message";
+import type {
+  PlatesCommand,
+  StockInPlateByMarketMessage,
+  StockInPlateCommand,
+} from "@/types/message";
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
 import type { TableColumnProps } from "ant-design-vue";
@@ -132,6 +136,15 @@ const stockInPlatePagination = computed(() => {
 });
 
 const openStockInPlateModal = ref<boolean>(false);
+
+const stockInPlateMarket = ref<string>("1");
+const requestStockInPlatesByMarket = () => {
+  let command: StockInPlateByMarketMessage = {
+    type: "STOCK_IN_PLATE_BY_MARKET",
+    market: parseInt(stockInPlateMarket.value),
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -148,6 +161,26 @@ const openStockInPlateModal = ref<boolean>(false);
             >
             </a-checkbox-group>
             <a-button type="primary" size="small" @click="requestPlates()"
+              >确定</a-button
+            >
+          </a-space>
+        </template>
+      </a-popover>
+      <a-popover title="选择市场" trigger="click">
+        <a-button type="primary">批量同步板块下股票(按市场)</a-button>
+        <template #content>
+          <a-space>
+            <a-radio-group
+              style="width: 100px"
+              v-model:value="stockInPlateMarket"
+              size="small"
+              :options="marketTypeToCheckBoxOptions()"
+            >
+            </a-radio-group>
+            <a-button
+              type="primary"
+              size="small"
+              @click="requestStockInPlatesByMarket()"
               >确定</a-button
             >
           </a-space>

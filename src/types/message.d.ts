@@ -1,5 +1,3 @@
-import type { Stock } from "@/api/futu";
-
 export declare interface Message {
   type:
     | "CONNECT"
@@ -30,9 +28,13 @@ export declare interface Message {
     | "USER_SECURITY"
     | "SET_PRICE_REMINDER"
     | "GET_PRICE_REMINDER"
-    | "IPO";
+    | "IPO"
+    | "STOCK_IN_PLATE_BY_MARKET";
 }
 
+export interface StockInPlateByMarketMessage extends Message {
+  market: number;
+}
 export interface WinningNumData {
   winningName: string;
   winningInfo: string;
