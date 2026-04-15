@@ -439,7 +439,9 @@ export interface AccountsCommand extends Message {
 }
 
 export interface SnapshotCommand extends Message {
-  securities: Array<PlateItem>;
+  market?: number;
+  isPlate?: number;
+  securities?: Array<PlateItem>;
 }
 
 export interface RehabsContent {

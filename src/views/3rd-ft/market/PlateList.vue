@@ -9,6 +9,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import type {
   PlatesCommand,
+  SnapshotCommand,
   StockInPlateByMarketMessage,
   StockInPlateCommand,
 } from "@/types/message";
@@ -145,6 +146,15 @@ const requestStockInPlatesByMarket = () => {
   };
   sendFtCommandOnNotifyEndPoint(command);
 };
+const plateSnapshotMarket = ref<string>("1");
+const requestPlatesSnapshotsByMarket = () => {
+  let command: SnapshotCommand = {
+    type: "SNAPSHOT",
+    market: parseInt(plateSnapshotMarket.value),
+    isPlate: 1,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -181,6 +191,26 @@ const requestStockInPlatesByMarket = () => {
               type="primary"
               size="small"
               @click="requestStockInPlatesByMarket()"
+              >确定</a-button
+            >
+          </a-space>
+        </template>
+      </a-popover>
+      <a-popover title="选择市场" trigger="click">
+        <a-button type="primary">批量请求板块快照数据(按市场)</a-button>
+        <template #content>
+          <a-space>
+            <a-radio-group
+              style="width: 100px"
+              v-model:value="plateSnapshotMarket"
+              size="small"
+              :options="marketTypeToCheckBoxOptions()"
+            >
+            </a-radio-group>
+            <a-button
+              type="primary"
+              size="small"
+              @click="requestPlatesSnapshotsByMarket()"
               >确定</a-button
             >
           </a-space>
