@@ -10,7 +10,9 @@ export const useAnalyzeStatistics = defineStore("analyzeStatistics", () => {
       manual: true,
     }
   );
-  const heatmapByPlates = computed(() => heatmapByPlatesResp.value?.data || []);
+  const heatmapByPlates = computed(
+    () => heatmapByPlatesResp.value?.data || { raises: [], reduces: [] }
+  );
 
   return {
     requestHeatmapByPlates,

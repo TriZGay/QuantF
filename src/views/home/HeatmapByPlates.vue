@@ -20,38 +20,112 @@ const props = defineProps({
   },
 });
 
-const heatmapChartOption = reactive({
+const raiseChartOption = reactive({
   title: {
     text: "",
     left: "left",
-    subtext: "",
   },
   series: {
     roam: false,
-    name: "涨跌幅",
+    name: "涨幅",
     gap: 2,
     type: "treemap",
     breadcrumb: {
-      show: false
+      show: false,
+    },
+    label: {
+      show: true,
+      formatter:"{b} +{c}%"
     },
     data: [],
+    levels: [
+      {
+        colorMappingBy: "value",
+        color: [
+          "#FFEDE6",
+          "#FFDBD0",
+          "#FFC8B8",
+          "#FFB4A0",
+          "#FF9F88",
+          "#FF8870",
+          "#F86F59",
+          "#F05640",
+          "#E53E26",
+          "#D81E06",
+        ],
+      },
+    ],
   },
 });
 
-watch(heatmapByPlates, (data) => {
+const reduceChartOption = reactive({
+  title: {
+    text: "",
+    left: "left",
+  },
+  grid: {
+    top: "20%",
+  },
+  label: {
+    show: true,
+    formatter:"{b} -{c}%"
+  },
+  series: {
+    roam: false,
+    name: "跌幅",
+    gap: 2,
+    type: "treemap",
+    breadcrumb: {
+      show: false,
+    },
+    data: [],
+    levels: [
+      {
+        colorMappingBy: "value",
+        color: [
+          "#B4F8EE",
+          "#A0F1DD",
+          "#8CE9CC",
+          "#78E0BB",
+          "#64D6AA",
+          "#50CB99",
+          "#3CBF88",
+          "#28B377",
+          "#14A666",
+          "#009955",
+        ],
+      },
+    ],
+  },
+});
+
+const drawRaisesChart = (raises: Array) => {
   if (props.market === 1) {
-    heatmapChartOption.title.text = "港股";
+    raiseChartOption.title.text = "港股-涨幅TOP10-" + raises[0].updateTime;
   }
-  heatmapChartOption.title.subtext = data[0].updateTime;
-  heatmapChartOption.series.data = data.map((plate: any) => {
+  raiseChartOption.series.data = raises.map((plate: any) => {
     return {
       name: plate.name,
       value: plate.priceChange,
-      itemStyle: {
-        color: plate.priceChange > 0 ? "#ff4d4f" : "#00b42a", // 红 / 绿
-      },
     };
   });
+};
+
+const drawReduceChart = (reduces: Array) => {
+  if (props.market === 1) {
+    reduceChartOption.title.text = "港股-跌幅TOP10-" + reduces[0].updateTime;
+  }
+  reduceChartOption.series.data = reduces.map((plate: any) => {
+    return {
+      name: plate.name,
+      value: Math.abs(plate.priceChange),
+    };
+  });
+};
+
+watch(heatmapByPlates, (data) => {
+  drawRaisesChart(data.raises);
+  drawReduceChart(data.reduces);
 });
 
 onMounted(() => {
@@ -60,13 +134,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <v-chart
-      :autoresize="true"
-      class="heatmapChart"
-      :option="heatmapChartOption"
-    />
-  </div>
+  <a-row :gutter="32">
+    <a-col :span="12">
+      <v-chart
+        :autoresize="true"
+        class="heatmapChart"
+        :option="raiseChartOption"
+      />
+    </a-col>
+    <a-col :span="12">
+      <v-chart
+        :autoresize="true"
+        class="heatmapChart"
+        :option="reduceChartOption"
+      />
+    </a-col>
+  </a-row>
 </template>
 
 <style scoped lang="less">
