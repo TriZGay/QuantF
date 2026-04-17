@@ -15,15 +15,15 @@ import {
 import type { Stock } from "@/api/futu";
 import type {
   CapitalDistributionCommand,
-  HistoryKLCommand,
   RehabsCommand,
   SetPriceReminderCommand,
+  SnapshotCommand,
+  StockInPlateByMarketMessage,
   StockOwnerPlatesCommand,
   StocksCommand,
   SubOrUnSubCommand,
 } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
-import type { Dayjs } from "dayjs";
 import HistoryKLineButton from "@/components/HistoryKLineButton/index.vue";
 import SnapshotButton from "@/components/SnapshotButton/index.vue";
 
@@ -201,33 +201,18 @@ watch(
   { deep: true }
 );
 
-const market = ref<number>();
-const stockType = ref<number>();
+const market = ref<string>("1");
+const stockType = ref<string>("3");
 
 const requestStocks = (): void => {
   let stocksCommand: StocksCommand = {
     type: "STOCKS",
-    market: market.value,
-    stockType: stockType.value,
+    market: parseInt(market.value),
+    stockType: parseInt(stockType.value),
   };
   sendFtCommandOnNotifyEndPoint(stocksCommand);
 };
 
-const klType = ref<string>("1");
-const beginDate = ref<Dayjs>();
-const endDate = ref<Dayjs>();
-
-const requestHistoryK = (row: Stock): void => {
-  let historyKLCommand: HistoryKLCommand = {
-    type: "KL_HISTORY",
-    market: row.marketCode,
-    code: row.code,
-    klType: parseInt(klType.value),
-    beginDate: beginDate.value.format("YYYY-MM-DD"),
-    endDate: endDate.value.format("YYYY-MM-DD"),
-  };
-  sendFtCommandOnNotifyEndPoint(historyKLCommand);
-};
 const requestStockOwnerPlates = (row: Stock): void => {
   let stockOwnerPlatesCommand: StockOwnerPlatesCommand = {
     type: "STOCK_OWNER_PLATE",
@@ -283,6 +268,24 @@ const requestSetPriceReminder = (row: Stock): void => {
   };
   sendFtCommandOnNotifyEndPoint(setPriceReminderCommand);
 };
+
+const stockInPlateMarket = ref<string>("1");
+const requestStockInPlatesByMarket = () => {
+  let command: StockInPlateByMarketMessage = {
+    type: "STOCK_IN_PLATE_BY_MARKET",
+    market: parseInt(stockInPlateMarket.value),
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
+const plateSnapshotMarket = ref<string>("1");
+const requestPlatesSnapshotsByMarket = () => {
+  let command: SnapshotCommand = {
+    type: "SNAPSHOT",
+    market: parseInt(plateSnapshotMarket.value),
+    isPlate: 1,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -304,6 +307,46 @@ const requestSetPriceReminder = (row: Stock): void => {
               :options="stockTypeToCheckBoxOptions()"
             ></a-select>
             <a-button type="primary" size="small" @click="requestStocks()"
+              >确定</a-button
+            >
+          </a-space>
+        </template>
+      </a-popover>
+      <a-popover title="选择市场" trigger="click">
+        <a-button type="primary">批量同步板块下股票(按市场)</a-button>
+        <template #content>
+          <a-space>
+            <a-radio-group
+              style="width: 100px"
+              v-model:value="stockInPlateMarket"
+              size="small"
+              :options="marketTypeToCheckBoxOptions()"
+            >
+            </a-radio-group>
+            <a-button
+              type="primary"
+              size="small"
+              @click="requestStockInPlatesByMarket()"
+              >确定</a-button
+            >
+          </a-space>
+        </template>
+      </a-popover>
+      <a-popover title="选择市场" trigger="click">
+        <a-button type="primary">批量请求板块快照数据(按市场)</a-button>
+        <template #content>
+          <a-space>
+            <a-radio-group
+              style="width: 100px"
+              v-model:value="plateSnapshotMarket"
+              size="small"
+              :options="marketTypeToCheckBoxOptions()"
+            >
+            </a-radio-group>
+            <a-button
+              type="primary"
+              size="small"
+              @click="requestPlatesSnapshotsByMarket()"
               >确定</a-button
             >
           </a-space>
