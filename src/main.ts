@@ -6,8 +6,8 @@ import App from "./App.vue";
 import { router } from "@/router";
 import "@/style/index.css";
 
-// import "ant-design-vue/dist/antd.dark.css";
-import "ant-design-vue/dist/antd.css";
+import "ant-design-vue/dist/antd.dark.css";
+// import "ant-design-vue/dist/antd.css";
 import * as Icons from "@ant-design/icons-vue";
 
 const app = createApp(App);
