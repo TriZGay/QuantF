@@ -15,6 +15,7 @@ import {
 import type { Stock } from "@/api/futu";
 import type {
   CapitalDistributionCommand,
+  PlatesCommand,
   RehabsCommand,
   SetPriceReminderCommand,
   SnapshotCommand,
@@ -286,6 +287,14 @@ const requestPlatesSnapshotsByMarket = () => {
   };
   sendFtCommandOnNotifyEndPoint(command);
 };
+const markets = ref<Array<string>>(["1"]);
+const requestPlates = (): void => {
+  let command: PlatesCommand = {
+    type: "PLATES",
+    markets: markets.value.map((market) => parseInt(market)),
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 </script>
 <template>
   <div class="stock-list-container">
@@ -347,6 +356,23 @@ const requestPlatesSnapshotsByMarket = () => {
               type="primary"
               size="small"
               @click="requestPlatesSnapshotsByMarket()"
+              >确定</a-button
+            >
+          </a-space>
+        </template>
+      </a-popover>
+      <a-popover title="选择市场" trigger="click">
+        <a-button type="primary">同步板块数据</a-button>
+        <template #content>
+          <a-space>
+            <a-checkbox-group
+              style="width: 100px"
+              v-model:value="markets"
+              size="small"
+              :options="marketTypeToCheckBoxOptions()"
+            >
+            </a-checkbox-group>
+            <a-button type="primary" size="small" @click="requestPlates()"
               >确定</a-button
             >
           </a-space>
