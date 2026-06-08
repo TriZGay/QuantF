@@ -3,56 +3,53 @@ import { usePagination, useRequest } from "vue-request";
 import {
   fetchAllStocks,
   fetchPlates,
+  fetchSnapshots,
   fetchStockByCode,
   fetchStockFilterCodes,
   fetchStocks,
   fetchSubscribeDetails,
   fetchSubscribeInfos,
-  fetchTradeCodes
+  fetchTradeCodes,
 } from "@/api/futu";
 import { computed } from "vue";
 
 export const useFutuApi = defineStore("futu-api", () => {
-
-  const {
-    data: oneStock,
-    run: queryStockByCode
-  } = useRequest(fetchStockByCode, {
-    manual: true
-  });
+  const { data: oneStock, run: queryStockByCode } = useRequest(
+    fetchStockByCode,
+    {
+      manual: true,
+    }
+  );
 
   const computedOneStock = computed(() => {
     return oneStock.value?.data || {};
   });
 
-  const {
-    data: allStocks,
-    run: queryAllStocks
-  } = useRequest(fetchAllStocks, {
-    manual: true
+  const { data: allStocks, run: queryAllStocks } = useRequest(fetchAllStocks, {
+    manual: true,
   });
 
   const computedAllStocks = computed(() => {
     return allStocks.value?.data || [];
   });
 
-  const {
-    data: tradeCodes,
-    run: queryTradeCodes
-  } = useRequest(fetchTradeCodes, {
-    manual: true
-  });
+  const { data: tradeCodes, run: queryTradeCodes } = useRequest(
+    fetchTradeCodes,
+    {
+      manual: true,
+    }
+  );
 
   const computedTradeCodes = computed(() => {
     return tradeCodes.value?.data || {};
   });
 
-  const {
-    data: stockFilterCodes,
-    run: queryStockFilterCodes
-  } = useRequest(fetchStockFilterCodes, {
-    manual: true
-  });
+  const { data: stockFilterCodes, run: queryStockFilterCodes } = useRequest(
+    fetchStockFilterCodes,
+    {
+      manual: true,
+    }
+  );
   const computedStockFilterCodes = computed(() => {
     return stockFilterCodes.value?.data || {};
   });
@@ -63,21 +60,21 @@ export const useFutuApi = defineStore("futu-api", () => {
     run: querySubscribeInfo,
     pageSize: subscribeInfoPageSize,
     current: subscribeInfoCurrent,
-    total: subscribeInfoTotal
+    total: subscribeInfoTotal,
   } = usePagination(fetchSubscribeInfos, {
     manual: true,
     pagination: {
       currentKey: "current",
       pageSizeKey: "size",
-      totalKey: "data.total"
-    }
+      totalKey: "data.total",
+    },
   });
   const subscribeInfos = computed(() => {
     return {
       pageSize: subscribeInfoPageSize.value,
       current: subscribeInfoCurrent.value,
       total: subscribeInfoTotal.value,
-      data: subscribeInfo.value?.data.records || []
+      data: subscribeInfo.value?.data.records || [],
     };
   });
   const {
@@ -86,14 +83,14 @@ export const useFutuApi = defineStore("futu-api", () => {
     run: querySubscribeDetails,
     pageSize: detailsPageSize,
     current: detailsCurrent,
-    total: detailsTotal
+    total: detailsTotal,
   } = usePagination(fetchSubscribeDetails, {
     manual: true,
     pagination: {
       currentKey: "current",
       pageSizeKey: "size",
-      totalKey: "data.total"
-    }
+      totalKey: "data.total",
+    },
   });
 
   const subscribeDetails = computed(() => {
@@ -101,7 +98,7 @@ export const useFutuApi = defineStore("futu-api", () => {
       pageSize: detailsPageSize.value,
       current: detailsCurrent.value,
       total: detailsTotal.value,
-      data: details.value?.data.records || []
+      data: details.value?.data.records || [],
     };
   });
 
@@ -111,14 +108,14 @@ export const useFutuApi = defineStore("futu-api", () => {
     loading: stockLoading,
     pageSize: stocksPageSize,
     total: stocksTotal,
-    current: stocksCurrent
+    current: stocksCurrent,
   } = usePagination(fetchStocks, {
     pagination: {
       currentKey: "current",
       pageSizeKey: "size",
-      totalKey: "data.total"
+      totalKey: "data.total",
     },
-    manual: true
+    manual: true,
   });
 
   const stocks = computed(() => {
@@ -126,7 +123,7 @@ export const useFutuApi = defineStore("futu-api", () => {
       pageSize: stocksPageSize.value,
       current: stocksCurrent.value,
       total: stocksTotal.value,
-      data: stocksData.value?.data.records || []
+      data: stocksData.value?.data.records || [],
     };
   });
 
@@ -136,14 +133,16 @@ export const useFutuApi = defineStore("futu-api", () => {
     loading: platesLoading,
     pageSize: platesPageSize,
     total: platesTotal,
-    current: platesCurrent
+    current: platesCurrent,
+    totalPage: platesTotalPage,
   } = usePagination(fetchPlates, {
     pagination: {
       currentKey: "current",
       pageSizeKey: "size",
-      totalKey: "data.total"
+      totalKey: "data.total",
+      totalPageKey: "data.pages",
     },
-    manual: true
+    manual: true,
   });
 
   const plates = computed(() => {
@@ -151,8 +150,19 @@ export const useFutuApi = defineStore("futu-api", () => {
       pageSize: platesPageSize.value,
       current: platesCurrent.value,
       total: platesTotal.value,
-      data: platesData.value?.data.records || []
+      totalPage: platesTotalPage.value,
+      data: platesData.value?.data.records || [],
     };
+  });
+
+  const { data: snapshotData, run: querySnapshots } = useRequest(
+    fetchSnapshots,
+    {
+      manual: true,
+    }
+  );
+  const computedSnapshots = computed(() => {
+    return snapshotData.value?.data || {};
   });
 
   return {
@@ -182,7 +192,9 @@ export const useFutuApi = defineStore("futu-api", () => {
     queryStockByCode,
     //
     computedAllStocks,
-    queryAllStocks
+    queryAllStocks,
+    //
+    computedSnapshots,
+    querySnapshots,
   };
-
 });

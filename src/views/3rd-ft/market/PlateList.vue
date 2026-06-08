@@ -1,259 +1,264 @@
 <script lang="ts" setup>
-import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
-import SnapshotButton from "@/components/SnapshotButton/index.vue";
-import {
-  marketTypeToCheckBoxOptions,
-  marketTypeToSelectOptions,
-} from "@/api/code";
-import { computed, onMounted, reactive, ref } from "vue";
-import { useFutuStomp } from "@/stores/futu-stomp";
-import type {
-  PlatesCommand,
-  SnapshotCommand,
-  StockInPlateByMarketMessage,
-  StockInPlateCommand,
-} from "@/types/message";
+import { marketTypeToSelectOptions } from "@/api/code";
+import { onMounted, ref, watch } from "vue";
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
-import type { TableColumnProps } from "ant-design-vue";
-import type { Plate } from "@/api/futu";
-
-const { queryPlates } = useFutuApi();
-const { plates, platesLoading } = storeToRefs(useFutuApi());
+import type { TableColumnsType } from "ant-design-vue";
+import type { SnapshotCommand } from "@/types/message";
+import { useFutuStomp } from "@/stores/futu-stomp";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const { futuStocksInPlate } = storeToRefs(useFutuStomp());
-const markets = ref<Array<number>>([]);
+
+const { queryPlates, queryAllStocks, querySnapshots } = useFutuApi();
+const { plates, computedAllStocks, computedSnapshots } = storeToRefs(
+  useFutuApi()
+);
+const market = ref("1");
+const plateId = ref();
+
+const platesSelectOptions = ref([]);
 
 onMounted(() => {
   queryPlates({
-    size: 10,
+    market: parseInt(market.value),
+    size: 200,
     current: 1,
   });
 });
 
-const requestPlates = (): void => {
-  let command: PlatesCommand = {
-    type: "PLATES",
-    markets: markets.value,
-  };
-  sendFtCommandOnNotifyEndPoint(command);
-};
-const pagination = computed<Object>(() => {
-  return {
-    total: plates.value.total,
-    current: plates.value.current,
-    pageSize: plates.value.pageSize,
-    showTotal: (total: Number, range: Array<any>) =>
-      `${range[0]}-${range[1]} of ${total} items`,
-  };
+watch(plates, (newPlates) => {
+  if (newPlates.data.length > 0) {
+    let platesOnPage = plates.value.data.map((p) => {
+      return { value: p.id, label: p.name, code: p.code, market: p.marketCode };
+    });
+    platesSelectOptions.value = platesSelectOptions.value.concat(platesOnPage);
+    if (plates.value.current !== plates.value.totalPage) {
+      plateId.value = newPlates.data[0].id;
+      querySnapshots({
+        market: newPlates.data[0].marketCode,
+        code: newPlates.data[0].code,
+        securityType: 7, //7-板块
+      });
+    }
+  } else {
+    platesSelectOptions.value = [];
+    plateId.value = null;
+  }
 });
 
-function onChangeTable(tableProps: Object) {
-  let queryForm = tableProps.form;
-  let { pageSize, current } = tableProps.pagination;
-  queryPlates({
-    ...queryForm,
-    size: pageSize,
-    current: current,
-  });
-}
+const onPopupScroll = (e) => {
+  const { target } = e;
+  const { scrollTop, scrollHeight, offsetHeight } = target;
+  if (scrollTop + 2 + offsetHeight >= scrollHeight) {
+    if (plates.value.current !== plates.value.totalPage) {
+      let current = plates.value.current;
+      current = current + 1;
+      queryPlates({
+        market: parseInt(market.value),
+        size: 200,
+        current: current,
+      });
+      let platesOnPage = plates.value.data.map((p) => {
+        return {
+          value: p.id,
+          label: p.name,
+          code: p.code,
+          market: p.marketCode,
+        };
+      });
+      platesSelectOptions.value =
+        platesSelectOptions.value.concat(platesOnPage);
+    }
+  }
+};
 
-const platesColumns = ref<TableColumnProps[]>([
+const plateFilterOption = (input, option) => {
+  return option.label.includes(input);
+};
+
+const onSelectPlate = (value, option) => {
+  queryAllStocks({
+    plateId: value,
+  });
+  //查询板块快照
+  let foundPlate = platesSelectOptions.value.find((ps) => ps.value === value);
+  const { code, market } = foundPlate;
+  querySnapshots({
+    market: market,
+    code: code,
+    securityType: 7, //7-板块
+  });
+};
+
+const stocksColumns = ref<TableColumnsType>([
   {
-    title: "代码",
+    title: "股票代码",
     dataIndex: "code",
     fixed: "left",
+    width: 120,
   },
   {
     title: "名称",
     dataIndex: "name",
-  },
-  {
-    title: "市场",
-    dataIndex: "market",
-  },
-  {
-    title: "板块类型",
-    dataIndex: "plateType",
-  },
-  {
-    title: "操作",
-    key: "action",
-  },
-]);
-
-function onFinish(queryForm: Object) {
-  queryPlates({
-    ...queryForm,
-    size: pagination.value.pageSize,
-    current: 1,
-  });
-}
-
-const formState = reactive({
-  name: {
-    name: "名称",
-    type: "input",
-    bindValue: "",
-  },
-  market: {
-    name: "市场",
-    type: "select",
-    selectOptions: marketTypeToSelectOptions(),
-    bindValue: "1",
-  },
-});
-
-const requestStockInPlate = (plate: Plate): void => {
-  let { marketCode, code } = plate;
-  let command: StockInPlateCommand = {
-    type: "STOCK_IN_PLATE",
-    plate: {
-      market: marketCode,
-      code: code,
-    },
-  };
-  sendFtCommandOnNotifyEndPoint(command);
-  openStockInPlateModal.value = true;
-};
-const stockInPlateColumns = ref<TableColumnProps[]>([
-  {
-    title: "代码",
-    dataIndex: ["basic", "security", "code"],
     fixed: "left",
-  },
-  {
-    title: "名称",
-    dataIndex: ["basic", "name"],
+    width: 120,
   },
 ]);
-const stockInPlatePagination = computed(() => {
-  return {
-    total: futuStocksInPlate.value?.stocks.length,
-    showTotal: (total: Number, range: Array<any>) =>
-      `${range[0]}-${range[1]} of ${total} items`,
-  };
-});
 
-const openStockInPlateModal = ref<boolean>(false);
-
-const stockInPlateMarket = ref<string>("1");
-const requestStockInPlatesByMarket = () => {
-  let command: StockInPlateByMarketMessage = {
-    type: "STOCK_IN_PLATE_BY_MARKET",
-    market: parseInt(stockInPlateMarket.value),
-  };
-  sendFtCommandOnNotifyEndPoint(command);
-};
-const plateSnapshotMarket = ref<string>("1");
-const requestPlatesSnapshotsByMarket = () => {
+const onConfirmReqSnapshot = () => {
+  let securities = computedAllStocks.value.map((s) => {
+    return { market: s.marketCode, code: s.code };
+  });
   let command: SnapshotCommand = {
     type: "SNAPSHOT",
-    market: parseInt(plateSnapshotMarket.value),
-    isPlate: 1,
+    isPlate: 0,
+    securities: securities,
   };
   sendFtCommandOnNotifyEndPoint(command);
 };
 </script>
 <template>
-  <div class="stock-list-container">
-    <a-space>
-      <a-popover title="选择市场" trigger="click">
-        <a-button type="primary">同步板块数据</a-button>
-        <template #content>
-          <a-space>
-            <a-checkbox-group
-              style="width: 100px"
-              v-model:value="markets"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            >
-            </a-checkbox-group>
-            <a-button type="primary" size="small" @click="requestPlates()"
-              >确定</a-button
-            >
-          </a-space>
-        </template>
-      </a-popover>
-      <a-popover title="选择市场" trigger="click">
-        <a-button type="primary">批量同步板块下股票(按市场)</a-button>
-        <template #content>
-          <a-space>
-            <a-radio-group
-              style="width: 100px"
-              v-model:value="stockInPlateMarket"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            >
-            </a-radio-group>
-            <a-button
-              type="primary"
-              size="small"
-              @click="requestStockInPlatesByMarket()"
-              >确定</a-button
-            >
-          </a-space>
-        </template>
-      </a-popover>
-      <a-popover title="选择市场" trigger="click">
-        <a-button type="primary">批量请求板块快照数据(按市场)</a-button>
-        <template #content>
-          <a-space>
-            <a-radio-group
-              style="width: 100px"
-              v-model:value="plateSnapshotMarket"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            >
-            </a-radio-group>
-            <a-button
-              type="primary"
-              size="small"
-              @click="requestPlatesSnapshotsByMarket()"
-              >确定</a-button
-            >
-          </a-space>
-        </template>
-      </a-popover>
-    </a-space>
-    <a-divider />
-    <AdvancedTable
-      :form="formState"
-      @on-finish="onFinish"
-      :columns="platesColumns"
-      :data-source="plates.data"
-      :loading="platesLoading"
-      :pagination="pagination"
-      @on-change-table="onChangeTable"
-    >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
-          <a-space>
-            <a-popconfirm
-              title="是否执行?"
-              @confirm="requestStockInPlate(record)"
-            >
-              <a-button type="link" size="small">查询板块下股票</a-button>
+  <div class="grid grid-cols-[40%_60%] gap-4">
+    <div class="border-gray-700 border-solid p-4 rounded">
+      <div class="mb-2">
+        <a-form layout="inline">
+          <a-form-item>
+            <a-select
+              v-model:value="market"
+              placeholder="市场"
+              :options="marketTypeToSelectOptions()"
+            />
+          </a-form-item>
+          <a-form-item class="w-52">
+            <a-select
+              v-model:value="plateId"
+              placeholder="板块"
+              show-search
+              :filter-option="plateFilterOption"
+              :options="platesSelectOptions"
+              @select="onSelectPlate"
+              @popupScroll="onPopupScroll"
+            />
+          </a-form-item>
+          <a-form-item label="页数">
+            {{
+              "(" +
+              plates.current +
+              "/" +
+              plates.totalPage +
+              ")" +
+              "(" +
+              plates.total +
+              ")"
+            }}
+          </a-form-item>
+          <a-form-item>
+            <a-popconfirm title="确定" @confirm="onConfirmReqSnapshot">
+              <a-button type="primary" size="small"
+                >请求快照数据({{ computedAllStocks.length }})</a-button
+              >
             </a-popconfirm>
-            <SnapshotButton :market="record.marketCode" :code="record.code" />
-          </a-space>
-        </template>
-      </template>
-    </AdvancedTable>
-    <a-modal
-      title="成分股"
-      v-model:visible="openStockInPlateModal"
-      width="648px"
-      @ok="openStockInPlateModal = false"
-    >
+          </a-form-item>
+        </a-form>
+      </div>
       <a-table
-        size="middle"
-        :pagination="stockInPlatePagination"
-        :data-source="futuStocksInPlate?.stocks"
-        :columns="stockInPlateColumns"
-      />
-    </a-modal>
+        :data-source="computedAllStocks"
+        :columns="stocksColumns"
+        size="small"
+      ></a-table>
+    </div>
+    <div class="border-gray-700 border-solid p-4 rounded">
+      <a-descriptions
+        :title="computedSnapshots?.baseResponse?.name"
+        layout="vertical"
+        bordered
+        :column="4"
+        size="small"
+      >
+        <a-descriptions-item label="代码">{{
+          computedSnapshots?.baseResponse?.code
+        }}</a-descriptions-item>
+        <a-descriptions-item label="状态">{{
+          computedSnapshots?.baseResponse?.isSuspend
+        }}</a-descriptions-item>
+        <a-descriptions-item label="上市时间">{{
+          computedSnapshots?.baseResponse?.listTime
+        }}</a-descriptions-item>
+        <a-descriptions-item label="更新时间">
+          {{ computedSnapshots?.baseResponse?.updateTime }}
+        </a-descriptions-item>
+        <a-descriptions-item label="上涨支数">
+          {{ computedSnapshots?.plateResponse?.raiseCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="下跌支数">
+          {{ computedSnapshots?.plateResponse?.fallCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="平盘支数">
+          {{ computedSnapshots?.plateResponse?.equalCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label=""></a-descriptions-item>
+        <a-descriptions-item label="最高价">
+          {{ computedSnapshots?.baseResponse?.highPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="最低价">
+          {{ computedSnapshots?.baseResponse?.lowPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="开盘价">
+          {{ computedSnapshots?.baseResponse?.openPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="昨收价">
+          {{ computedSnapshots?.baseResponse?.lastClosePrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="最新价">
+          {{ computedSnapshots?.baseResponse?.curPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="成交量">
+          {{ computedSnapshots?.baseResponse?.volume }}
+        </a-descriptions-item>
+        <a-descriptions-item label="成交额">
+          {{ computedSnapshots?.baseResponse?.turnover }}
+        </a-descriptions-item>
+        <a-descriptions-item label="换手率">
+          {{ computedSnapshots?.baseResponse?.turnoverRate }}
+        </a-descriptions-item>
+        <a-descriptions-item label="卖价">
+          {{ computedSnapshots?.baseResponse?.askPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="买价">
+          {{ computedSnapshots?.baseResponse?.bidPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="卖量">
+          {{ computedSnapshots?.baseResponse?.askVol }}
+        </a-descriptions-item>
+        <a-descriptions-item label="买量">
+          {{ computedSnapshots?.baseResponse?.bidVol }}
+        </a-descriptions-item>
+        <a-descriptions-item label="振幅">
+          {{ computedSnapshots?.baseResponse?.amplitude }}
+        </a-descriptions-item>
+        <a-descriptions-item label="平均价">
+          {{ computedSnapshots?.baseResponse?.avgPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="委比">
+          {{ computedSnapshots?.baseResponse?.bidAskRatio }}
+        </a-descriptions-item>
+        <a-descriptions-item label="量比">
+          {{ computedSnapshots?.baseResponse?.volumeRatio }}
+        </a-descriptions-item>
+        <a-descriptions-item label="52周最高价">
+          {{ computedSnapshots?.baseResponse?.highest52WeeksPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="52周最低价">
+          {{ computedSnapshots?.baseResponse?.lowest52WeeksPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="历史最高价">
+          {{ computedSnapshots?.baseResponse?.highestHistoryPrice }}
+        </a-descriptions-item>
+        <a-descriptions-item label="历史最低价">
+          {{ computedSnapshots?.baseResponse?.lowestHistoryPrice }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
   </div>
 </template>
 <style scoped lang="less"></style>
