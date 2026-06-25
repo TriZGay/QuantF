@@ -38,6 +38,7 @@ const cachedViews = computed<string[]>(() => tagView.cachedViews);
         </RouterView>
       </div>
     </a-layout-content>
+    <a-back-top/>
     <a-layout-footer style="text-align: center">
       Quantf ©2099 Created by Futakotome
     </a-layout-footer>
