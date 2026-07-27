@@ -15,7 +15,7 @@ const { queryPlates, queryAllStocks, querySnapshots } = useFutuApi();
 const { plates, computedAllStocks, computedSnapshots } = storeToRefs(
   useFutuApi()
 );
-const market = ref('1');
+const market = ref("1");
 const plateId = ref();
 
 const plateCode = ref("");
@@ -198,10 +198,12 @@ const requestSnapshot = () => {
             {{ computedSnapshots?.baseResponse?.updateTime }}
           </a-descriptions-item>
           <a-descriptions-item label="上涨支数">
-            {{ computedSnapshots?.plateResponse?.raiseCount }}
+            {{ computedSnapshots?.plateResponse?.raiseCount
+            }}<caret-up-outlined :style="{'color': 'red'}"/>
           </a-descriptions-item>
           <a-descriptions-item label="下跌支数">
             {{ computedSnapshots?.plateResponse?.fallCount }}
+            <caret-down-outlined :style="{'color': 'green'}"/>
           </a-descriptions-item>
           <a-descriptions-item label="平盘支数">
             {{ computedSnapshots?.plateResponse?.equalCount }}
