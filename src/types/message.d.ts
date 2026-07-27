@@ -29,7 +29,42 @@ export declare interface Message {
     | "SET_PRICE_REMINDER"
     | "GET_PRICE_REMINDER"
     | "IPO"
-    | "STOCK_IN_PLATE_BY_MARKET";
+    | "STOCK_IN_PLATE_BY_MARKET"
+    | "VALUATION_P_S_LIST";
+}
+
+export interface PlateItem {
+  security: CommonSecurity; // 股票
+  name: string; // 股票名称
+  valuationVal: number; // 估值
+  forwardValue: number; // 预测估值，当前仅支持 PE 和 PS
+  valuationPercentile: number; // 估值历史分位，百分号前的值，如 12.34 表示 12.34%
+  marketCap: number; // 市值
+}
+
+export interface StockItem {
+  security: CommonSecurity; // 股票
+  name: string; // 板块名称
+}
+
+export interface ValuationPlateStockListContent {
+  count: number; // 成分股总数
+  stockList: Array<StockItem>; // 成分股估值列表
+  nextKey: string; // 分页标识，"-1" 表示无更多数据
+  plateList: Array<PlateItem>; // 指数成分股所属行业/板块列表；仅在指数全部板块首次请求时返回
+}
+
+export interface ValuePlateStockListCommand extends Message {
+  market: number;
+  code: string;
+  valuationType?: 1 | 2 | 3; //1-PE 2-PB 3-PS
+  nextKey?: string;
+  num?: number;
+  sortType?: 1 | 2; //1-desc 2-asc
+  sortId?: 51 | 52 | 53 | 54; //51=市值（默认）52=估值 53=预测估值 54=历史分位
+  filterMarket?: number;
+  filterCode?: string;
+  content?: ValuationPlateStockListContent;
 }
 
 export interface StockInPlateByMarketMessage extends Message {

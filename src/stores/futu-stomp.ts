@@ -21,6 +21,7 @@ import type {
   StockInPlateCommand,
   UserGroupCommand,
   UserSecurityCommand,
+  ValuePlateStockListCommand,
 } from "@/types/message";
 
 export const useFutuStomp = defineStore("futu-stomp", () => {
@@ -51,6 +52,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
   });
   const futuStocksInPlate =
     ref<StockInPlateCommand>() as Ref<StockInPlateCommand>;
+  const futuValuationPlateStockList =
+    ref<ValuePlateStockListCommand>() as Ref<ValuePlateStockListCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -183,6 +186,13 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuStocksInPlate.value = JSON.parse(msg.body);
             }
           );
+          //板块/指数成分股估值列表
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/valuation_p_s_list",
+            (msg) => {
+              futuValuationPlateStockList.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -236,5 +246,6 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuGetPriceReminder,
     futuGetIpoList,
     futuStocksInPlate,
+    futuValuationPlateStockList,
   };
 });

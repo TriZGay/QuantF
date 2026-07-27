@@ -1,4 +1,4 @@
-import type { SnapshotCommand } from "@/types/message";
+import type { PlateItem, SnapshotCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
@@ -12,11 +12,11 @@ export function useSnapshot() {
           market: market,
           code: code,
         },
-      ],
+      ] as PlateItem[],
     };
     sendFtCommandOnNotifyEndPoint(snapshotCommand);
   };
   return {
-    requestSnapshot
+    requestSnapshot,
   };
 }
