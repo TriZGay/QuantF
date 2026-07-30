@@ -109,11 +109,13 @@ export const useFutuApi = defineStore("futu-api", () => {
     pageSize: stocksPageSize,
     total: stocksTotal,
     current: stocksCurrent,
+    totalPage: stocksTotalPages,
   } = usePagination(fetchStocks, {
     pagination: {
       currentKey: "current",
       pageSizeKey: "size",
       totalKey: "data.total",
+      totalPageKey: "data.pages",
     },
     manual: true,
   });
@@ -123,6 +125,7 @@ export const useFutuApi = defineStore("futu-api", () => {
       pageSize: stocksPageSize.value,
       current: stocksCurrent.value,
       total: stocksTotal.value,
+      totalPage: stocksTotalPages.value,
       data: stocksData.value?.data.records || [],
     };
   });

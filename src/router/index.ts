@@ -1,7 +1,8 @@
 import {
-  createRouter, createWebHashHistory,
+  createRouter,
+  createWebHashHistory,
   createWebHistory,
-  type RouteRecordRaw
+  type RouteRecordRaw,
 } from "vue-router";
 import * as process from "node:process";
 
@@ -23,23 +24,25 @@ const routes: RouteRecordRaw[] = [
     name: "LoginPage",
     component: () => import("@/views/login/Login.vue"),
     meta: {
-      hidden: true
-    }
+      hidden: true,
+    },
   },
   {
     path: "/",
     redirect: "/home",
     component: () => import("@/layouts/Layout.vue"),
-    children: [{
-      path: "/home",
-      name: "Home",
-      meta: {
-        title: "首页",
-        icon: "home-filled",
-        closable: false
+    children: [
+      {
+        path: "/home",
+        name: "Home",
+        meta: {
+          title: "首页",
+          icon: "home-filled",
+          closable: false,
+        },
+        component: () => import("@/views/home/Home.vue"),
       },
-      component: () => import("@/views/home/Home.vue")
-    }]
+    ],
   },
   {
     path: "/thirdFutu",
@@ -47,7 +50,7 @@ const routes: RouteRecordRaw[] = [
     redirect: "/thirdFutu/index",
     meta: {
       title: "第三方-富途",
-      icon: "account-book-filled"
+      icon: "account-book-filled",
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
@@ -56,55 +59,65 @@ const routes: RouteRecordRaw[] = [
         name: "FutuIndex",
         meta: {
           title: "概况",
-          icon: "laptop-outlined"
+          icon: "laptop-outlined",
         },
-        component: () => import("@/views/3rd-ft/Ovr.vue")
+        component: () => import("@/views/3rd-ft/Ovr.vue"),
       },
       {
         path: "/thirdFutu/sub",
         name: "SubscribePage",
         meta: {
           title: "订阅",
-          icon: "bank-filled"
+          icon: "bank-filled",
         },
-        component: () => import("@/views/3rd-ft/SubscribePage.vue")
+        component: () => import("@/views/3rd-ft/SubscribePage.vue"),
       },
       {
         path: "/thirdFutu/filter",
         name: "StockFilterPage",
         meta: {
           title: "自选器",
-          icon: "filter-outlined"
+          icon: "filter-outlined",
         },
-        component: () => import("@/views/3rd-ft/MyFilter.vue")
+        component: () => import("@/views/3rd-ft/MyFilter.vue"),
       },
       {
         path: "/thirdFutu/market",
         name: "MartetPage",
-        redirect: "/thirdFutu/market/stockList",
+        redirect: "/thirdFutu/market/objList",
         meta: {
           title: "市场",
-          icon: "account-book-filled"
+          icon: "account-book-filled",
         },
         children: [
           {
-            path: "/thirdFutu/market/stockList",
-            name: "StockList",
+            path: "/thirdFutu/market/objList",
+            name: "ObjectList",
             meta: {
               title: "标的物",
-              icon: "container-filled"
+              icon: "container-filled",
             },
-            component: () => import("@/views/3rd-ft/market/StockList.vue")
-          }, {
+            component: () => import("@/views/3rd-ft/market/ObjectList.vue"),
+          },
+          {
             path: "/thirdFutu/market/plates",
             name: "PlateList",
             meta: {
               title: "板块",
-              icon: "pie-chart-outlined"
+              icon: "pie-chart-outlined",
             },
-            component: () => import("@/views/3rd-ft/market/PlateList.vue")
-          }
-        ]
+            component: () => import("@/views/3rd-ft/market/PlateList.vue"),
+          },
+          {
+            path: "/thirdFutu/market/stocks",
+            name: "StockList",
+            meta: {
+              title: "个股",
+              icon: "pie-chart-outlined",
+            },
+            component: () => import("@/views/3rd-ft/market/StockList.vue"),
+          },
+        ],
       },
       {
         path: "/thirdFutu/trade",
@@ -112,7 +125,7 @@ const routes: RouteRecordRaw[] = [
         redirect: "/thirdFutu/trade/account",
         meta: {
           title: "交易",
-          icon: "bank-filled"
+          icon: "bank-filled",
         },
         children: [
           {
@@ -120,20 +133,20 @@ const routes: RouteRecordRaw[] = [
             name: "AccountPage",
             meta: {
               title: "账户",
-              icon: "credit-card-outlined"
+              icon: "credit-card-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/AccountPage.vue")
+            component: () => import("@/views/3rd-ft/trade/AccountPage.vue"),
           },
           {
             path: "/thirdFutu/trade/order",
             name: "OrderPage",
             meta: {
               title: "订单",
-              icon: "table-outlined"
+              icon: "table-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/OrderList.vue")
-          }
-        ]
+            component: () => import("@/views/3rd-ft/trade/OrderList.vue"),
+          },
+        ],
       },
       {
         path: "/thirdFutu/realtime",
@@ -141,7 +154,7 @@ const routes: RouteRecordRaw[] = [
         redirect: "/thirdFutu/realtime/rtk_min1",
         meta: {
           title: "实时",
-          icon: "fund-outlined"
+          icon: "fund-outlined",
         },
         children: [
           {
@@ -149,67 +162,73 @@ const routes: RouteRecordRaw[] = [
             name: "RealTimeKMin1",
             meta: {
               title: "1分钟实时K线图",
-              icon: "sliders-outlined"
+              icon: "sliders-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLine.vue")
+            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLine.vue"),
           },
           {
             path: "/thirdFutu/realtime/rtk_min3",
             name: "RealTimeKMin3",
             meta: {
               title: "3分钟实时K线图",
-              icon: "sliders-outlined"
+              icon: "sliders-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin3.vue")
+            component: () =>
+              import("@/views/3rd-ft/trade/k/RealTimeKLineMin3.vue"),
           },
           {
             path: "/thirdFutu/realtime/rtk_min5",
             name: "RealTimeKMin5",
             meta: {
               title: "5分钟实时K线图",
-              icon: "sliders-outlined"
+              icon: "sliders-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin5.vue")
+            component: () =>
+              import("@/views/3rd-ft/trade/k/RealTimeKLineMin5.vue"),
           },
           {
             path: "/thirdFutu/realtime/rtk_min15",
             name: "RealTimeKMin15",
             meta: {
               title: "15分钟实时K线图",
-              icon: "sliders-outlined"
+              icon: "sliders-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin15.vue")
+            component: () =>
+              import("@/views/3rd-ft/trade/k/RealTimeKLineMin15.vue"),
           },
           {
             path: "/thirdFutu/realtime/rtk_min30",
             name: "RealTimeKMin30",
             meta: {
               title: "30分钟实时K线图",
-              icon: "sliders-outlined"
+              icon: "sliders-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin30.vue")
+            component: () =>
+              import("@/views/3rd-ft/trade/k/RealTimeKLineMin30.vue"),
           },
           {
             path: "/thirdFutu/realtime/rtk_min60",
             name: "RealTimeKMin60",
             meta: {
               title: "60分钟实时K线图",
-              icon: "sliders-outlined"
+              icon: "sliders-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/k/RealTimeKLineMin60.vue")
+            component: () =>
+              import("@/views/3rd-ft/trade/k/RealTimeKLineMin60.vue"),
           },
           {
             path: "/thirdFutu/realtime/rto",
             name: "RealTimeBaseQuote",
             meta: {
               title: "实时报价",
-              icon: "area-chart-outlined"
+              icon: "area-chart-outlined",
             },
-            component: () => import("@/views/3rd-ft/trade/RealTimeBaseQuote.vue")
-          }
-        ]
-      }
-    ]
+            component: () =>
+              import("@/views/3rd-ft/trade/RealTimeBaseQuote.vue"),
+          },
+        ],
+      },
+    ],
   },
   {
     path: "/thirdAks",
@@ -217,42 +236,50 @@ const routes: RouteRecordRaw[] = [
     redirect: "/thirdAks/stocks",
     meta: {
       title: "第三方-AkShares",
-      icon: "account-book-filled"
+      icon: "account-book-filled",
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: [{
-      path: "/thirdAks/stocks",
-      name: "AksStocksPage",
-      meta: {
-        title: "股票",
-        icon: "container-filled"
-      },
-      children: [{
-        path: "/thirdAks/stocks/zh",
-        name: "AksStocksZhPage",
+    children: [
+      {
+        path: "/thirdAks/stocks",
+        name: "AksStocksPage",
         meta: {
-          title: "大A",
-          icon: "container-filled"
+          title: "股票",
+          icon: "container-filled",
         },
-        component: () => import("@/views/3rd-akshares/stocks/StocksZhPage.vue")
-      }, {
-        path: "/thirdAks/stocks/us",
-        name: "AksStocksUsPage",
-        meta: {
-          title: "美股",
-          icon: "container-filled"
-        },
-        component: () => import("@/views/3rd-akshares/stocks/StocksUsPage.vue")
-      }]
-    }, {
-      path: "/thirdAks/indies",
-      name: "AksIndiesPage",
-      meta: {
-        title: "指数",
-        icon: "container-filled"
+        children: [
+          {
+            path: "/thirdAks/stocks/zh",
+            name: "AksStocksZhPage",
+            meta: {
+              title: "大A",
+              icon: "container-filled",
+            },
+            component: () =>
+              import("@/views/3rd-akshares/stocks/StocksZhPage.vue"),
+          },
+          {
+            path: "/thirdAks/stocks/us",
+            name: "AksStocksUsPage",
+            meta: {
+              title: "美股",
+              icon: "container-filled",
+            },
+            component: () =>
+              import("@/views/3rd-akshares/stocks/StocksUsPage.vue"),
+          },
+        ],
       },
-      component: () => import("@/views/3rd-akshares/stocks/StocksZhPage.vue")
-    }]
+      {
+        path: "/thirdAks/indies",
+        name: "AksIndiesPage",
+        meta: {
+          title: "指数",
+          icon: "container-filled",
+        },
+        component: () => import("@/views/3rd-akshares/stocks/StocksZhPage.vue"),
+      },
+    ],
   },
   {
     path: "/operation",
@@ -260,7 +287,7 @@ const routes: RouteRecordRaw[] = [
     redirect: "/operation/sync",
     meta: {
       title: "操作中心",
-      icon: "bank-filled"
+      icon: "bank-filled",
     },
     component: () => import("@/layouts/Layout.vue"),
     children: [
@@ -269,44 +296,49 @@ const routes: RouteRecordRaw[] = [
         name: "DataClean",
         meta: {
           title: "数据清洗",
-          icon: "bg-colors-outlined"
+          icon: "bg-colors-outlined",
         },
-        component: () => import("@/views/operation/DataCleaning.vue")
-      }
-    ]
+        component: () => import("@/views/operation/DataCleaning.vue"),
+      },
+    ],
   },
   {
     path: "/analyze",
     name: "AnalyzeData",
     meta: {
       title: "统计分析",
-      icon: "stock-outlined"
+      icon: "stock-outlined",
     },
     component: () => import("@/layouts/Layout.vue"),
-    children: [{
-      path: "/analyze/k",
-      name: "KLineAnalyze",
-      meta: {
-        title: "K线",
-        icon: "sliders-outlined"
+    children: [
+      {
+        path: "/analyze/k",
+        name: "KLineAnalyze",
+        meta: {
+          title: "K线",
+          icon: "sliders-outlined",
+        },
+        component: () => import("@/views/analyze/K.vue"),
       },
-      component: () => import("@/views/analyze/K.vue")
-    }, {
-      path: "/analyze/strategy",
-      name: "StrategyAnalyze",
-      meta: {
-        title: "策略",
-        icon: "code-sandbox-outlined"
+      {
+        path: "/analyze/strategy",
+        name: "StrategyAnalyze",
+        meta: {
+          title: "策略",
+          icon: "code-sandbox-outlined",
+        },
+        component: () => import("@/views/analyze/Strategy.vue"),
       },
-      component: () => import("@/views/analyze/Strategy.vue")
-    }]
-  }
+    ],
+  },
 ];
 
 const router = createRouter({
-  history: process.env.NODE_ENV === "development" ? createWebHashHistory(import.meta.env.BASE_URL) :
-    createWebHistory(import.meta.env.BASE_URL),
-  routes: routes
+  history:
+    process.env.NODE_ENV === "development"
+      ? createWebHashHistory(import.meta.env.BASE_URL)
+      : createWebHistory(import.meta.env.BASE_URL),
+  routes: routes,
 });
 
 export { router, routes };

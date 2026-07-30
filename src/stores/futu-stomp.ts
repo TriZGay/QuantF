@@ -8,6 +8,7 @@ import type {
   AccPositionCommand,
   CapitalDistributionCommand,
   CapitalFlowCommand,
+  CompanyProfileCommand,
   FutuHistoryKQuota,
   FutuMarketState,
   GetIpoListCommand,
@@ -54,6 +55,9 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<StockInPlateCommand>() as Ref<StockInPlateCommand>;
   const futuValuationPlateStockList =
     ref<ValuePlateStockListCommand>() as Ref<ValuePlateStockListCommand>;
+  const futuCompanyProfile =
+    ref<CompanyProfileCommand>() as Ref<CompanyProfileCommand>;
+
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -193,6 +197,13 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuValuationPlateStockList.value = JSON.parse(msg.body);
             }
           );
+          //公司概况
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/company_profile",
+            (msg) => {
+              futuCompanyProfile.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -247,5 +258,6 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuGetIpoList,
     futuStocksInPlate,
     futuValuationPlateStockList,
+    futuCompanyProfile,
   };
 });

@@ -30,7 +30,47 @@ export declare interface Message {
     | "GET_PRICE_REMINDER"
     | "IPO"
     | "STOCK_IN_PLATE_BY_MARKET"
-    | "VALUATION_P_S_LIST";
+    | "VALUATION_P_S_LIST"
+    | "COMPANY_PROFILE"
+    | "COMPANY_EXECUTIVES";
+}
+export interface DirectorInfo {
+  displayLeaderName: string; // 高管展示名称（仅用于展示，不用于查询背景接口）
+  leaderName: string; // 高管姓名（可传入 GetCompanyExecutiveBackground 查询背景）
+  positionName: string; // 职位名称
+  beginDate: number; // 任职起始日时间戳（秒）
+  beginDateStr: string; // 任职起始日字符串，格式 YYYY-MM-DD，对应市场时区
+  leaderGender: string; // 性别，如 "Male" / "Female"
+  leaderAge: string; // 年龄，字符串形式，如 "62"
+  highestEducation: string; // 最高学历
+  annualSalary: number; // 年薪
+  issueDate: number; // 发布日期时间戳（秒）
+  issueDateStr: string; // 发布日期字符串，格式 YYYY-MM-DD，对应市场时区
+}
+export interface CompanyExecutivesContent {
+  directorList?: Array<DirectorInfo>;
+}
+export interface CompanyExecutivesCommand extends Command {
+  market: number;
+  code: string;
+  content?: CompanyExecutivesContent;
+}
+
+export interface CompanyLabItem {
+  name: string; // 标签名
+  value: string; // 标签对应信息
+  fieldType: number; // 标签类型
+  fieldTypeStr: string;
+}
+
+export interface CompanyProfileContent {
+  itemList?: Array<CompanyLabItem>;
+}
+
+export interface CompanyProfileCommand extends Command {
+  market: number;
+  code: string;
+  content?: CompanyProfileContent;
 }
 
 export interface PlateItem {

@@ -1,509 +1,270 @@
-<script setup lang="ts">
+<script setup>
+import { marketTypeToSelectOptions } from "@/api/code";
+import { onMounted, ref, watch } from "vue";
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
-import { computed, onMounted, reactive, ref, watch } from "vue";
-import type { TableColumnsType } from "ant-design-vue";
-
-import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
-import {
-  FT_SUB_TYPE,
-  marketTypeToCheckBoxOptions,
-  marketTypeToSelectOptions,
-  stockTypeToCheckBoxOptions,
-  stockTypeToSelectOptions,
-} from "@/api/code";
-import type { Stock } from "@/api/futu";
-import type {
-  CapitalDistributionCommand,
-  PlatesCommand,
-  RehabsCommand,
-  SetPriceReminderCommand,
-  SnapshotCommand,
-  StockInPlateByMarketMessage,
-  StockOwnerPlatesCommand,
-  StocksCommand,
-  SubOrUnSubCommand,
-} from "@/types/message";
+const { queryStocks } = useFutuApi();
+const { stocks } = storeToRefs(useFutuApi());
 import { useFutuStomp } from "@/stores/futu-stomp";
-import HistoryKLineButton from "@/components/HistoryKLineButton/index.vue";
-import SnapshotButton from "@/components/SnapshotButton/index.vue";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
+const { futuCompanyProfile } = storeToRefs(useFutuStomp());
 
-const { queryStocks, queryTradeCodes } = useFutuApi();
-const { stockLoading, stocks, computedTradeCodes } = storeToRefs(useFutuApi());
-
-const stocksColumns = ref<TableColumnsType>([
-  {
-    title: "股票代码",
-    dataIndex: "code",
-    fixed: "left",
-    width: 120,
-  },
-  {
-    title: "名称",
-    dataIndex: "name",
-    fixed: "left",
-    width: 120,
-  },
-  {
-    title: "每手数量",
-    dataIndex: "lotSize",
-    width: 100,
-  },
-  {
-    title: "上市日期",
-    dataIndex: "listingDate",
-    width: 120,
-  },
-  {
-    title: "是否退市",
-    dataIndex: "delisting",
-    width: 100,
-  },
-  {
-    title: "行情市场",
-    dataIndex: "market",
-    width: 100,
-  },
-  {
-    title: "所属交易所",
-    dataIndex: "exchangeType",
-    width: 120,
-  },
-  {
-    title: "操作",
-    key: "action",
-    width: 420,
-    fixed: "right",
-  },
-]);
-
-const pagination = computed<Object>(() => {
-  return {
-    total: stocks.value.total,
-    current: stocks.value.current,
-    pageSize: stocks.value.pageSize,
-    showTotal: (total: Number, range: Array<any>) =>
-      `${range[0]}-${range[1]} of ${total} items`,
-  };
-});
+const market = ref("1");
+const stockId = ref();
+const stockSelectOptions = ref([]);
 
 onMounted(() => {
   queryStocks({
-    delisting: 0,
-    stockType: 3,
-    size: 10,
+    market: parseInt(market.value),
+    size: 200,
     current: 1,
   });
-  queryTradeCodes();
 });
 
-function onChangeTable(tableProps: Object) {
-  let queryForm = tableProps.form;
-  let { pageSize, current } = tableProps.pagination;
-  queryStocks({
-    ...queryForm,
-    size: pageSize,
-    current: current,
-  });
+const queryStockInfos = (market, code) => {
+  queryCompanyProfile(market, code);
+};
+
+const queryCompanyExecutives = (market, code) => {
+  let commadn = {
+
+  }
 }
 
-const formState = reactive({
-  code: {
-    name: "代码",
-    type: "input",
-    bindValue: "",
-  },
-  name: {
-    name: "名称",
-    type: "input",
-    bindValue: "",
-  },
-  market: {
-    name: "市场",
-    type: "select",
-    selectOptions: marketTypeToSelectOptions(),
-    bindValue: "1",
-  },
-  stockType: {
-    name: "标的物类型",
-    type: "select",
-    selectOptions: stockTypeToSelectOptions(),
-    bindValue: "3",
-  },
-  delisting: {
-    name: "是否退市",
-    type: "select",
-    selectOptions: [
-      { label: "否", value: "0" },
-      { label: "是", value: "1" },
-    ],
-    bindValue: "0",
-  },
-});
-
-function onFinish(queryForm: Object) {
-  queryStocks({
-    ...queryForm,
-    size: pagination.value.pageSize,
-    current: 1,
-  });
-}
-
-const subTypes = computed(() => {
-  let arr: Array<Object> = [];
-  Object.keys(FT_SUB_TYPE).forEach((key) => {
-    arr.push({
-      label: FT_SUB_TYPE[key],
-      value: key,
-    });
-  });
-  return arr;
-});
-
-const selectedSubType = ref([]);
-
-function onClick2Subscribe(row: Stock) {
-  let { marketCode, code, name, stockTypeCode } = row;
-  let subMessage: SubOrUnSubCommand = {
-    type: "SUBSCRIPTION",
-    securityList: [
-      {
-        market: marketCode,
-        code: code,
-        name: name,
-        type: stockTypeCode,
-      },
-    ],
-    subTypeList: selectedSubType.value,
-    unsub: false,
+const queryCompanyProfile = (market, code) => {
+  let command = {
+    type: "COMPANY_PROFILE",
+    market: market,
+    code: code,
   };
-  sendFtCommandOnNotifyEndPoint(subMessage);
-}
+  sendFtCommandOnNotifyEndPoint(command);
+};
 
-const checkAll = ref<boolean>(false);
-const indeterminate = ref<boolean>(false);
+watch(stocks, (newStocks) => {
+  if (newStocks.data.length > 0) {
+    let stocksOnPage = stocks.value.data.map((p) => {
+      return { value: p.id, label: p.name, code: p.code, market: p.marketCode };
+    });
+    stockSelectOptions.value = stockSelectOptions.value.concat(stocksOnPage);
+    stockId.value = newStocks.data[0].id;
+    if (stocks.value.current === 1) {
+      queryStockInfos(newStocks.data[0].marketCode, newStocks.data[0].code);
+    }
+  } else {
+    stockSelectOptions.value = [];
+    stockId.value = null;
+  }
+});
 
-function onCheckAllChange(e: any) {
-  indeterminate.value = false;
-  selectedSubType.value = e.target.checked
-    ? subTypes.value.map((v) => v.value)
-    : [];
-}
+const companyBizInfo = ref("");
+const companyIntroduction = ref("");
 
 watch(
-  () => selectedSubType,
-  (val) => {
-    indeterminate.value =
-      !!val.value.length && val.value.length < subTypes.value.length;
-    checkAll.value = val.value.length === subTypes.value.length;
+  futuCompanyProfile,
+  (profile) => {
+    if (profile?.content?.itemList.length > 0) {
+      let independents = profile.content.itemList.filter(
+        (i) => i.fieldTypeStr === "独立标题"
+      );
+      if (independents.length > 0) {
+        let foundBizInfo = independents.find((i) => i.name === "公司业务");
+        if (typeof foundBizInfo !== "undefined") {
+          companyBizInfo.value = foundBizInfo.value;
+        }
+        let foundIntroduction = independents.find((i) => i.name === "公司简介");
+        if (typeof foundIntroduction !== "undefined") {
+          companyIntroduction.value = foundIntroduction.value;
+        }
+      }
+    }
   },
   { deep: true }
 );
 
-const market = ref<string>("1");
-const stockType = ref<string>("3");
-
-const requestStocks = (): void => {
-  let stocksCommand: StocksCommand = {
-    type: "STOCKS",
-    market: parseInt(market.value),
-    stockType: parseInt(stockType.value),
-  };
-  sendFtCommandOnNotifyEndPoint(stocksCommand);
+const stockFilterOption = (input, option) => {
+  return option.label.includes(input);
 };
 
-const requestStockOwnerPlates = (row: Stock): void => {
-  let stockOwnerPlatesCommand: StockOwnerPlatesCommand = {
-    type: "STOCK_OWNER_PLATE",
-    securities: [
-      {
-        market: row.marketCode,
-        code: row.code,
-      },
-    ],
-  };
-  sendFtCommandOnNotifyEndPoint(stockOwnerPlatesCommand);
+const onPopupScroll = (e) => {
+  const { target } = e;
+  const { scrollTop, scrollHeight, offsetHeight } = target;
+  if (scrollTop + 2 + offsetHeight >= scrollHeight) {
+    if (stocks.value.current !== stocks.value.totalPage) {
+      let current = stocks.value.current;
+      current = current + 1;
+      queryStocks({
+        market: parseInt(market.value),
+        size: 200,
+        current: current,
+      });
+      let stocksOnPage = stocks.value.data.map((p) => {
+        return {
+          value: p.id,
+          label: p.name,
+          code: p.code,
+          market: p.marketCode,
+        };
+      });
+      stockSelectOptions.value = stockSelectOptions.value.concat(stocksOnPage);
+    }
+  }
 };
 
-const requestCapitalDistribution = (row: Stock): void => {
-  let capitalDistributionCommand: CapitalDistributionCommand = {
-    type: "CAPITAL_DISTRIBUTION",
-    security: {
-      market: row.marketCode,
-      code: row.code,
-    },
-  };
-  sendFtCommandOnNotifyEndPoint(capitalDistributionCommand);
-};
-const requestRehabs = (row: Stock): void => {
-  let rehabsCommand: RehabsCommand = {
-    type: "REHABS",
-    security: {
-      market: row.marketCode,
-      code: row.code,
-    },
-  };
-  sendFtCommandOnNotifyEndPoint(rehabsCommand);
-};
-
-const setPriceReminderForm = ref({
-  op: 1,
-  remindType: 1,
-  remindFreq: 1,
-  value: 0,
-  note: "",
-});
-
-const requestSetPriceReminder = (row: Stock): void => {
-  let setPriceReminderCommand: SetPriceReminderCommand = {
-    type: "SET_PRICE_REMINDER",
-    market: row.marketCode,
-    code: row.code,
-    op: setPriceReminderForm.value?.op,
-    remindType: setPriceReminderForm.value?.remindType,
-    remindFreq: setPriceReminderForm.value?.remindFreq,
-    value: setPriceReminderForm.value?.value,
-    note: setPriceReminderForm.value?.note,
-  };
-  sendFtCommandOnNotifyEndPoint(setPriceReminderCommand);
-};
-
-const stockInPlateMarket = ref<string>("1");
-const requestStockInPlatesByMarket = () => {
-  let command: StockInPlateByMarketMessage = {
-    type: "STOCK_IN_PLATE_BY_MARKET",
-    market: parseInt(stockInPlateMarket.value),
-  };
-  sendFtCommandOnNotifyEndPoint(command);
-};
-const plateSnapshotMarket = ref<string>("1");
-const requestPlatesSnapshotsByMarket = () => {
-  let command: SnapshotCommand = {
-    type: "SNAPSHOT",
-    market: parseInt(plateSnapshotMarket.value),
-    isPlate: 1,
-  };
-  sendFtCommandOnNotifyEndPoint(command);
-};
-const markets = ref<Array<string>>(["1"]);
-const requestPlates = (): void => {
-  let command: PlatesCommand = {
-    type: "PLATES",
-    markets: markets.value.map((market) => parseInt(market)),
-  };
-  sendFtCommandOnNotifyEndPoint(command);
+const onSelectStock = (value, option) => {
+  // queryAllStocks({
+  //   plateId: value,
+  // });
+  // //查询板块快照
+  // let foundPlate = platesSelectOptions.value.find((ps) => ps.value === value);
+  // market.value = foundPlate.market.toString();
+  // plateCode.value = foundPlate.code;
+  // querySnapshots({
+  //   market: foundPlate.market,
+  //   code: foundPlate.code,
+  //   securityType: 7, //7-板块
+  // });
 };
 </script>
+
 <template>
-  <div class="stock-list-container">
-    <a-space>
-      <a-popover title="选择市场和标的物类型" trigger="click">
-        <a-button type="primary">同步静态标的物</a-button>
-        <template #content>
-          <a-space>
-            <a-select
-              style="width: 100px"
-              v-model:value="market"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            />
-            <a-select
-              style="width: 100px"
-              v-model:value="stockType"
-              size="small"
-              :options="stockTypeToCheckBoxOptions()"
-            ></a-select>
-            <a-button type="primary" size="small" @click="requestStocks()"
-              >确定</a-button
+  <div class="border-gray-700 border-solid p-4 rounded overflow-y-auto">
+    <div class="mb-2">
+      <a-form layout="inline">
+        <a-form-item>
+          <a-select
+            v-model:value="market"
+            placeholder="市场"
+            :options="marketTypeToSelectOptions()"
+          />
+        </a-form-item>
+        <a-form-item class="w-52">
+          <a-select
+            v-model:value="stockId"
+            placeholder="个股"
+            show-search
+            :filter-option="stockFilterOption"
+            :options="stockSelectOptions"
+            @select="onSelectStock"
+            @popupScroll="onPopupScroll"
+          />
+        </a-form-item>
+        <a-form-item label="页数">
+          {{
+            "(" +
+            stocks.current +
+            "/" +
+            stocks.totalPage +
+            ")" +
+            "(" +
+            stocks.total +
+            ")"
+          }}
+        </a-form-item>
+      </a-form>
+    </div>
+    <div class="h-[480px]">
+      <!-- 顶部股票头部信息 -->
+      <a-card class="mb-6 shadow-sm" bordered>
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 rounded-lg bg-blue-500 text-white flex items-center justify-center text-xl font-bold"
             >
-          </a-space>
-        </template>
-      </a-popover>
-      <a-popover title="选择市场" trigger="click">
-        <a-button type="primary">批量同步板块下股票(按市场)</a-button>
-        <template #content>
-          <a-space>
-            <a-radio-group
-              style="width: 100px"
-              v-model:value="stockInPlateMarket"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            >
-            </a-radio-group>
-            <a-button
-              type="primary"
-              size="small"
-              @click="requestStockInPlatesByMarket()"
-              >确定</a-button
-            >
-          </a-space>
-        </template>
-      </a-popover>
-      <a-popover title="选择市场" trigger="click">
-        <a-button type="primary">批量请求板块快照数据(按市场)</a-button>
-        <template #content>
-          <a-space>
-            <a-radio-group
-              style="width: 100px"
-              v-model:value="plateSnapshotMarket"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            >
-            </a-radio-group>
-            <a-button
-              type="primary"
-              size="small"
-              @click="requestPlatesSnapshotsByMarket()"
-              >确定</a-button
-            >
-          </a-space>
-        </template>
-      </a-popover>
-      <a-popover title="选择市场" trigger="click">
-        <a-button type="primary">同步板块数据</a-button>
-        <template #content>
-          <a-space>
-            <a-checkbox-group
-              style="width: 100px"
-              v-model:value="markets"
-              size="small"
-              :options="marketTypeToCheckBoxOptions()"
-            >
-            </a-checkbox-group>
-            <a-button type="primary" size="small" @click="requestPlates()"
-              >确定</a-button
-            >
-          </a-space>
-        </template>
-      </a-popover>
-    </a-space>
-    <a-divider />
-    <AdvancedTable
-      :form="formState"
-      @on-finish="onFinish"
-      :columns="stocksColumns"
-      :data-source="stocks.data"
-      :loading="stockLoading"
-      :row-key="(record:Stock) => record.id"
-      :pagination="pagination"
-      :scroll="{ x: 1000 }"
-      @on-change-table="onChangeTable"
-    >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
-          <a-space>
-            <HistoryKLineButton
-              :sub-type="11"
-              :market="record.marketCode"
-              :code="record.code"
-            />
-            <SnapshotButton :market="record.marketCode" :code="record.code" />
-            <a-popover title="选择订阅类型" trigger="click">
-              <a-button type="link" size="small">订阅</a-button>
-              <template #content>
-                <a-menu style="padding: 10px 10px">
-                  <a-checkbox
-                    v-model:checked="checkAll"
-                    :indeterminate="indeterminate"
-                    @change="onCheckAllChange"
-                    >全选
-                  </a-checkbox>
-                  <br />
-                  <a-checkbox-group
-                    style="width: 100px"
-                    v-model:value="selectedSubType"
-                    :options="subTypes"
-                  />
-                  <br />
-                  <a-button
-                    type="primary"
-                    size="small"
-                    @click="onClick2Subscribe(record)"
-                    >确定
-                  </a-button>
-                </a-menu>
-              </template>
-            </a-popover>
-            <a-popover title="确定" trigger="click">
-              <a-button type="link" size="small" disabled>板块数据</a-button>
-              <template #content>
-                <a-button
-                  type="primary"
-                  size="small"
-                  @click="requestStockOwnerPlates(record)"
-                  >确定</a-button
-                >
-              </template>
-            </a-popover>
-            <a-popover title="确定" trigger="click">
-              <a-button type="link" size="small" disabled>资金分布</a-button>
-              <template #content>
-                <a-button
-                  type="primary"
-                  size="small"
-                  @click="requestCapitalDistribution(record)"
-                  >确定</a-button
-                >
-              </template>
-            </a-popover>
-            <a-popover title="确定" trigger="click">
-              <a-button type="link" size="small" disabled>复权因子</a-button>
-              <template #content>
-                <a-button
-                  type="primary"
-                  size="small"
-                  @click="requestRehabs(record)"
-                  >确定</a-button
-                >
-              </template>
-            </a-popover>
-            <a-popover title="确定" trigger="click">
-              <a-button type="link" size="small" disabled
-                >设置到价提醒</a-button
+              zzz
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">zzzz</h2>
+              <div class="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                <span>股票代码：</span>
+                <span>行业：zzz</span>
+                <span>上市时间：zzzz</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-red-500">zzz</div>
+              <div class="text-xs text-gray-400">当前股价(元)</div>
+            </div>
+            <a-button type="primary">加入自选</a-button>
+          </div>
+        </div>
+      </a-card>
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- 左侧主体：公司概览数组动态渲染 -->
+        <div class="lg:col-span-3">
+          <a-card title="公司核心概览" bordered size="small" class="shadow-sm">
+            <!-- 数组循环渲染概览信息 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div
+                v-for="(
+                  item, index
+                ) in futuCompanyProfile?.content?.itemList.filter(
+                  (i) => i.fieldTypeStr !== '独立标题'
+                )"
+                :key="index"
+                class="dark:bg-gray-50 rounded-lg p-4 border-solid border border-gray-50"
               >
-              <template #content>
-                <a-form>
-                  <a-form-item label="价格">
-                    <a-input-number
-                      v-model:value="setPriceReminderForm.value"
-                    />
-                  </a-form-item>
-                  <a-form-item label="操作类型">
-                    <a-select
-                      v-model:value="setPriceReminderForm.op"
-                      :options="computedTradeCodes?.setPriceReminderOps"
-                    />
-                  </a-form-item>
-                  <a-form-item label="提醒类型">
-                    <a-select
-                      v-model:value="setPriceReminderForm.remindType"
-                      :options="computedTradeCodes?.setPriceReminderTypes"
-                    />
-                  </a-form-item>
-                  <a-form-item label="提醒频率">
-                    <a-select
-                      v-model:value="setPriceReminderForm.remindFreq"
-                      :options="computedTradeCodes?.setPriceReminderFreqs"
-                    />
-                  </a-form-item>
-                  <a-form-item label="备注">
-                    <a-input v-model:value="setPriceReminderForm.note" />
-                  </a-form-item>
-                </a-form>
-                <a-button
-                  type="primary"
-                  size="small"
-                  @click="requestSetPriceReminder(record)"
-                  >确定</a-button
-                >
-              </template>
-            </a-popover>
-          </a-space>
-        </template>
-      </template>
-    </AdvancedTable>
+                <div class="text-sm dark:text-gray-400 mb-1">
+                  {{ item.name }}
+                </div>
+                <div class="text-base font-medium dark:text-gray-700 break-all">
+                  {{ item.value }}
+                </div>
+              </div>
+            </div>
+
+            <!-- 公司简介大文本区域 -->
+            <div class="mt-8 pt-6 border-t dark:border-gray-100">
+              <h3 class="text-base font-semibold dark:text-gray-800 mb-3">
+                企业简介
+              </h3>
+              <p class="dark:text-gray-600 leading-relaxed whitespace-pre-line">
+                {{ companyIntroduction }}
+              </p>
+            </div>
+          </a-card>
+        </div>
+
+        <!-- 右侧侧边栏辅助卡片 -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+          <a-card title="主营业务" bordered size="small">
+            <p class="dark:text-gray-600 text-sm leading-relaxed">
+              {{ companyBizInfo }}
+            </p>
+          </a-card>
+
+          <a-card title="股本规模" bordered size="small">
+            <div class="space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-400">总股本</span>
+                <span class="font-medium">zzz 万股</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-400">流通股本</span>
+                <span class="font-medium">zzz 万股</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-400">总市值</span>
+                <span class="font-medium">zzz 亿元</span>
+              </div>
+            </div>
+          </a-card>
+
+          <a-card title="操作工具" bordered size="small">
+            <div class="flex flex-col gap-3">
+              <a-button block>财务报表</a-button>
+              <a-button block>高管信息</a-button>
+              <a-button block>行业对比</a-button>
+            </div>
+          </a-card>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-<style lang="less" scoped></style>
+
+<style scoped lang="less"></style>

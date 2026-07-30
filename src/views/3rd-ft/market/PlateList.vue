@@ -36,8 +36,9 @@ watch(plates, (newPlates) => {
       return { value: p.id, label: p.name, code: p.code, market: p.marketCode };
     });
     platesSelectOptions.value = platesSelectOptions.value.concat(platesOnPage);
-    if (plates.value.current !== plates.value.totalPage) {
-      plateId.value = newPlates.data[0].id;
+    plateId.value = newPlates.data[0].id;
+    if (plates.value.current === 1) {
+      //仅限进去的时候，也就是当第一页的时候查询
       querySnapshots({
         market: newPlates.data[0].marketCode,
         code: newPlates.data[0].code,
@@ -199,11 +200,11 @@ const requestSnapshot = () => {
           </a-descriptions-item>
           <a-descriptions-item label="上涨支数">
             {{ computedSnapshots?.plateResponse?.raiseCount
-            }}<caret-up-outlined :style="{'color': 'red'}"/>
+            }}<caret-up-outlined :style="{ color: 'red' }" />
           </a-descriptions-item>
           <a-descriptions-item label="下跌支数">
             {{ computedSnapshots?.plateResponse?.fallCount }}
-            <caret-down-outlined :style="{'color': 'green'}"/>
+            <caret-down-outlined :style="{ color: 'green' }" />
           </a-descriptions-item>
           <a-descriptions-item label="平盘支数">
             {{ computedSnapshots?.plateResponse?.equalCount }}
