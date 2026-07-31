@@ -8,10 +8,11 @@ const { stocks } = storeToRefs(useFutuApi());
 import { useFutuStomp } from "@/stores/futu-stomp";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const { futuCompanyProfile } = storeToRefs(useFutuStomp());
+const { futuCompanyProfile, futuCompanyExecutives, futuCompanyExecutiveBg } =
+  storeToRefs(useFutuStomp());
 
 const market = ref("1");
-const stockId = ref();
+const stockCode = ref("");
 const stockSelectOptions = ref([]);
 
 onMounted(() => {
@@ -24,13 +25,40 @@ onMounted(() => {
 
 const queryStockInfos = (market, code) => {
   queryCompanyProfile(market, code);
+  queryCompanyExecutives(market, code);
 };
 
-const queryCompanyExecutives = (market, code) => {
-  let commadn = {
+const queryCompanyExecutiveBg = (leaderName) => {
+  let command = {
+    type: "COMPANY_EXECUTIVE_BACKGROUND",
+    market: parseInt(market.value),
+    code: stockCode.value,
+    leaderName: leaderName,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 
-  }
-}
+const executivesModalVisible = ref(false);
+const executivesColumns = ref([
+  { title: "高管展示名称", dataIndex: "displayLeaderName", width: 120 },
+  { title: "高管姓名", dataIndex: "leaderName", width: 100 },
+  { title: "职位名称", dataIndex: "positionName", width: 100 },
+  { title: "任职起始日", dataIndex: "beginDateStr", width: 100 },
+  { title: "性别", dataIndex: "leaderGender", width: 100 },
+  { title: "年龄", dataIndex: "leaderAge", width: 100 },
+  { title: "最高学历", dataIndex: "highestEducation", width: 100 },
+  { title: "年薪", dataIndex: "annualSalary", width: 100 },
+  { title: "发布日期", dataIndex: "issueDateStr", width: 100 },
+]);
+
+const queryCompanyExecutives = (market, code) => {
+  let command = {
+    type: "COMPANY_EXECUTIVES",
+    market: market,
+    code: code,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 
 const queryCompanyProfile = (market, code) => {
   let command = {
@@ -44,16 +72,16 @@ const queryCompanyProfile = (market, code) => {
 watch(stocks, (newStocks) => {
   if (newStocks.data.length > 0) {
     let stocksOnPage = stocks.value.data.map((p) => {
-      return { value: p.id, label: p.name, code: p.code, market: p.marketCode };
+      return { value: p.code, label: p.name, market: p.marketCode };
     });
     stockSelectOptions.value = stockSelectOptions.value.concat(stocksOnPage);
-    stockId.value = newStocks.data[0].id;
     if (stocks.value.current === 1) {
+      stockCode.value = newStocks.data[0].code;
       queryStockInfos(newStocks.data[0].marketCode, newStocks.data[0].code);
     }
   } else {
     stockSelectOptions.value = [];
-    stockId.value = null;
+    stockCode.value = null;
   }
 });
 
@@ -140,7 +168,7 @@ const onSelectStock = (value, option) => {
         </a-form-item>
         <a-form-item class="w-52">
           <a-select
-            v-model:value="stockId"
+            v-model:value="stockCode"
             placeholder="个股"
             show-search
             :filter-option="stockFilterOption"
@@ -257,10 +285,39 @@ const onSelectStock = (value, option) => {
           <a-card title="操作工具" bordered size="small">
             <div class="flex flex-col gap-3">
               <a-button block>财务报表</a-button>
-              <a-button block>高管信息</a-button>
+              <a-button block @click="executivesModalVisible = true"
+                >高管信息</a-button
+              >
               <a-button block>行业对比</a-button>
             </div>
           </a-card>
+          <a-modal
+            v-model:visible="executivesModalVisible"
+            :width="900"
+            title="高管信息"
+          >
+            <!-- 表格 -->
+            <a-table
+              :columns="executivesColumns"
+              :data-source="futuCompanyExecutives?.content?.directorList"
+              size="small"
+            >
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.dataIndex === 'leaderName'">
+                  <a-popover title="高管背景" trigger="click">
+                    <template #content>
+                      <div class="w-96">
+                        {{ futuCompanyExecutiveBg?.content?.briefBackground}}
+                      </div>
+                    </template>
+                    <a @click="queryCompanyExecutiveBg(record.leaderName)">{{
+                        record.leaderName
+                      }}</a>
+                  </a-popover>
+                </template>
+              </template>
+            </a-table>
+          </a-modal>
         </div>
       </div>
     </div>

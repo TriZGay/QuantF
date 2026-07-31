@@ -8,6 +8,8 @@ import type {
   AccPositionCommand,
   CapitalDistributionCommand,
   CapitalFlowCommand,
+  CompanyExecutiveBgCommand,
+  CompanyExecutivesCommand,
   CompanyProfileCommand,
   FutuHistoryKQuota,
   FutuMarketState,
@@ -57,7 +59,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<ValuePlateStockListCommand>() as Ref<ValuePlateStockListCommand>;
   const futuCompanyProfile =
     ref<CompanyProfileCommand>() as Ref<CompanyProfileCommand>;
-
+  const futuCompanyExecutives =
+    ref<CompanyExecutivesCommand>() as Ref<CompanyExecutivesCommand>;
+  const futuCompanyExecutiveBg =
+    ref<CompanyExecutiveBgCommand>() as Ref<CompanyExecutiveBgCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -204,6 +209,20 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuCompanyProfile.value = JSON.parse(msg.body);
             }
           );
+          //公司高管
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/company_executives",
+            (msg) => {
+              futuCompanyExecutives.value = JSON.parse(msg.body);
+            }
+          );
+          //高管背景
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/company_executive_background",
+            (msg) => {
+              futuCompanyExecutiveBg.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -259,5 +278,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuStocksInPlate,
     futuValuationPlateStockList,
     futuCompanyProfile,
+    futuCompanyExecutives,
+    futuCompanyExecutiveBg,
   };
 });

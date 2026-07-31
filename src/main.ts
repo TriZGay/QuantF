@@ -1,4 +1,4 @@
-//@ts-ignore
+//@ts-nocheck
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import Antd from "ant-design-vue";

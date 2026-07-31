@@ -32,8 +32,21 @@ export declare interface Message {
     | "STOCK_IN_PLATE_BY_MARKET"
     | "VALUATION_P_S_LIST"
     | "COMPANY_PROFILE"
-    | "COMPANY_EXECUTIVES";
+    | "COMPANY_EXECUTIVES"
+    | "COMPANY_EXECUTIVE_BACKGROUND";
 }
+
+export interface CompanyExecutiveBackgroundContent {
+  briefBackground: string;
+}
+
+export interface CompanyExecutiveBgCommand extends Message {
+  market: number;
+  code: string;
+  leaderName: string;
+  content?: CompanyExecutiveBackgroundContent;
+}
+
 export interface DirectorInfo {
   displayLeaderName: string; // 高管展示名称（仅用于展示，不用于查询背景接口）
   leaderName: string; // 高管姓名（可传入 GetCompanyExecutiveBackground 查询背景）
@@ -50,7 +63,7 @@ export interface DirectorInfo {
 export interface CompanyExecutivesContent {
   directorList?: Array<DirectorInfo>;
 }
-export interface CompanyExecutivesCommand extends Command {
+export interface CompanyExecutivesCommand extends Message {
   market: number;
   code: string;
   content?: CompanyExecutivesContent;
@@ -67,7 +80,7 @@ export interface CompanyProfileContent {
   itemList?: Array<CompanyLabItem>;
 }
 
-export interface CompanyProfileCommand extends Command {
+export interface CompanyProfileCommand extends Message {
   market: number;
   code: string;
   content?: CompanyProfileContent;
