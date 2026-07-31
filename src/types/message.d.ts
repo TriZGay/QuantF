@@ -33,7 +33,136 @@ export declare interface Message {
     | "VALUATION_P_S_LIST"
     | "COMPANY_PROFILE"
     | "COMPANY_EXECUTIVES"
-    | "COMPANY_EXECUTIVE_BACKGROUND";
+    | "COMPANY_EXECUTIVE_BACKGROUND"
+    | "COMPANY_OP_EFFICIENCY"
+    | "ANALYST_CONSENSUS"
+    | "CO_ACTIONS_DIVIDEND"
+    | "CO_ACTIONS_BUYBACK";
+}
+export interface ABuyBackItem {
+  changeRegDate: number; // 工商变更登记日时间戳（秒）
+  changeRegDateStr: string; // 工商变更登记日字符串，格式 YYYY-MM-DD，对应市场时区
+  changeDate: number; // 股份变动日时间戳（秒）
+  changeDateStr: string; // 股份变动日字符串，格式 YYYY-MM-DD，对应市场时区
+  eventProceDesc: string; // 事件进程描述
+  advanceDate: number; // 预案公告日时间戳（秒）
+  advanceDateStr: string; // 预案公告日字符串，格式 YYYY-MM-DD，对应市场时区
+  meetPassDate: number; // 股东大会通过日时间戳（秒）
+  meetPassDateStr: string; // 股东大会通过日字符串，格式 YYYY-MM-DD，对应市场时区
+  startDate: number; // 回购开始日时间戳（秒）
+  startDateStr: string; // 回购开始日字符串，格式 YYYY-MM-DD，对应市场时区
+  endDate: number; // 回购截止日时间戳（秒）
+  endDateStr: string; // 回购截止日字符串，格式 YYYY-MM-DD，对应市场时区
+  payDate: number; // 支付日时间戳（秒）
+  payDateStr: string; // 支付日字符串，格式 YYYY-MM-DD，对应市场时区
+  seller: string; // 出售方（股份被回购方）
+  buyBackMode: string; // 回购方式
+  shareType: string; // 股份类别
+  buyBackSum: number; // 回购股数（股）
+  buyBackMoney: number; // 回购金额
+  percentage: number; // 占已发行股份百分比，百分号前的值，如 12.34 表示 12.34%
+  valueFloor: number; // 拟回购资金总额下限
+  valueCeiling: number; // 拟回购资金总额上限
+  priceFloor: number; // 回购价格下限
+  priceCeiling: number; // 回购价格上限
+  volumeFloor: number; // 拟回购股数下限
+  volumeCeiling: number; // 拟回购股数上限
+}
+export interface HKBuyBackItem {
+  publDate: number; // 公告日时间戳（秒）
+  publDateStr: string; // 公告日字符串，格式 YYYY-MM-DD，对应市场时区
+  endDate: number; // 回购截止日时间戳（秒）
+  endDateStr: string; // 回购截止日字符串，格式 YYYY-MM-DD，对应市场时区
+  buyBackMoney: number; // 回购金额
+  buyBackSum: number; // 回购股数（股）
+  percentage: number; // 占已发行股份百分比，百分号前的值，如 12.34 表示 12.34%
+  highPrice: number; // 最高回购价
+  lowPrice: number; // 最低回购价
+  cumulativeSum: number; // 本轮累计回购股数（股）
+  cumulativePercentage: number; // 本轮累计回购占总股本百分比，百分号前的值，如 12.34 表示 12.34%
+  shareType: string; // 股份类别
+}
+export interface CorporateActionsBuybackContent {
+  hkBuyBackList?: Array<HKBuyBackItem>;
+  aBuyBackList?: Array<ABuyBackItem>;
+  nextKey: string;
+}
+export interface CoActionsBuyBackCommand extends Message {
+  market: number;
+  code: string;
+  nextKey: string;
+  num: number;
+  content?: CorporateActionsBuybackContent;
+}
+export interface CorporateActionsDividendContent {
+  pubDate: string; // 公告日，格式 YYYY/MM/DD，对应市场时区
+  statement: string; // 分配方案描述，如"末期息5.3港元"
+  process: string; // 事件进展，如"方案实施"/"预案"；仅港股和A股的正股与信托有值
+  recordDate: string; // 股权登记日，格式 YYYY/MM/DD，对应市场时区。ETF无此数据
+  exDate: string; // 除权除息日，格式 YYYY/MM/DD，对应市场时区
+  dividendPayableDate: string; // 派息日，格式 YYYY/MM/DD，对应市场时区
+  fiscalYear: string; // 财政年度,如"2026"。仅ETF有值。
+}
+
+export interface CoActionsDividendCommand extends Message {
+  market: number;
+  code: string;
+  contents?: Array<CorporateActionsDividendContent>;
+}
+
+export interface AnalystConsensusContent {
+  highest: number;
+  average: number;
+  lowest: number;
+  rating: number;
+  ratingStr: string;
+  total: number;
+  updateTime: number;
+  updateTimeStr: string;
+  buy: number;
+  hold: number;
+  sell: number;
+  strongBuy: number;
+  underperform: number;
+}
+
+export interface AnalystConsensusCommand extends Message {
+  market: number;
+  code: string;
+  content?: AnalystConsensusContent;
+}
+
+export interface OperationalEfficiencyItem {
+  fiscalYear: number;
+  financialType: number;
+  financialTypeStr: string;
+  periodText: string;
+  endDate: number;
+  endDateStr: string;
+  employeeNum: number;
+  employeeNumYoy: number;
+  incomePerCapita: number;
+  incomePerCapitaYoy: number;
+  profitPerCapita: number;
+  profitPerCapitaYoy: number;
+  netProfitPerCapita: number;
+  netProfitPerCapitaYoy: number;
+}
+
+export interface CompanyOpEfficiencyContent {
+  itemList: Array<OperationalEfficiencyItem>; // 经营效率数据列表
+  nextKey: string; //分页标识，"-1" 表示无更多数据
+  currencyCode: string; // 货币代码(ISO 4217)
+}
+
+export interface CompanyOpEffCommand extends Message {
+  market: number;
+  code: string;
+  nextKey: string;
+  num: number;
+  currencyCode: string;
+  financialType: number;
+  content?: CompanyOpEfficiencyContent;
 }
 
 export interface CompanyExecutiveBackgroundContent {

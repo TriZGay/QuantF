@@ -6,10 +6,14 @@ import type {
   AccFundsCommand,
   AccountsCommand,
   AccPositionCommand,
+  AnalystConsensusCommand,
   CapitalDistributionCommand,
   CapitalFlowCommand,
+  CoActionsBuyBackCommand,
+  CoActionsDividendCommand,
   CompanyExecutiveBgCommand,
   CompanyExecutivesCommand,
+  CompanyOpEffCommand,
   CompanyProfileCommand,
   FutuHistoryKQuota,
   FutuMarketState,
@@ -63,6 +67,14 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<CompanyExecutivesCommand>() as Ref<CompanyExecutivesCommand>;
   const futuCompanyExecutiveBg =
     ref<CompanyExecutiveBgCommand>() as Ref<CompanyExecutiveBgCommand>;
+  const futuCompanyOpEff =
+    ref<CompanyOpEffCommand>() as Ref<CompanyOpEffCommand>;
+  const futuAnalystConsensus =
+    ref<AnalystConsensusCommand>() as Ref<AnalystConsensusCommand>;
+  const futuCoActionsDividend =
+    ref<CoActionsDividendCommand>() as Ref<CoActionsDividendCommand>;
+  const futuCoActionsBuyBack =
+    ref<CoActionsBuyBackCommand>() as Ref<CoActionsBuyBackCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -223,6 +235,34 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuCompanyExecutiveBg.value = JSON.parse(msg.body);
             }
           );
+          //经营效率
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/company_op_efficiency",
+            (msg) => {
+              futuCompanyOpEff.value = JSON.parse(msg.body);
+            }
+          );
+          //分析师评级概述
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/ana_con",
+            (msg) => {
+              futuAnalystConsensus.value = JSON.parse(msg.body);
+            }
+          );
+          //派息分红
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/co_act_dividend",
+            (msg) => {
+              futuCoActionsDividend.value = JSON.parse(msg.body);
+            }
+          );
+          //回购
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/co_act_buyback",
+            (msg) => {
+              futuCoActionsBuyBack.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -280,5 +320,9 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuCompanyProfile,
     futuCompanyExecutives,
     futuCompanyExecutiveBg,
+    futuCompanyOpEff,
+    futuAnalystConsensus,
+    futuCoActionsDividend,
+    futuCoActionsBuyBack,
   };
 });

@@ -3,13 +3,20 @@ import { marketTypeToSelectOptions } from "@/api/code";
 import { onMounted, ref, watch } from "vue";
 import { useFutuApi } from "@/stores/futu-api";
 import { storeToRefs } from "pinia";
-const { queryStocks } = useFutuApi();
-const { stocks } = storeToRefs(useFutuApi());
 import { useFutuStomp } from "@/stores/futu-stomp";
 
+const { queryStocks } = useFutuApi();
+const { stocks } = storeToRefs(useFutuApi());
+
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const { futuCompanyProfile, futuCompanyExecutives, futuCompanyExecutiveBg } =
-  storeToRefs(useFutuStomp());
+const {
+  futuCompanyProfile,
+  futuCompanyExecutives,
+  futuCompanyExecutiveBg,
+  futuCompanyOpEff,
+  futuCoActionsDividend,
+  futuCoActionsBuyBack,
+} = storeToRefs(useFutuStomp());
 
 const market = ref("1");
 const stockCode = ref("");
@@ -26,6 +33,90 @@ onMounted(() => {
 const queryStockInfos = (market, code) => {
   queryCompanyProfile(market, code);
   queryCompanyExecutives(market, code);
+  queryCompanyOpEff(market, code);
+  queryCoActionsDividend(market, code);
+  queryCoActionsBuyback(market, code);
+};
+
+const coActionsBuybackVisible = ref(false);
+const coActionsBuybackHkColumns = ref([
+  { title: "公告日", dataIndex: "publDateStr", width: 120 },
+  { title: "回购截止日", dataIndex: "endDateStr", width: 100 },
+  { title: "回购金额", dataIndex: "buyBackMoney", width: 100 },
+  { title: "回购股数(股)", dataIndex: "buyBackSum", width: 100 },
+  { title: "占已发行股份百分比(%)", dataIndex: "percentage", width: 200 },
+  { title: "最高回购价", dataIndex: "highPrice", width: 100 },
+  { title: "最低回购价", dataIndex: "lowPrice", width: 100 },
+  { title: "本轮累计回购股数(股)", dataIndex: "cumulativeSum", width: 200 },
+  {
+    title: "本轮累计回购占总股本百分比(%)",
+    dataIndex: "cumulativePercentage",
+    width: 220,
+  },
+  { title: "股份类别", dataIndex: "shareType", width: 100 },
+]);
+const queryCoActionsBuyback = (market, code) => {
+  let command = {
+    type: "CO_ACTIONS_BUYBACK",
+    market: market,
+    code: code,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
+
+const coActionsDividendVisible = ref(false);
+const coActionsDividendColumns = ref([
+  { title: "公告日", dataIndex: "pubDate", width: 120 },
+  { title: "分配方案描述", dataIndex: "statement", width: 100 },
+  { title: "事件进展", dataIndex: "process", width: 100 },
+  { title: "股权登记日", dataIndex: "recordDate", width: 100 },
+  { title: "除权除息日", dataIndex: "exDate", width: 100 },
+  { title: "派息日", dataIndex: "dividendPayableDate", width: 100 },
+  { title: "财政年度", dataIndex: "fiscalYear", width: 100 },
+]);
+const queryCoActionsDividend = (market, code) => {
+  let command = {
+    type: "CO_ACTIONS_DIVIDEND",
+    market: market,
+    code: code,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
+
+const companyOpEffVisible = ref(false);
+const companyOpEffColumns = ref([
+  { title: "财务年度", dataIndex: "fiscalYear", width: 120 },
+  { title: "财报类型", dataIndex: "financialTypeStr", width: 120 },
+  { title: "财报周期", dataIndex: "periodText", width: 100 },
+  { title: "截止日", dataIndex: "endDateStr", width: 150 },
+  { title: "员工人数", dataIndex: "employeeNum", width: 100 },
+  { title: "员工人数同比增长率(%)", dataIndex: "employeeNumYoy", width: 220 },
+  { title: "人均营收", dataIndex: "incomePerCapita", width: 100 },
+  {
+    title: "人均营收同比增长率(%)",
+    dataIndex: "incomePerCapitaYoy",
+    width: 220,
+  },
+  { title: "人均营业利润", dataIndex: "fiscalYear", width: 100 },
+  {
+    title: "人均营业利润同比增长率(%)",
+    dataIndex: "profitPerCapitaYoy",
+    width: 220,
+  },
+  { title: "人均净利润", dataIndex: "netProfitPerCapita", width: 100 },
+  {
+    title: "人均净利润同比增长率(%)",
+    dataIndex: "netProfitPerCapitaYoy",
+    width: 220,
+  },
+]);
+const queryCompanyOpEff = (market, code) => {
+  let command = {
+    type: "COMPANY_OP_EFFICIENCY",
+    market: market,
+    code: code,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
 };
 
 const queryCompanyExecutiveBg = (leaderName) => {
@@ -193,7 +284,7 @@ const onSelectStock = (value, option) => {
     </div>
     <div class="h-[480px]">
       <!-- 顶部股票头部信息 -->
-      <a-card class="mb-6 shadow-sm" bordered>
+      <a-card bordered>
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
@@ -285,12 +376,58 @@ const onSelectStock = (value, option) => {
           <a-card title="操作工具" bordered size="small">
             <div class="flex flex-col gap-3">
               <a-button block>财务报表</a-button>
-              <a-button block @click="executivesModalVisible = true"
-                >高管信息</a-button
+              <a-button block @click="executivesModalVisible = true">
+                高管信息
+              </a-button>
+              <a-button block @click="companyOpEffVisible = true">
+                经营效率
+              </a-button>
+              <a-button block @click="coActionsDividendVisible = true">
+                分红派息
+              </a-button>
+              <a-button block @click="coActionsBuybackVisible = true"
+                >回购</a-button
               >
-              <a-button block>行业对比</a-button>
             </div>
           </a-card>
+          <a-modal
+            v-model:visible="coActionsBuybackVisible"
+            :width="900"
+            title="回购"
+          >
+            <!--            todo big a buyback-->
+            <span>NextKey:{{ futuCoActionsBuyBack?.content?.nextKey }}</span>
+            <a-table
+              :columns="coActionsBuybackHkColumns"
+              :data-source="futuCoActionsBuyBack?.content?.hkBuyBackList"
+              size="small"
+              :scroll="{ x: 1500 }"
+            />
+          </a-modal>
+          <a-modal
+            v-model:visible="coActionsDividendVisible"
+            :width="900"
+            title="分红派息"
+          >
+            <a-table
+              :columns="coActionsDividendColumns"
+              :data-source="futuCoActionsDividend?.contents"
+              size="small"
+            />
+          </a-modal>
+          <a-modal
+            v-model:visible="companyOpEffVisible"
+            :width="900"
+            title="经营效率"
+          >
+            <span>NextKey:{{ futuCompanyOpEff?.content?.nextKey }}</span>
+            <a-table
+              :columns="companyOpEffColumns"
+              :data-source="futuCompanyOpEff?.content?.itemList"
+              size="small"
+              :scroll="{ x: 1800 }"
+            />
+          </a-modal>
           <a-modal
             v-model:visible="executivesModalVisible"
             :width="900"
@@ -307,12 +444,12 @@ const onSelectStock = (value, option) => {
                   <a-popover title="高管背景" trigger="click">
                     <template #content>
                       <div class="w-96">
-                        {{ futuCompanyExecutiveBg?.content?.briefBackground}}
+                        {{ futuCompanyExecutiveBg?.content?.briefBackground }}
                       </div>
                     </template>
                     <a @click="queryCompanyExecutiveBg(record.leaderName)">{{
-                        record.leaderName
-                      }}</a>
+                      record.leaderName
+                    }}</a>
                   </a-popover>
                 </template>
               </template>
