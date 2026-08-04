@@ -15,6 +15,7 @@ import type {
   CompanyExecutivesCommand,
   CompanyOpEffCommand,
   CompanyProfileCommand,
+  CorporateActionsStockSplitsCommand,
   FutuHistoryKQuota,
   FutuMarketState,
   GetIpoListCommand,
@@ -75,6 +76,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<CoActionsDividendCommand>() as Ref<CoActionsDividendCommand>;
   const futuCoActionsBuyBack =
     ref<CoActionsBuyBackCommand>() as Ref<CoActionsBuyBackCommand>;
+  const futuCoActionsStockSplits =
+    ref<CorporateActionsStockSplitsCommand>() as Ref<CorporateActionsStockSplitsCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -263,6 +266,13 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuCoActionsBuyBack.value = JSON.parse(msg.body);
             }
           );
+          //拆合股
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/co_act_ss",
+            (msg) => {
+              futuCoActionsStockSplits.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -324,5 +334,6 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuAnalystConsensus,
     futuCoActionsDividend,
     futuCoActionsBuyBack,
+    futuCoActionsStockSplits,
   };
 });

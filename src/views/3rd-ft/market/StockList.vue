@@ -16,6 +16,7 @@ const {
   futuCompanyOpEff,
   futuCoActionsDividend,
   futuCoActionsBuyBack,
+  futuCoActionsStockSplits,
 } = storeToRefs(useFutuStomp());
 
 const market = ref("1");
@@ -36,6 +37,33 @@ const queryStockInfos = (market, code) => {
   queryCompanyOpEff(market, code);
   queryCoActionsDividend(market, code);
   queryCoActionsBuyback(market, code);
+  queryCoActionsStockSplits(market, code);
+};
+
+const coActionsStockSplitsVisible = ref(false);
+const coActionsStockSplitsColumns = ref([
+  { title: "公告日", dataIndex: "dirDeciPubDateStr", width: 120 },
+  { title: "重组方式", dataIndex: "reformType", width: 100 },
+  { title: "比率", dataIndex: "rate", width: 100 },
+  { title: "除权日", dataIndex: "exDateStr", width: 100 },
+  { title: "决议日", dataIndex: "smDeciDateStr", width: 200 },
+  { title: "临时买卖日", dataIndex: "tempTradeBeginDateStr", width: 100 },
+  { title: "并行买卖开始日", dataIndex: "simulTradeBeginDateStr", width: 100 },
+  { title: "并行买卖结束日", dataIndex: "simulTradeEndDateStr", width: 200 },
+  { title: "事件进程", dataIndex: "eventStatus", width: 220 },
+  { title: "新面值", dataIndex: "newParValue", width: 100 },
+  { title: "临时证券代码", dataIndex: "tempShareCode", width: 100 },
+  { title: "临时证券简称", dataIndex: "tempShareAbbrName", width: 100 },
+  { title: "新买卖单位", dataIndex: "newTradeUnit", width: 100 },
+  { title: "生效后股数(股)", dataIndex: "sharesAfterEffect", width: 100 }
+]);
+const queryCoActionsStockSplits = (market, code) => {
+  let command = {
+    type: "CO_ACTIONS_STOCK_SPLITS",
+    market: market,
+    code: code,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
 };
 
 const coActionsBuybackVisible = ref(false);
@@ -385,11 +413,29 @@ const onSelectStock = (value, option) => {
               <a-button block @click="coActionsDividendVisible = true">
                 分红派息
               </a-button>
-              <a-button block @click="coActionsBuybackVisible = true"
-                >回购</a-button
-              >
+              <a-button block @click="coActionsBuybackVisible = true">
+                回购
+              </a-button>
+              <a-button block @click="coActionsStockSplitsVisible = true">
+                拆合股
+              </a-button>
             </div>
           </a-card>
+          <a-modal
+            v-model:visible="coActionsStockSplitsVisible"
+            :width="900"
+            title="拆合股"
+          >
+            <span
+              >NextKey:{{ coActionsStockSplitsVisible?.content?.nextKey }}</span
+            >
+            <a-table
+              :columns="coActionsStockSplitsColumns"
+              :data-source="futuCoActionsStockSplits?.content?.splitItemList"
+              size="small"
+              :scroll="{ x: 1000 }"
+            />
+          </a-modal>
           <a-modal
             v-model:visible="coActionsBuybackVisible"
             :width="900"

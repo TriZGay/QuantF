@@ -37,8 +37,47 @@ export declare interface Message {
     | "COMPANY_OP_EFFICIENCY"
     | "ANALYST_CONSENSUS"
     | "CO_ACTIONS_DIVIDEND"
-    | "CO_ACTIONS_BUYBACK";
+    | "CO_ACTIONS_BUYBACK"
+    | "CO_ACTIONS_STOCK_SPLITS";
 }
+
+export interface StockSplitItem {
+  dirDeciPubDate: number; // 公告日时间戳（秒）
+  dirDeciPubDateStr: string; // 公告日字符串，格式 YYYY-MM-DD，对应市场时区
+  reformType: string; // 重组方式
+  rate: string; // 比率
+  // 港股专有字段（仅港股的正股与信托有值）
+  exDate: number; // 除权日时间戳（秒）
+  exDateStr: string; // 除权日字符串，格式 YYYY-MM-DD，对应市场时区
+  smDeciDate: number; // 决议日时间戳（秒）
+  smDeciDateStr: string; // 决议日字符串，格式 YYYY-MM-DD，对应市场时区
+  tempTradeBeginDate: number; // 临时买卖日时间戳（秒）
+  tempTradeBeginDateStr: string; // 临时买卖日字符串，格式 YYYY-MM-DD，对应市场时区
+  simulTradeBeginDate: number; // 并行买卖开始日时间戳（秒）
+  simulTradeBeginDateStr: string; // 并行买卖开始日字符串，格式 YYYY-MM-DD，对应市场时区
+  simulTradeEndDate: number; // 并行买卖结束日时间戳（秒）
+  simulTradeEndDateStr: string; // 并行买卖结束日字符串，格式 YYYY-MM-DD，对应市场时区
+  eventStatus: string; // 事件进程（如：方案实施）
+  newParValue: number; // 新面值
+  tempShareCode: string; // 临时证券代码（如：02988）
+  tempShareAbbrName: string; // 临时证券简称（如：腾讯控股）
+  newTradeUnit: number; // 新买卖单位（如：100）
+  sharesAfterEffect: number; // 生效后股数（股）
+}
+
+export interface CorporateActionsStockSplitsContent {
+  splitItemList: Array<StockSplitItem>;
+  nextKey: string;
+}
+
+export interface CorporateActionsStockSplitsCommand extends Message {
+  market: number;
+  code: string;
+  nextKey: string;
+  num: number;
+  content?: CorporateActionsStockSplitsContent;
+}
+
 export interface ABuyBackItem {
   changeRegDate: number; // 工商变更登记日时间戳（秒）
   changeRegDateStr: string; // 工商变更登记日字符串，格式 YYYY-MM-DD，对应市场时区
