@@ -22,6 +22,7 @@ import type {
   GetPriceReminderCommand,
   HistoryOrderCommand,
   IncompleteOrderCommand,
+  IndicatorListCommand,
   IpoListResult,
   Message,
   RehabsCommand,
@@ -78,6 +79,8 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<CoActionsBuyBackCommand>() as Ref<CoActionsBuyBackCommand>;
   const futuCoActionsStockSplits =
     ref<CorporateActionsStockSplitsCommand>() as Ref<CorporateActionsStockSplitsCommand>;
+  const futuIndicatorList =
+    ref<IndicatorListCommand>() as Ref<IndicatorListCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -273,6 +276,13 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuCoActionsStockSplits.value = JSON.parse(msg.body);
             }
           );
+          //指标列表
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/indictor_list",
+            (msg) => {
+              futuIndicatorList.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -335,5 +345,6 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuCoActionsDividend,
     futuCoActionsBuyBack,
     futuCoActionsStockSplits,
+    futuIndicatorList,
   };
 });

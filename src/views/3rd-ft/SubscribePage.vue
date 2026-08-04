@@ -5,81 +5,87 @@ import { parseFTsubType, parseSecurityType } from "@/api/code";
 import { Modal, type TableColumnProps } from "ant-design-vue";
 import { useFutuApi } from "@/stores/futu-api";
 import type { SubscribeInfo } from "@/api/futu";
-import type { SubOrUnSubCommand } from "@/types/message";
+import type { IndicatorListCommand, SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import HistoryKLineButton from "@/components/HistoryKLineButton/index.vue";
+import { useTimeoutFn } from "@vueuse/core";
 
-const {
-  sendFtCommandOnNotifyEndPoint
-} = useFutuStomp();
+const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
+const { futuIndicatorList } = storeToRefs(useFutuStomp());
 
-const {
-  querySubscribeInfo,
-  querySubscribeDetails
-} = useFutuApi();
+const { querySubscribeInfo, querySubscribeDetails } = useFutuApi();
 const {
   subscribeInfoLoading,
   subscribeInfos,
   subscribeDetailsLoading,
-  subscribeDetails
+  subscribeDetails,
 } = storeToRefs(useFutuApi());
 
 onMounted(() => {
   querySubscribeInfo({
     size: 10,
-    current: 1
+    current: 1,
   });
   querySubscribeDetails({
     size: 10,
-    current: 1
+    current: 1,
   });
+  queryIndicatorList();
 });
+
+const { start: queryIndicatorList } = useTimeoutFn(() => {
+  let command: IndicatorListCommand = {
+    type: "INDICATOR_LIST",
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+}, 1000);
+
 const subscribeInfoColumns = ref<TableColumnProps[]>([
   {
     title: "代码",
     dataIndex: "securityCode",
-    fixed: "left"
+    fixed: "left",
   },
   {
     title: "名称",
-    dataIndex: "securityName"
+    dataIndex: "securityName",
   },
   {
     title: "标的物类型",
-    dataIndex: "securityType"
+    dataIndex: "securityType",
   },
   {
     title: "订阅类型",
-    dataIndex: "subTypes"
+    dataIndex: "subTypes",
   },
   {
     title: "操作",
-    key: "action"
-  }
+    key: "action",
+  },
 ]);
 const subscribeDetailsColumns = ref<TableColumnProps[]>([
   {
     title: "代码",
     dataIndex: "securityCode",
-    fixed: "left"
+    fixed: "left",
   },
   {
     title: "名称",
-    dataIndex: "securityName"
+    dataIndex: "securityName",
   },
   {
     title: "标的物类型",
-    dataIndex: "securityType"
+    dataIndex: "securityType",
   },
   {
     title: "订阅类型",
-    dataIndex: "subType"
+    dataIndex: "subType",
   },
   {
     title: "操作",
-    key: "action"
-  }
+    key: "action",
+  },
 ]);
 
 function onChangeTable(tableProps: Object) {
@@ -88,7 +94,7 @@ function onChangeTable(tableProps: Object) {
   querySubscribeInfo({
     ...queryForm,
     size: pageSize,
-    current: current
+    current: current,
   });
 }
 
@@ -98,7 +104,7 @@ function onChangeDetailsTable(tableProps: Object) {
   querySubscribeDetails({
     ...queryForm,
     size: pageSize,
-    current: current
+    current: current,
   });
 }
 
@@ -107,7 +113,8 @@ const pagination = computed<Object>(() => {
     total: subscribeInfos.value.total,
     current: subscribeInfos.value.current,
     pageSize: subscribeInfos.value.pageSize,
-    showTotal: (total: Number, range: Array<any>) => `${range[0]}-${range[1]} of ${total} items`
+    showTotal: (total: Number, range: Array<any>) =>
+      `${range[0]}-${range[1]} of ${total} items`,
   };
 });
 const paginationDetails = computed<Object>(() => {
@@ -115,12 +122,14 @@ const paginationDetails = computed<Object>(() => {
     total: subscribeDetails.value.total,
     current: subscribeDetails.value.current,
     pageSize: subscribeDetails.value.pageSize,
-    showTotal: (total: Number, range: Array<any>) => `${range[0]}-${range[1]} of ${total} items`
+    showTotal: (total: Number, range: Array<any>) =>
+      `${range[0]}-${range[1]} of ${total} items`,
   };
 });
 
 function cancelSubscribe(row: SubscribeInfo) {
-  let { securityMarket, securityCode, securityName, securityType, subType } = row;
+  let { securityMarket, securityCode, securityName, securityType, subType } =
+    row;
   Modal.confirm({
     title: "请确认",
     icon: createVNode(ExclamationCircleOutlined),
@@ -131,34 +140,46 @@ function cancelSubscribe(row: SubscribeInfo) {
     onOk() {
       let subMessage: SubOrUnSubCommand = {
         type: "SUBSCRIPTION",
-        securityList: [{
-          market: securityMarket,
-          code: securityCode,
-          name: securityName,
-          type: securityType
-        }],
+        securityList: [
+          {
+            market: securityMarket,
+            code: securityCode,
+            name: securityName,
+            type: securityType,
+          },
+        ],
         subTypeList: [subType],
-        unsub: true
+        unsub: true,
       };
       sendFtCommandOnNotifyEndPoint(subMessage);
-    }
+    },
   });
 }
 </script>
 <template>
   <div class="subscribe-info-container">
     <a-typography>
+      <a-typography-title :level="5">指标列表</a-typography-title>
+      <a-typography-paragraph>
+        {{ futuIndicatorList }}
+      </a-typography-paragraph>
+    </a-typography>
+    <a-typography>
       <a-typography-title :level="5">订阅情况</a-typography-title>
       <a-typography-paragraph>
-        <a-table :columns="subscribeInfoColumns" :data-source="subscribeInfos.data"
-                 :loading="subscribeInfoLoading" :pagination="pagination" @change="onChangeTable">
+        <a-table
+          :columns="subscribeInfoColumns"
+          :data-source="subscribeInfos.data"
+          :loading="subscribeInfoLoading"
+          :pagination="pagination"
+          @change="onChangeTable"
+        >
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'securityType'">
               {{ parseSecurityType(record.securityType) }}
             </template>
             <template v-if="column.key === 'action'">
-              <a-space>
-              </a-space>
+              <a-space> </a-space>
             </template>
           </template>
         </a-table>
@@ -167,11 +188,13 @@ function cancelSubscribe(row: SubscribeInfo) {
     <a-typography>
       <a-typography-title :level="5">订阅细节</a-typography-title>
       <a-typography-paragraph>
-        <a-table :columns="subscribeDetailsColumns"
-                 :data-source="subscribeDetails.data"
-                 :loading="subscribeDetailsLoading"
-                 :pagination="paginationDetails"
-                 @change="onChangeDetailsTable">
+        <a-table
+          :columns="subscribeDetailsColumns"
+          :data-source="subscribeDetails.data"
+          :loading="subscribeDetailsLoading"
+          :pagination="paginationDetails"
+          @change="onChangeDetailsTable"
+        >
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'securityType'">
               {{ parseSecurityType(record.securityType) }}
@@ -180,14 +203,21 @@ function cancelSubscribe(row: SubscribeInfo) {
               {{ parseFTsubType(record.subType) }}
             </template>
             <template v-if="column.key === 'action'">
-                    <span>
-                      <a-space>
-                        <a-button type="link" size="small" @click="cancelSubscribe(record)">取消订阅</a-button>
-                        <HistoryKLineButton :sub-type="record.subType"
-                                            :market="record.securityMarket"
-                                            :code="record.securityCode" />
-                      </a-space>
-                    </span>
+              <span>
+                <a-space>
+                  <a-button
+                    type="link"
+                    size="small"
+                    @click="cancelSubscribe(record)"
+                    >取消订阅</a-button
+                  >
+                  <HistoryKLineButton
+                    :sub-type="record.subType"
+                    :market="record.securityMarket"
+                    :code="record.securityCode"
+                  />
+                </a-space>
+              </span>
             </template>
           </template>
         </a-table>
@@ -195,5 +225,4 @@ function cancelSubscribe(row: SubscribeInfo) {
     </a-typography>
   </div>
 </template>
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

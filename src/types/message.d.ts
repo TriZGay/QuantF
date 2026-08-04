@@ -38,7 +38,38 @@ export declare interface Message {
     | "ANALYST_CONSENSUS"
     | "CO_ACTIONS_DIVIDEND"
     | "CO_ACTIONS_BUYBACK"
-    | "CO_ACTIONS_STOCK_SPLITS";
+    | "CO_ACTIONS_STOCK_SPLITS"
+    | "INDICATOR_LIST";
+}
+
+export interface IndicatorIOParam {
+  index: number;
+  name: string;
+  type: number;
+}
+
+export interface IndicatorInfo {
+  shortName: string;
+  fullName: string;
+  inputs: Array<IndicatorIOParam>;
+  outputs: Array<IndicatorIOParam>;
+  script: string;
+}
+
+export interface IndicatorEntry {
+  myLang?: IndicatorInfo;
+  python?: IndicatorInfo;
+}
+
+export interface IndicatorListContent {
+  indicatorList?: Array<IndicatorEntry>;
+}
+
+export interface IndicatorListCommand extends Message {
+  searchKey?: string;
+  langType?: number;
+  searchMode?: number;
+  content?: IndicatorListContent;
 }
 
 export interface StockSplitItem {
