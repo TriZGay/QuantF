@@ -22,6 +22,8 @@ import type {
   GetPriceReminderCommand,
   HistoryOrderCommand,
   IncompleteOrderCommand,
+  IndicatorCalcCommand,
+  IndicatorCalcResultCommand,
   IndicatorListCommand,
   IpoListResult,
   Message,
@@ -81,6 +83,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<CorporateActionsStockSplitsCommand>() as Ref<CorporateActionsStockSplitsCommand>;
   const futuIndicatorList =
     ref<IndicatorListCommand>() as Ref<IndicatorListCommand>;
+  const futuIndicatorCalcReq =
+    ref<IndicatorCalcCommand>() as Ref<IndicatorCalcCommand>;
+  const futuIndicatorCalcResult =
+    ref<IndicatorCalcResultCommand>() as Ref<IndicatorCalcResultCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -283,6 +289,20 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuIndicatorList.value = JSON.parse(msg.body);
             }
           );
+          //指标计算请求
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/indictor_calc_req",
+            (msg) => {
+              futuIndicatorCalcReq.value = JSON.parse(msg.body);
+            }
+          );
+          //指标计算结果推送
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/indictor_calc_push",
+            (msg) => {
+              futuIndicatorCalcResult.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -346,5 +366,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuCoActionsBuyBack,
     futuCoActionsStockSplits,
     futuIndicatorList,
+    futuIndicatorCalcReq,
+    futuIndicatorCalcResult,
   };
 });

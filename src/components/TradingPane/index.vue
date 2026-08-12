@@ -1,8 +1,6 @@
 <script setup>
-import { klTypeToSelectOptions, rehabTypeToRadioOptions } from "@/api/code";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { provide, ref } from "vue";
-import dayjs from "dayjs";
+import { provide } from "vue";
 
 import { useK } from "./k";
 import { useVolumes } from "./volumes";
@@ -16,10 +14,6 @@ const props = defineProps({
   height: {
     type: Number,
     default: 600,
-  },
-  codes: {
-    type: Array,
-    default: [],
   },
   k: {
     type: Object,
@@ -56,35 +50,7 @@ const props = defineProps({
       updateTime: "",
     },
   },
-  ma: {
-    type: Object,
-    default: {
-      datetime: [],
-      ma5: [],
-      ma10: [],
-      ma20: [],
-      ma30: [],
-      ma60: [],
-      ma120: [],
-    },
-  },
 });
-const emit = defineEmits([
-  "on-select-code",
-  "on-select-indies",
-  "on-select-granularity",
-  "on-select-dataset",
-]);
-const query = ref({
-  code: "",
-  granularity: 1,
-  rehabType: "1",
-  start: dayjs().startOf("month"),
-  end: dayjs().startOf("day"),
-  indies: [],
-});
-
-const indiesMode = ref(2);
 
 const { kOptions } = useK(props);
 const { volumeOptions } = useVolumes(props);
@@ -92,101 +58,9 @@ const { capitalDistributionOptions } = useCapitalDistribution(props);
 const { capitalFlowOptions } = useCapitalFlow(props);
 
 useMa(props, kOptions);
-
-const onSelectCode = (value) => {
-  query.value.code = value;
-  emit("on-select-code", query.value);
-};
-
-const handleIndiesChange = (value) => {
-  emit("on-select-indies", query.value);
-};
-
-const onSelectGranularity = (value) => {
-  query.value.code = "";
-  query.value.granularity = value;
-  emit("on-select-granularity", query.value);
-};
-
-const onSearchDataset = () => {
-  emit("on-select-dataset", query.value);
-};
 </script>
 
 <template>
-  <div class="search-area">
-    <a-form layout="inline" :model="query">
-      <a-form-item label="标的物" class="w-40">
-        <a-select
-          size="small"
-          v-model:value="query.code"
-          :options="codes"
-          @select="onSelectCode"
-        >
-          <template #option="{ value, label, icon }">
-            <span role="img" :aria-label="value" v-if="icon === 21">🇨🇳</span>
-            <span role="img" :aria-label="value" v-if="icon === 1">hk</span>
-            &nbsp;&nbsp;{{ label }}
-          </template>
-        </a-select>
-      </a-form-item>
-      <a-form-item label="周期" class="w-36">
-        <a-select
-          size="small"
-          v-model:value="query.granularity"
-          :options="klTypeToSelectOptions()"
-          @select="onSelectGranularity"
-        />
-      </a-form-item>
-      <a-form-item label="复权" class="w-72">
-        <a-radio-group
-          size="small"
-          v-model:value="query.rehabType"
-          :options="rehabTypeToRadioOptions()"
-        />
-      </a-form-item>
-      <a-form-item label="开始时间">
-        <a-date-picker size="small" v-model:value="query.start" show-time />
-      </a-form-item>
-      <a-form-item label="结束时间">
-        <a-date-picker size="small" v-model:value="query.end" show-time />
-      </a-form-item>
-      <a-form-item label="指标">
-        <a-checkbox-group
-          size="small"
-          v-model:value="query.indies"
-          :options="[
-            { label: 'MA(5/10/20/30/60/120)', value: 'ma' },
-            { label: 'BOLL(20,2.0)', value: 'boll' },
-            { label: 'EMA(5/10/20/60/120)', value: 'ema' },
-            { label: 'MACD(12,26,9)', value: 'macd' },
-            { label: 'RSI(6,12,24)', value: 'rsi' },
-            { label: 'KDJ(9,3,3)', value: 'kdj' },
-            { label: 'ARBR(26)', value: 'arbr' },
-          ]"
-          @change="handleIndiesChange"
-        />
-      </a-form-item>
-      <a-form-item label="指标计算模式">
-        <a-radio-group>
-          <a-radio-group
-            size="small"
-            v-model:value="indiesMode"
-            :options="[
-              { label: 'wasm', value: 1 },
-              { label: '后端', value: 2 },
-            ]"
-          />
-        </a-radio-group>
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" size="small" @click="onSearchDataset">
-          <template #icon><SearchOutlined /></template>
-          查询
-        </a-button>
-      </a-form-item>
-    </a-form>
-  </div>
   <div :style="{ height: height + 'px' }" class="trading-pane">
     <v-chart
       :autoresize="true"

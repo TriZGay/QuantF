@@ -12,9 +12,10 @@ const endDate = ref<Dayjs>();
 
 const visible = ref<boolean>(false);
 const props = defineProps<{
-  subType: number;
-  market: number;
-  code: string;
+  subType?: number;
+  klType?: number;
+  market?: number;
+  code?: string;
 }>();
 const klType = ref<number>(0);
 const computeKlType = (subType: number) => {
@@ -52,6 +53,7 @@ const computeKlType = (subType: number) => {
     //订阅年K
     return 5;
   }
+  return 0;
 };
 const requestHistoryK = (): void => {
   let historyKLCommand: HistoryKLCommand = {
@@ -66,7 +68,11 @@ const requestHistoryK = (): void => {
 };
 
 const openModal = () => {
-  klType.value = computeKlType(props.subType);
+  if (props.klType === null ||  props.klType === undefined) {
+    klType.value = computeKlType(props.subType);
+  } else {
+    klType.value = props.klType;
+  }
   visible.value = true;
 };
 </script>

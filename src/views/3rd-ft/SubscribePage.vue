@@ -5,14 +5,12 @@ import { parseFTsubType, parseSecurityType } from "@/api/code";
 import { Modal, type TableColumnProps } from "ant-design-vue";
 import { useFutuApi } from "@/stores/futu-api";
 import type { SubscribeInfo } from "@/api/futu";
-import type { IndicatorListCommand, SubOrUnSubCommand } from "@/types/message";
+import type { SubOrUnSubCommand } from "@/types/message";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import HistoryKLineButton from "@/components/HistoryKLineButton/index.vue";
-import { useTimeoutFn } from "@vueuse/core";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const { futuIndicatorList } = storeToRefs(useFutuStomp());
 
 const { querySubscribeInfo, querySubscribeDetails } = useFutuApi();
 const {
@@ -31,15 +29,7 @@ onMounted(() => {
     size: 10,
     current: 1,
   });
-  queryIndicatorList();
 });
-
-const { start: queryIndicatorList } = useTimeoutFn(() => {
-  let command: IndicatorListCommand = {
-    type: "INDICATOR_LIST",
-  };
-  sendFtCommandOnNotifyEndPoint(command);
-}, 1000);
 
 const subscribeInfoColumns = ref<TableColumnProps[]>([
   {
@@ -158,12 +148,6 @@ function cancelSubscribe(row: SubscribeInfo) {
 </script>
 <template>
   <div class="subscribe-info-container">
-    <a-typography>
-      <a-typography-title :level="5">指标列表</a-typography-title>
-      <a-typography-paragraph>
-        {{ futuIndicatorList }}
-      </a-typography-paragraph>
-    </a-typography>
     <a-typography>
       <a-typography-title :level="5">订阅情况</a-typography-title>
       <a-typography-paragraph>

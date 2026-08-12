@@ -1,26 +1,31 @@
 <script lang="ts" setup>
 import TradingPane from "@/components/TradingPane/index.vue";
 import { storeToRefs } from "pinia";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useAnalyzeMeta } from "@/stores/ana-meta";
 import { useAnalyzeKline } from "@/stores/ana-k";
 import { useCapitalDistribution } from "@/components/CapitalDistributionButton/capitalDistribution";
 import { useCapitalFlow } from "@/components/CapitalFlowButton/capiflow";
 import dayjs from "dayjs";
+import {
+  klTypeToSelectOptions,
+  parseRehabType,
+  rehabTypeToRadioOptions,
+} from "@/api/code";
+import HistoryKLineButton from "@/components/HistoryKLineButton/index.vue";
+import { useFutuStomp } from "@/stores/futu-stomp";
+import { useTimeoutFn } from "@vueuse/core/index";
 import type {
-  ArbrResponse,
-  BollResponse,
-  EMaData,
-  KdjResponse,
-  KLine,
-  MacdResponse,
-  MaData,
-  RsiResponse,
-} from "@/api/analyze";
-import { isAll200 } from "@/utils/web";
-import type { AxiosResponse } from "axios";
-import { useAnalyzeIndies } from "@/stores/ana-indicator";
-import { parseRehabType } from "@/api/code";
+  CommonSecurity,
+  IndicatorCalcCommand,
+  IndicatorListCommand,
+} from "@/types/message";
+import type { CascaderProps } from "ant-design-vue";
+import type {
+  CascaderOptionType,
+  ShowSearchType,
+} from "ant-design-vue/lib/cascader";
+import type { KLine } from "@/api/analyze";
 
 const { sendCapitalDistributionCommand, capitalDistribution } =
   useCapitalDistribution();
@@ -35,575 +40,9 @@ const analyzeKStores = useAnalyzeKline();
 const fetchKLine = analyzeKStores.requestK;
 const { kData } = storeToRefs(analyzeKStores);
 // 指标
-const analyzeIndiesStores = useAnalyzeIndies();
-const fetchRsiData = analyzeIndiesStores.requestRsiData;
-const fetchKdjData = analyzeIndiesStores.requestKdjData;
-const fetchBolls = analyzeIndiesStores.requestBollData;
-const fetchEmaData = analyzeIndiesStores.requestEmaData;
-const fetchMaLine = analyzeIndiesStores.requestMaData;
-const fetchMacdData = analyzeIndiesStores.requestMacdData;
-const fetchArbrData = analyzeIndiesStores.requestArbrData;
-
-const metaCodeSelectOptions = computed(() => {
-  let options: Array<any> = [];
-  metaCodes.value.forEach((item) => {
-    options.push({
-      icon: item.market,
-      label: item.code,
-      value: item.code + ":" + item.market,
-    });
-  });
-  return options;
-});
-
-function drawAnalyzePic(
-  kLines: KLine[],
-  maLines: MaData[],
-  bollLines: BollResponse[],
-  emaLines: EMaData[],
-  macdLines: MacdResponse[],
-  rsiLines: RsiResponse[],
-  kdjLines: KdjResponse[],
-  arbrLines: ArbrResponse[]
-) {
-  let xAxisTime: Array<string> = [];
-  let candelstickArray: Array = [];
-  let volumes: Array = [];
-  kLines.forEach((k, index) => {
-    xAxisTime.push(k.datetime);
-    candelstickArray.push([k.openPrice, k.closePrice, k.lowPrice, k.highPrice]);
-    volumes.push([index, k.volume, k.openPrice > k.closePrice ? 1 : -1]);
-  });
-  kLineOptions.value = {
-    xAxis: [
-      {
-        type: "category",
-        data: xAxisTime,
-        boundaryGap: false,
-        axisLine: { onZero: false },
-        splitLine: { show: false },
-        axisPointer: {
-          z: 100,
-        },
-      },
-      {
-        type: "category",
-        data: xAxisTime,
-        boundaryGap: false,
-        gridIndex: 1,
-        axisLine: { onZero: false },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: { show: false },
-      },
-      {
-        type: "category",
-        data: xAxisTime,
-        boundaryGap: false,
-        gridIndex: 2,
-        axisLine: { onZero: false },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: { show: false },
-      },
-    ],
-    yAxis: [
-      {
-        scale: true,
-        splitArea: {
-          show: true,
-        },
-      },
-      {
-        scale: true,
-        gridIndex: 1,
-        splitNumber: 2,
-        axisLabel: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitLine: { show: false },
-      },
-      {
-        scale: true,
-        gridIndex: 2,
-        splitNumber: 2,
-        axisLabel: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitLine: { show: false },
-      },
-    ],
-    tooltip: {
-      trigger: "axis",
-      axisPointer: {
-        type: "cross",
-      },
-    },
-    axisPointer: {
-      link: [
-        {
-          xAxisIndex: "all",
-        },
-      ],
-    },
-    visualMap: [
-      {
-        show: false,
-        seriesIndex: 1,
-        dimension: 2,
-        pieces: [
-          {
-            value: 1,
-            color: "#00da3c",
-          },
-          {
-            value: -1,
-            color: "#ec0000",
-          },
-        ],
-      },
-      {
-        show: false,
-        seriesIndex: 18,
-        pieces: [
-          { lt: 0, color: "#00da3c" },
-          { gt: 0, color: "#ec0000" },
-        ],
-      },
-    ],
-    grid: [
-      {
-        top: "8%",
-        left: "5%",
-        right: "5%",
-        height: "40%",
-      },
-      {
-        top: "50%",
-        left: "5%",
-        right: "5%",
-        height: "20%",
-      },
-      {
-        top: "73%",
-        left: "5%",
-        right: "5%",
-        height: "20%",
-      },
-    ],
-    dataZoom: [
-      {
-        type: "inside",
-        xAxisIndex: [0, 1, 2],
-        start: 0,
-        end: 100,
-      },
-      {
-        show: true,
-        type: "slider",
-        xAxisIndex: [0, 1, 2],
-        top: "90%",
-        start: 0,
-        end: 100,
-      },
-    ],
-    series: [
-      {
-        name: formState.code.bindValue,
-        type: "candlestick",
-        data: candelstickArray,
-        markPoint: {
-          data: [
-            {
-              name: "highest value",
-              type: "max",
-              valueDim: "highest",
-            },
-            {
-              name: "lowest value",
-              type: "min",
-              valueDim: "lowest",
-            },
-          ],
-        },
-        markLine: {
-          symbol: ["none", "none"],
-          data: [
-            [
-              {
-                name: "from lowest to highest",
-                type: "min",
-                valueDim: "lowest",
-                symbol: "circle",
-                symbolSize: 10,
-                label: {
-                  show: false,
-                },
-                emphasis: {
-                  label: {
-                    show: false,
-                  },
-                },
-              },
-              {
-                type: "max",
-                valueDim: "highest",
-                symbol: "circle",
-                symbolSize: 10,
-                label: {
-                  show: false,
-                },
-                emphasis: {
-                  label: {
-                    show: false,
-                  },
-                },
-              },
-            ],
-          ],
-        },
-      },
-      {
-        name: "成交量",
-        type: "bar",
-        xAxisIndex: 1,
-        yAxisIndex: 1,
-        data: volumes,
-      },
-      {
-        name: "MA5",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: maLines.map((ma) => ma.ma5Value),
-      },
-      {
-        name: "MA10",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: maLines.map((ma) => ma.ma10Value),
-      },
-      {
-        name: "MA20",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: maLines.map((ma) => ma.ma20Value),
-      },
-      {
-        name: "MA30",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: maLines.map((ma) => ma.ma30Value),
-      },
-      {
-        name: "MA60",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: maLines.map((ma) => ma.ma60Value),
-      },
-      {
-        name: "MA120",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: maLines.map((ma) => ma.ma120Value),
-      },
-      {
-        name: "MID",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: bollLines.map((ma) => ma.ma20Mid),
-      },
-      {
-        name: "UPPER",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: bollLines.map((ma) => ma.doubleUpper),
-      },
-      {
-        name: "LOWER",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: bollLines.map((ma) => ma.doubleLower),
-      },
-      {
-        name: "EMA5",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: emaLines.map((ema) => ema.ema5Value),
-      },
-      {
-        name: "EMA10",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: emaLines.map((ema) => ema.ema10Value),
-      },
-      {
-        name: "EMA20",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: emaLines.map((ema) => ema.ema20Value),
-      },
-      {
-        name: "EMA60",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: emaLines.map((ema) => ema.ema60Value),
-      },
-      {
-        name: "EMA120",
-        type: "line",
-        showSymbol: false,
-        smooth: true,
-        data: emaLines.map((ema) => ema.ema120Value),
-      },
-      {
-        name: "DIF",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        showSymbol: false,
-        smooth: true,
-        data: macdLines.map((macd) => macd.dif),
-      },
-      {
-        name: "DEA",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        showSymbol: false,
-        smooth: true,
-        data: macdLines.map((macd) => macd.dea),
-      },
-      {
-        name: "MACD",
-        type: "bar",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: macdLines.map((macd) => macd.macd),
-      },
-      {
-        name: "RSI6",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: rsiLines.map((rsi) => rsi.rsi6),
-      },
-      {
-        name: "RSI12",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: rsiLines.map((rsi) => rsi.rsi12),
-      },
-      {
-        name: "RSI24",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: rsiLines.map((rsi) => rsi.rsi24),
-      },
-      {
-        name: "K",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: kdjLines.map((kdj) => kdj.k),
-      },
-      {
-        name: "D",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: kdjLines.map((kdj) => kdj.d),
-      },
-      {
-        name: "J",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: kdjLines.map((kdj) => kdj.j),
-      },
-      {
-        name: "AR",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: arbrLines.map((arbr) => arbr.ar),
-      },
-      {
-        name: "BR",
-        type: "line",
-        xAxisIndex: 2,
-        yAxisIndex: 2,
-        data: arbrLines.map((arbr) => arbr.br),
-      },
-    ],
-  };
-}
-
-function onFinish(values: any) {
-  let fetchMethods: Array<Promise<AxiosResponse>> = [];
-  if (values.indies.includes("ma")) {
-    fetchMethods.push(
-      fetchMaLine({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  if (values.indies.includes("boll")) {
-    fetchMethods.push(
-      fetchBolls({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  if (values.indies.includes("ema")) {
-    fetchMethods.push(
-      fetchEmaData({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  if (values.indies.includes("macd")) {
-    fetchMethods.push(
-      fetchMacdData({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  if (values.indies.includes("rsi")) {
-    fetchMethods.push(
-      fetchRsiData({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  if (values.indies.includes("kdj")) {
-    fetchMethods.push(
-      fetchKdjData({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  if (values.indies.includes("arbr")) {
-    fetchMethods.push(
-      fetchArbrData({
-        rehabType: values.rehabType,
-        granularity: values.granularity,
-        code: values.code,
-        start: dayjs(values.range[0]).format("YYYY-MM-DD HH:mm:ss"),
-        end: dayjs(values.range[1]).format("YYYY-MM-DD HH:mm:ss"),
-      })
-    );
-  }
-  Promise.all(fetchMethods).then((allPromises) => {
-    if (isAll200(allPromises)) {
-      let kLines: KLine[] = [];
-      let kPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/k/n"
-      );
-      if (kPromiseIndex != -1) {
-        kData.value = allPromises[kPromiseIndex].data;
-        kLines = allPromises[kPromiseIndex].data;
-      }
-      let maLines: MaData[] = [];
-      let maPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/ma/n"
-      );
-      if (maPromiseIndex != -1) {
-        maLines = allPromises[maPromiseIndex].data;
-      }
-      let bollLines: BollResponse[] = [];
-      let bollPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/boll/boll202"
-      );
-      if (bollPromiseIndex != -1) {
-        bollLines = allPromises[bollPromiseIndex].data;
-      }
-      let emaLines: EMaData[] = [];
-      let emaPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/ema/n"
-      );
-      if (emaPromiseIndex != -1) {
-        emaLines = allPromises[emaPromiseIndex].data;
-      }
-      let macdLines: MacdResponse[] = [];
-      let macdPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/macd/macd12269"
-      );
-      if (macdPromiseIndex != -1) {
-        macdLines = allPromises[macdPromiseIndex].data;
-      }
-      let rsiLines: RsiResponse[] = [];
-      let rsiPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/rsi/rsi61224"
-      );
-      if (rsiPromiseIndex != -1) {
-        rsiLines = allPromises[rsiPromiseIndex].data;
-      }
-      let kdjLines: KdjResponse[] = [];
-      let kdjPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/kdj/kdj933"
-      );
-      if (kdjPromiseIndex != -1) {
-        kdjLines = allPromises[kdjPromiseIndex].data;
-      }
-      let arbrLines: ArbrResponse[] = [];
-      let arbrPromiseIndex = allPromises.findIndex(
-        (promise) => promise.config.url === "/ana/arbr/arbr26"
-      );
-      if (arbrPromiseIndex != -1) {
-        arbrLines = allPromises[arbrPromiseIndex].data;
-      }
-      drawAnalyzePic(
-        kLines,
-        maLines,
-        bollLines,
-        emaLines,
-        macdLines,
-        rsiLines,
-        kdjLines,
-        arbrLines
-      );
-    }
-  });
-}
+const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
+const { futuIndicatorList, futuIndicatorCalcReq, futuIndicatorCalcResult } =
+  storeToRefs(useFutuStomp());
 
 const volumes = computed(() => {
   let xAxisTime: Array<String> = [];
@@ -631,117 +70,169 @@ const kLines = computed(() => {
   };
 });
 
-const maData = ref<{
-  datetime: Array<String>;
-  ma5: Array<Number>;
-  ma10: Array<Number>;
-  ma20: Array<Number>;
-  ma30: Array<Number>;
-  ma60: Array<Number>;
-  ma120: Array<Number>;
-}>({
-  datetime: [],
-  ma5: [],
-  ma10: [],
-  ma20: [],
-  ma30: [],
-  ma60: [],
-  ma120: [],
+const query = ref({
+  code: "",
+  granularity: 1,
+  rehabType: "1",
+  start: dayjs().startOf("month"),
+  end: dayjs().startOf("day"),
 });
 
-function queryDataset(values: any) {
-  let realCode = values.code.split(":")[0];
-  let market = values.code.split(":")[1];
+const metaCodeSelectOptions = ref<Array<any>>([]);
+
+watch(
+  () => query.value.code,
+  (code) => {
+    let realCode = code.split(":")[0];
+    marketOnSelect.value = parseInt(code.split(":")[1]);
+    codeOnSelect.value = realCode;
+    klTypeForHistoryK.value = query.value.granularity;
+    fetchTbInfoPerCode(
+      query.value.granularity,
+      realCode,
+      parseInt(query.value.rehabType)
+    );
+  }
+);
+
+watch(
+  () => metaCodes,
+  (newVal) => {
+    if (newVal.value.length > 0) {
+      let options: Array<any> = [];
+      newVal.value.forEach((item) => {
+        options.push({
+          icon: item.market,
+          label: item.code,
+          value: item.code + ":" + item.market,
+        });
+      });
+      metaCodeSelectOptions.value = options;
+      query.value.code = newVal.value[0].code + ":" + newVal.value[0].market;
+    } else {
+      metaCodeSelectOptions.value = [];
+    }
+  },
+  { deep: true }
+);
+
+const marketOnSelect = ref();
+const codeOnSelect = ref();
+const klTypeForHistoryK = ref();
+
+const onSelectGranularity = (value) => {
+  query.value.code = "";
+  query.value.granularity = value;
+  fetchCodes({
+    granularity: query.value.granularity,
+  });
+};
+
+const onSearchDataset = () => {
+  let realCode = query.value.code.split(":")[0];
+  let market = parseInt(query.value.code.split(":")[1]);
   fetchKLine({
-    rehabType: values.rehabType,
-    granularity: values.granularity,
+    rehabType: parseInt(query.value.rehabType),
+    granularity: query.value.granularity,
     code: realCode,
-    start: dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
-    end: dayjs(values.end).format("YYYY-MM-DD HH:mm:ss"),
+    start: dayjs(query.value.start).format("YYYY-MM-DD HH:mm:ss"),
+    end: dayjs(query.value.end).format("YYYY-MM-DD HH:mm:ss"),
   });
   sendCapitalDistributionCommand({
     marketCode: market,
     code: realCode,
   });
   //k线周期 1分K的码表值刚好为1-实时
-  let periodType = values.granularity;
+  let periodType = query.value.granularity;
   sendCapitalFlowCommand(
     market,
     realCode,
     periodType,
-    dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
-    dayjs(values.end).format("YYYY-MM-DD HH:mm:ss")
+    dayjs(query.value.start).format("YYYY-MM-DD HH:mm:ss"),
+    dayjs(query.value.end).format("YYYY-MM-DD HH:mm:ss")
   );
-
-  // queryMaData(values);
-}
-
-function queryTbInfo(values: any) {
-  let realCode = values.code.split(":")[0];
-  fetchTbInfoPerCode(values.granularity, realCode, values.rehabType);
-}
-
-function queryMaData(values: any) {
-  if (values.indies.includes("ma")) {
-    fetchMaLine({
-      rehabType: values.rehabType,
-      granularity: values.granularity,
-      code: values.code,
-      start: dayjs(values.start).format("YYYY-MM-DD HH:mm:ss"),
-      end: dayjs(values.end).format("YYYY-MM-DD HH:mm:ss"),
-    }).then((res) => {
-      if (res.status === 200) {
-        let xAxisTime: Array<String> = [];
-        let ma5Array: Array<Number> = [];
-        let ma10Array: Array<Number> = [];
-        let ma20Array: Array<Number> = [];
-        let ma30Array: Array<Number> = [];
-        let ma60Array: Array<Number> = [];
-        let ma120Array: Array<Number> = [];
-        res.data.forEach((ma, index) => {
-          xAxisTime.push(ma.updateTime);
-          ma5Array.push(ma.ma5Value);
-          ma10Array.push(ma.ma10Value);
-          ma20Array.push(ma.ma20Value);
-          ma30Array.push(ma.ma30Value);
-          ma60Array.push(ma.ma60Value);
-          ma120Array.push(ma.ma120Value);
-        });
-        maData.value.datetime = xAxisTime;
-        maData.value.ma5 = ma5Array;
-        maData.value.ma10 = ma10Array;
-        maData.value.ma20 = ma20Array;
-        maData.value.ma30 = ma30Array;
-        maData.value.ma60 = ma60Array;
-        maData.value.ma120 = ma120Array;
-      }
-    });
-  } else {
-    maData.value.datetime = [];
-    maData.value.ma5 = [];
-    maData.value.ma10 = [];
-    maData.value.ma20 = [];
-    maData.value.ma30 = [];
-    maData.value.ma60 = [];
-    maData.value.ma120 = [];
-  }
-}
-
-function queryIndiesDataset(values: any) {
-  queryMaData(values);
-}
-
-function queryCodes(values: any) {
-  fetchCodes({
-    granularity: values.granularity,
-  });
-}
+};
 
 onMounted(() => {
   fetchCodes({
     granularity: 1,
   });
+  queryIndicatorList();
 });
+
+const indies = ref([]);
+
+const { start: queryIndicatorList } = useTimeoutFn(() => {
+  let command: IndicatorListCommand = {
+    type: "INDICATOR_LIST",
+    langType: 1,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+}, 1000);
+
+const indiesFilter: ShowSearchType["filter"] = (inputValue, path) => {
+  return path.some(
+    (option) =>
+      option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
+  );
+};
+
+const computeIndicatorList = computed(() => {
+  let options: CascaderProps["options"] = [];
+  futuIndicatorList.value?.content?.indicatorList.forEach((item) => {
+    let cascaderItem: CascaderOptionType = {};
+    cascaderItem.value = item?.myLang?.shortName;
+    cascaderItem.label = item?.myLang?.shortName + "-" + item?.myLang?.fullName;
+    let inputs: CascaderProps["options"] = [];
+    item?.myLang?.inputs?.forEach((i) => {
+      let children: CascaderOptionType = {};
+      children.value = i.index;
+      children.label = i.name;
+      inputs.push(children);
+    });
+    cascaderItem.children = inputs;
+    options.push(cascaderItem);
+  });
+  return options;
+});
+
+const onSearchIndiesData = () => {
+  indies.value.forEach((item) => {
+    let shortName = item[0];
+    let index = item[1];
+    sendIndicatorCalcReq(shortName, index);
+  });
+};
+
+const sendIndicatorCalcReq = (shortName: string, index: number) => {
+  let kLine = kData.value.map((item: KLine) => {
+    return {
+      time: item.datetime,
+      highPrice: item.highPrice,
+      openPrice: item.openPrice,
+      lowPrice: item.lowPrice,
+      closePrice: item.closePrice,
+    };
+  });
+  let klType = query.value.granularity;
+  let sec: CommonSecurity = {
+    market: parseInt(query.value.code.split(":")[1]),
+    code: query.value.code.split(":")[0],
+  };
+  let command: IndicatorCalcCommand = {
+    type: "INDICATOR_CALC",
+    langType: 1,
+    shortName: shortName,
+    data: {
+      security: sec,
+      klType: klType,
+      kLine: kLine,
+    },
+    num: kLine.length,
+    inputs: [{ index: index, value: 20 }],
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
 </script>
 <template>
   <div>
@@ -759,19 +250,99 @@ onMounted(() => {
       <a-descriptions-item label="K线表最小时间" span="2">
         {{ computedTbInfoPerCode?.kInfo?.minTime }}
       </a-descriptions-item>
+      <a-descriptions-item label="操作">
+        <HistoryKLineButton
+          :kl-type="klTypeForHistoryK"
+          :market="marketOnSelect"
+          :code="codeOnSelect"
+        />
+      </a-descriptions-item>
     </a-descriptions>
     <a-divider />
+    <div class="search-area">
+      <a-form :model="query" :label-col="{ span: 4 }" :label-align="'left'">
+        <div class="grid grid-cols-[50%_50%] gap-4">
+          <div>
+            <a-form-item label="标的物">
+              <a-select
+                v-model:value="query.code"
+                :options="metaCodeSelectOptions"
+              >
+                <template #option="{ value, label, icon }">
+                  <span role="img" :aria-label="value" v-if="icon === 21">
+                    🇨🇳
+                  </span>
+                  <span role="img" :aria-label="value" v-if="icon === 1">
+                    hk
+                  </span>
+                  &nbsp;&nbsp;{{ label }}
+                </template>
+              </a-select>
+            </a-form-item>
+            <a-form-item label="周期">
+              <a-select
+                v-model:value="query.granularity"
+                :options="klTypeToSelectOptions()"
+                @select="onSelectGranularity"
+              />
+            </a-form-item>
+            <a-form-item label="复权">
+              <a-radio-group
+                v-model:value="query.rehabType"
+                :options="rehabTypeToRadioOptions()"
+              />
+            </a-form-item>
+            <a-form-item label="时间范围">
+              <div class="flex gap-4">
+                <a-date-picker
+                  v-model:value="query.start"
+                  show-time
+                  placeholder="开始时间"
+                  class="flex-1"
+                />
+                <a-date-picker
+                  v-model:value="query.end"
+                  show-time
+                  placeholder="结束时间"
+                  class="flex-1"
+                />
+              </div>
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary" @click="onSearchDataset">
+                <template #icon><SearchOutlined /></template>
+                查询
+              </a-button>
+            </a-form-item>
+          </div>
+          <div>
+            <a-form-item label="指标">
+              <a-cascader
+                v-model:value="indies"
+                multiple
+                placeholder="选择指标..."
+                :show-search="{ indiesFilter }"
+                :options="computeIndicatorList"
+              />
+            </a-form-item>
+            {{ indies }}
+            {{ futuIndicatorCalcReq }}
+            {{ futuIndicatorCalcResult }}
+            <a-form-item>
+              <a-button type="primary" @click="onSearchIndiesData">
+                <template #icon><SearchOutlined /></template>
+                查询
+              </a-button>
+            </a-form-item>
+          </div>
+        </div>
+      </a-form>
+    </div>
     <TradingPane
-      :codes="metaCodeSelectOptions"
       :k="kLines"
       :volumes="volumes"
-      :ma="maData"
       :capital-distribution="capitalDistribution"
       :capital-flow="capitalFlow"
-      @on-select-code="queryTbInfo"
-      @on-select-indies="queryIndiesDataset"
-      @on-select-granularity="queryCodes"
-      @on-select-dataset="queryDataset"
     />
   </div>
 </template>

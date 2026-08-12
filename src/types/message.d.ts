@@ -39,7 +39,47 @@ export declare interface Message {
     | "CO_ACTIONS_DIVIDEND"
     | "CO_ACTIONS_BUYBACK"
     | "CO_ACTIONS_STOCK_SPLITS"
-    | "INDICATOR_LIST";
+    | "INDICATOR_LIST"
+    | "INDICATOR_CALC"
+    | "INDICATOR_CALC_RESULT";
+}
+export interface IndicatorOutputRow {
+  time: string;
+  values: Array<number>;
+}
+
+export interface IndicatorCalcResult {
+  calcId: string;
+  outputs: Array<IndicatorIOParam>; //输出
+  outputRows: Array<IndicatorOutputRow>;
+}
+
+export interface IndicatorCalcResultCommand extends Message {
+  result: IndicatorCalcResult;
+}
+
+export interface IndicatorCalcReqResult {
+  calcId: string;
+}
+
+export interface IndicatorCalcData {
+  security: CommonSecurity;
+  klType: number;
+  kLine: Array;
+}
+
+export interface IndicatorCalcInput {
+  index: number;
+  value?: string;
+}
+
+export interface IndicatorCalcCommand extends Message {
+  shortName: string;
+  langType: 1 | 2; //1-mylang 2-python
+  data: IndicatorCalcData;
+  num?: number;
+  inputs?: Array<IndicatorCalcInput>;
+  content?: IndicatorCalcReqResult;
 }
 
 export interface IndicatorIOParam {
@@ -463,7 +503,7 @@ export interface BasicInfo {
 
 export interface CommonSecurity {
   market: number;
-  marketStr: string;
+  marketStr?: string;
   code: string;
 }
 
