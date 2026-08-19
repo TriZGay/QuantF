@@ -41,8 +41,36 @@ export declare interface Message {
     | "CO_ACTIONS_STOCK_SPLITS"
     | "INDICATOR_LIST"
     | "INDICATOR_CALC"
-    | "INDICATOR_CALC_RESULT";
+    | "INDICATOR_CALC_RESULT"
+    | "INSTITUTION_LIST";
 }
+export interface InstitutionListItem {
+  institutionId: number; // 机构ID
+  institutionName: string; // 机构名称
+  positionValue: number; // 持仓市值
+  positionValueChange: number; // 持仓市值变化
+  positionCount: number; // 持仓股票数
+  positionCountChange: number; // 持仓股票数变化
+  disclosureDate: string; // 披露日期(yyyy-MM-dd)
+}
+
+export interface InstitutionListContent {
+  dataList: Array<InstitutionListItem>;
+  allCount: number;
+  nextPage: string;
+  currency: string;
+}
+
+export interface InstitutionListCommand extends Message {
+  market: number;
+  sortField: number;
+  sortDir: number;
+  count: number;
+  page: string;
+  namePart: string;
+  content: InstitutionListContent;
+}
+
 export interface IndicatorOutputRow {
   time: string;
   values: Array<number>;

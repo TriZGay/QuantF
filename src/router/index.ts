@@ -100,6 +100,15 @@ const routes: RouteRecordRaw[] = [
             component: () => import("@/views/3rd-ft/market/ObjectList.vue"),
           },
           {
+            path: "/thirdFutu/market/institution",
+            name: "Institution",
+            meta: {
+              title: "机构",
+              icon: "container-filled",
+            },
+            component: () => import("@/views/3rd-ft/market/InstitutionList.vue"),
+          },
+          {
             path: "/thirdFutu/market/plates",
             name: "PlateList",
             meta: {
