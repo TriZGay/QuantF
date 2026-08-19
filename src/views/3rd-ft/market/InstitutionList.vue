@@ -5,6 +5,7 @@ import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
 import { onMounted, ref, watch } from "vue";
 import type {
+  InstitutionDistributionCommand,
   InstitutionListCommand,
   InstitutionProfileCommand,
 } from "@/types/message";
@@ -12,9 +13,11 @@ import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
 import { marketTypeToSelectOptions } from "@/api/code";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const { futuInstitutionList, futuInstitutionProfile } = storeToRefs(
-  useFutuStomp()
-);
+const {
+  futuInstitutionList,
+  futuInstitutionProfile,
+  futuInstitutionDistribution,
+} = storeToRefs(useFutuStomp());
 
 const { start: requestInstitutionList } = useTimeoutFn((filter) => {
   const command: InstitutionListCommand = {
@@ -67,6 +70,7 @@ const columns = ref([
   {
     title: "操作",
     key: "action",
+    fixed: "right",
   },
 ]);
 
@@ -135,6 +139,43 @@ watch(
 );
 
 const profileVisible = ref(false);
+
+const queryInstitutionDistr = (institutionId) => {
+  let command: InstitutionDistributionCommand = {
+    type: "INSTITUTION_DISTR",
+    market: queryForm.value.market.bindValue,
+    institutionId: institutionId,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
+
+watch(
+  () => futuInstitutionDistribution,
+  (distr) => {
+    distrVisible.value = true;
+  },
+  { deep: true }
+);
+
+const distrVisible = ref(false);
+const distrColumns = [
+  {
+    title: "行业ID",
+    dataIndex: "industryId",
+  },
+  {
+    title: "行业名称",
+    dataIndex: "industryName",
+  },
+  {
+    title: "持仓市值",
+    dataIndex: "positionValue",
+  },
+  {
+    title: "行业占比(%)",
+    dataIndex: "portfolioPct",
+  },
+];
 </script>
 
 <template>
@@ -155,7 +196,7 @@ const profileVisible = ref(false);
       :row-key="'institutionId'"
       :virtual="true"
       :pagination="false"
-      :scroll="{ y: 450 }"
+      :scroll="{ y: 450, x: 1500 }"
       :has-more="hasMore"
       :reset-flag="resetFlag"
       @load-more="onLoadMore"
@@ -172,6 +213,12 @@ const profileVisible = ref(false);
               type="link"
               @click="queryInstitutionProfile(record.institutionId)"
               >概况</a-button
+            >
+            <a-button
+              size="small"
+              type="link"
+              @click="queryInstitutionDistr(record.institutionId)"
+              >持仓行业分布</a-button
             >
           </a-space>
         </template>
@@ -222,6 +269,13 @@ const profileVisible = ref(false);
           {{ futuInstitutionProfile?.content?.currency }}
         </a-descriptions-item>
       </a-descriptions>
+    </a-modal>
+    <a-modal v-model:visible="distrVisible" :width="900" title="持仓行业分布">
+      <a-table
+        size="small"
+        :columns="distrColumns"
+        :data-source="futuInstitutionDistribution?.content?.dataList"
+      />
     </a-modal>
   </div>
 </template>

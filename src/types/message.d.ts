@@ -43,7 +43,24 @@ export declare interface Message {
     | "INDICATOR_CALC"
     | "INDICATOR_CALC_RESULT"
     | "INSTITUTION_LIST"
-    | "INSTITUTION_PROFILE";
+    | "INSTITUTION_PROFILE"
+    | "INSTITUTION_DISTR";
+}
+export interface IndustryDistributionItem {
+  industryId: number; // 行业ID
+  industryName: string; // 行业名称
+  positionValue: number; // 持仓市值
+  portfolioPct: number; // 行业占比(%)
+}
+
+export interface InstitutionDistributionContent {
+  dataList: Array<IndustryDistributionItem>;
+}
+
+export interface InstitutionDistributionCommand extends Message {
+  market: number;
+  institutionId: number;
+  content?: InstitutionDistributionContent;
 }
 
 export interface InstitutionProfileContent {
