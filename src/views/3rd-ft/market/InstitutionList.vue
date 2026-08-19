@@ -3,13 +3,18 @@
 import { useTimeoutFn } from "@vueuse/core";
 import { useFutuStomp } from "@/stores/futu-stomp";
 import { storeToRefs } from "pinia";
-import { onMounted, reactive, ref, watch } from "vue";
-import type { InstitutionListCommand } from "@/types/message";
+import { onMounted, ref, watch } from "vue";
+import type {
+  InstitutionListCommand,
+  InstitutionProfileCommand,
+} from "@/types/message";
 import AdvancedTable from "@/components/AdvancedTable/AdvancedTable.vue";
 import { marketTypeToSelectOptions } from "@/api/code";
 
 const { sendFtCommandOnNotifyEndPoint } = useFutuStomp();
-const { futuInstitutionList } = storeToRefs(useFutuStomp());
+const { futuInstitutionList, futuInstitutionProfile } = storeToRefs(
+  useFutuStomp()
+);
 
 const { start: requestInstitutionList } = useTimeoutFn((filter) => {
   const command: InstitutionListCommand = {
@@ -59,6 +64,10 @@ const columns = ref([
     title: "披露日期",
     dataIndex: "disclosureDate",
   },
+  {
+    title: "操作",
+    key: "action",
+  },
 ]);
 
 const queryForm = ref({
@@ -107,6 +116,25 @@ const onLoadMore = (form) => {
   }
   page.value++;
 };
+
+const queryInstitutionProfile = (institutionId) => {
+  let command: InstitutionProfileCommand = {
+    type: "INSTITUTION_PROFILE",
+    market: queryForm.value.market.bindValue,
+    institutionId: institutionId,
+  };
+  sendFtCommandOnNotifyEndPoint(command);
+};
+
+watch(
+  () => futuInstitutionProfile,
+  (profile) => {
+    profileVisible.value = true;
+  },
+  { deep: true }
+);
+
+const profileVisible = ref(false);
 </script>
 
 <template>
@@ -136,7 +164,65 @@ const onLoadMore = (form) => {
       :columns="columns"
       :data-source="tableData"
     >
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'action'">
+          <a-space>
+            <a-button
+              size="small"
+              type="link"
+              @click="queryInstitutionProfile(record.institutionId)"
+              >概况</a-button
+            >
+          </a-space>
+        </template>
+      </template>
     </AdvancedTable>
+    <a-modal v-model:visible="profileVisible" :width="900" title="概况">
+      <a-descriptions :title="futuInstitutionProfile?.content?.institutionName">
+        <a-descriptions-item label="持仓市值">
+          {{ futuInstitutionProfile?.content?.positionValue }}
+        </a-descriptions-item>
+        <a-descriptions-item label="上期持仓市值">
+          {{ futuInstitutionProfile?.content?.lastPositionValue }}
+        </a-descriptions-item>
+        <a-descriptions-item label="市值变化比例(%)">
+          {{ futuInstitutionProfile?.content?.positionValueChangePct }}
+        </a-descriptions-item>
+        <a-descriptions-item label="总持仓数">
+          {{ futuInstitutionProfile?.content?.totalHoldingCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="持仓变动数">
+          {{ futuInstitutionProfile?.content?.holdingChangeCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="建仓标的数">
+          {{ futuInstitutionProfile?.content?.newCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="清仓标的数">
+          {{ futuInstitutionProfile?.content?.soldOutCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="增持标的数">
+          {{ futuInstitutionProfile?.content?.increaseCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="减持标的数">
+          {{ futuInstitutionProfile?.content?.decreaseCount }}
+        </a-descriptions-item>
+        <a-descriptions-item label="Top10持股占比(%)">
+          {{ futuInstitutionProfile?.content?.top10Pct }}
+        </a-descriptions-item>
+        <a-descriptions-item label="Top10占比变动(%)">
+          {{ futuInstitutionProfile?.content?.top10PctChange }}
+        </a-descriptions-item>
+        <a-descriptions-item label="披露日期">
+          {{ futuInstitutionProfile?.content?.disclosureDate }}
+        </a-descriptions-item>
+        <a-descriptions-item label="机构简介">
+          {{ futuInstitutionProfile?.content?.description }}
+        </a-descriptions-item>
+        <a-descriptions-item label="币种">
+          {{ futuInstitutionProfile?.content?.currency }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-modal>
   </div>
 </template>
 

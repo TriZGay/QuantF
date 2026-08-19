@@ -42,8 +42,34 @@ export declare interface Message {
     | "INDICATOR_LIST"
     | "INDICATOR_CALC"
     | "INDICATOR_CALC_RESULT"
-    | "INSTITUTION_LIST";
+    | "INSTITUTION_LIST"
+    | "INSTITUTION_PROFILE";
 }
+
+export interface InstitutionProfileContent {
+  institutionName: string; // 机构名称
+  description: string; // 机构简介
+  positionValue: number; // 持仓市值
+  lastPositionValue: number; // 上期持仓市值
+  positionValueChangePct: number; // 市值变化比例(%)
+  totalHoldingCount: number; // 总持仓数
+  holdingChangeCount: number; // 持仓变动数
+  newCount: number; // 建仓标的数
+  soldOutCount: number; // 清仓标的数
+  increaseCount: number; // 增持标的数
+  decreaseCount: number; // 减持标的数
+  top10Pct: number; // Top10持股占比(%)
+  top10PctChange: number; // Top10占比变动(%)
+  disclosureDate: string; // 披露日期(yyyy-MM-dd)
+  currency: string; // 币种
+}
+
+export interface InstitutionProfileCommand extends Message {
+  market: number;
+  institutionId: number;
+  content?: InstitutionProfileContent;
+}
+
 export interface InstitutionListItem {
   institutionId: number; // 机构ID
   institutionName: string; // 机构名称
