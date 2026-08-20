@@ -44,8 +44,71 @@ export declare interface Message {
     | "INDICATOR_CALC_RESULT"
     | "INSTITUTION_LIST"
     | "INSTITUTION_PROFILE"
-    | "INSTITUTION_DISTR";
+    | "INSTITUTION_DISTR"
+    | "INSTITUTION_HOLDING_CHANGE"
+    | "INSTITUTION_HOLDING_LIST";
 }
+
+export interface HoldingListItem {
+  security: CommonSecurity; // 股票
+  name: string; // 名称
+  industryName: string; // 所属行业
+  holdingValue: number; // 持股市值
+  holdingPct: number; // 持股比例-占股票总市值(%)
+  lastHoldingPct: number; // 上期持股比例(%)
+  changeShares: number; // 变动股数
+  portfolioPct: number; // 占机构总仓位比例(%)
+  changePct: number; // 变动比例(%)
+  holdingDate: string; // 持仓时间(yyyy-MM-dd)
+  source: string; // 披露来源
+}
+
+export interface InstitutionHoldingListContent {
+  dataList: Array<HoldingListItem>; // 数据列表
+  allCount: number; // 总数
+  nextPage: string; // 下一页游标, 空=无更多
+  currency: string; // 币种
+}
+
+export interface InstitutionHoldingListCommand extends Message {
+  market: number; // Qot_Common.QotMarket
+  institutionId: number; // 机构ID
+  changeType: number; // HoldingChangeType, 按变动类型筛选(不传=全部)
+  sortField: number; // SortField
+  sortDir: number; // SortDir
+  count: number; // 条数 [1,200], 默认20
+  page: string; // 翻页游标, 首次不传
+  keyword: string; // 搜索关键词(股票名/代码)
+  content?: InstitutionHoldingListContent;
+}
+
+export interface HoldingChangeItem {
+  security: CommonSecurity; // 股票
+  name: string; // 名称
+  portfolioPct: number; // 持股比例(%)
+  changeShares: number; // 变动股数
+  changePct: number; // 变动比例(%)
+  holdingDate: string; // 持仓时间(yyyy-MM-dd)
+  source: string; // 披露来源
+}
+
+export interface InstitutionHoldingChangeContent {
+  dataList: Array<HoldingChangeItem>; // 数据列表
+  allCount: number; // 总数
+  nextPage: string; // 下一页游标, 空=无更多
+}
+
+export interface InstitutionHoldingChangeCommand extends Message {
+  market: number; // Qot_Common.QotMarket
+  institutionId: number; // 机构ID
+  changeType: number; // HoldingChangeType, 默认建仓
+  sortField: number; // SortField
+  sortDir: number; // SortDir
+  count: number; // 条数 [1,200], 默认20
+  page: string; // 翻页游标, 首次不传
+  content?: InstitutionHoldingChangeContent;
+}
+
 export interface IndustryDistributionItem {
   industryId: number; // 行业ID
   industryName: string; // 行业名称

@@ -26,6 +26,8 @@ import type {
   IndicatorCalcResultCommand,
   IndicatorListCommand,
   InstitutionDistributionCommand,
+  InstitutionHoldingChangeCommand,
+  InstitutionHoldingListCommand,
   InstitutionListCommand,
   InstitutionProfileCommand,
   IpoListResult,
@@ -96,6 +98,10 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<InstitutionProfileCommand>() as Ref<InstitutionProfileCommand>;
   const futuInstitutionDistribution =
     ref<InstitutionDistributionCommand>() as Ref<InstitutionDistributionCommand>;
+  const futuInstitutionHoldingChange =
+    ref<InstitutionHoldingChangeCommand>() as Ref<InstitutionHoldingChangeCommand>;
+  const futuInstitutionHoldingList =
+    ref<InstitutionHoldingListCommand>() as Ref<InstitutionHoldingListCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -333,6 +339,20 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuInstitutionDistribution.value = JSON.parse(msg.body);
             }
           );
+          //机构持仓变动
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/institution_holding_change",
+            (msg) => {
+              futuInstitutionHoldingChange.value = JSON.parse(msg.body);
+            }
+          );
+          //机构持股列表
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/institution_holding_list",
+            (msg) => {
+              futuInstitutionHoldingList.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -401,5 +421,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuInstitutionList,
     futuInstitutionProfile,
     futuInstitutionDistribution,
+    futuInstitutionHoldingChange,
+    futuInstitutionHoldingList,
   };
 });
