@@ -9,6 +9,7 @@ import type {
   AnalystConsensusCommand,
   CapitalDistributionCommand,
   CapitalFlowCommand,
+  ChainListCommand,
   CoActionsBuyBackCommand,
   CoActionsDividendCommand,
   CompanyExecutiveBgCommand,
@@ -102,6 +103,7 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     ref<InstitutionHoldingChangeCommand>() as Ref<InstitutionHoldingChangeCommand>;
   const futuInstitutionHoldingList =
     ref<InstitutionHoldingListCommand>() as Ref<InstitutionHoldingListCommand>;
+  const futuChainList = ref<ChainListCommand>() as Ref<ChainListCommand>;
 
   const connectToNotifyEndPoint = (): void => {
     futuStompNotifyClient.value = Stomp.client("/rt/notify");
@@ -353,6 +355,13 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
               futuInstitutionHoldingList.value = JSON.parse(msg.body);
             }
           );
+          //产业链列表
+          futuStompNotifyClient.value?.subscribe(
+            "/quantx/topic/industrial_chain_list",
+            (msg) => {
+              futuChainList.value = JSON.parse(msg.body);
+            }
+          );
         }
       },
       (err) => {
@@ -423,5 +432,6 @@ export const useFutuStomp = defineStore("futu-stomp", () => {
     futuInstitutionDistribution,
     futuInstitutionHoldingChange,
     futuInstitutionHoldingList,
+    futuChainList,
   };
 });

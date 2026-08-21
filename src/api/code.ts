@@ -134,6 +134,12 @@ export const MA_TYPE = {
   6: "MA120",
 };
 
+export const CHAIN_TYPE = {
+  1: "串联型",
+  2: "并列型",
+  3: "上中下游型",
+};
+
 export function stockTypeToSelectOptions() {
   return Object.keys(FT_SECURITY_TYPE).map((stockType) => {
     return {

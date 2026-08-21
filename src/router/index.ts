@@ -106,7 +106,8 @@ const routes: RouteRecordRaw[] = [
               title: "机构",
               icon: "container-filled",
             },
-            component: () => import("@/views/3rd-ft/market/InstitutionList.vue"),
+            component: () =>
+              import("@/views/3rd-ft/market/InstitutionList.vue"),
           },
           {
             path: "/thirdFutu/market/plates",
@@ -125,6 +126,15 @@ const routes: RouteRecordRaw[] = [
               icon: "pie-chart-outlined",
             },
             component: () => import("@/views/3rd-ft/market/StockList.vue"),
+          },
+          {
+            path: "/thirdFutu/market/chain",
+            name: "ChainList",
+            meta: {
+              title: "产业链",
+              icon: "pie-chart-outlined",
+            },
+            component: () => import("@/views/3rd-ft/market/ChainList.vue"),
           },
         ],
       },

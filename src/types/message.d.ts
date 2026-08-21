@@ -46,7 +46,31 @@ export declare interface Message {
     | "INSTITUTION_PROFILE"
     | "INSTITUTION_DISTR"
     | "INSTITUTION_HOLDING_CHANGE"
-    | "INSTITUTION_HOLDING_LIST";
+    | "INSTITUTION_HOLDING_LIST"
+    | "INDUSTRIAL_CHAIN_LIST";
+}
+export interface IndustrialChainInfo {
+  chainId: number; // 产业链ID
+  chainType: number; // IndustrialChainType
+  name: string; // 名称
+  detail: string; // 详情描述
+  marketCap: number; // 市值
+  stocksNum: number; // 成分股数量
+  relationSecurityList: Array<CommonSecurity>; // 相关股票
+}
+
+export interface IndustrialChainListContent {
+  dataList: Array<IndustrialChainInfo>;
+  allCount: number;
+  nextPage: string;
+}
+
+export interface ChainListCommand extends Message {
+  market: number; // Qot_Common.QotMarket
+  keyword: string; // 搜索关键字(可选)
+  count: number; // 条数 [1,50], 默认20
+  page: string; // 翻页游标, 首次不传
+  content?: IndustrialChainListContent;
 }
 
 export interface HoldingListItem {
